@@ -1,0 +1,162 @@
+Turn-Based RPG Design Planning: "The Relic Switcher" 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. Core Systems & Design Rules
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+• Weapon Sets & Quick Swapping:
+    Equip two active weapon slots (Primary and Secondary). Players can swap between them mid-combat.
+
+• Cooldown Preservation: *** Come Back To Later ***
+    Skill cooldowns continue ticking down on stowed off-pocket weapons, allowing setup and execution combos across weapon swaps.
+
+• Swap Cost:
+    Swapping consumes a small amount of Stamina (e.g., 10 ST) to maintain combat pacing without infinite free swaps.
+
+• Status Effect Build-Up:
+    - Bleed: Fills a target's Bleed meter. Upon hitting 100%, deals massive flat % max-HP damage and resets.
+    - Frostbite: Reduces target's Stamina regeneration per turn by 50% for 3 turns once triggered.
+    - Burn (DoT): Deals ticking elemental damage over consecutive turn resolution phases.
+
+• Telegraphed Intent System:
+    - Preparation Phase (Turn Start): Boss announces intent (e.g., Winding up Heavy Cleave).
+    - Player Action Phase: Player executes attacks, casts skills, blocks, or dodges.
+    - Resolution Phase (Turn End): Player actions resolve followed by the boss's telegraphed intent.
+
+• Core Stats:
+    - HP: Health Points
+    - SP: Stamina Points
+    - MP: Mana Points
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2. Core Attributes & Scaling Rules
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+• Constitution (CON)
+    - Base (1): Provides 80 HP and baseline physical/status resistance.
+    - Primary: Increases Max HP (+10 HP per point).
+    - Secondary: Increases Physical Resistance & Status Buildup Resistance.
+
+• Strength (STR)
+    - Base (1): Base heavy weapon damage and base posture damage.
+    - Primary: Boosts damage with heavier weapons.
+    - Secondary: Increases Posture/Stamina drain on hit; reduces posture drain when blocking.
+
+• Agility (AGI)
+    - Base (1): Provides 50 SP and baseline Stamina regen per turn.
+    - Primary: Boosts damage with light weapons.
+    - Secondary: Increases Max Stamina (+5 SP per point), dodge chance, and multi-hit potential.
+
+• Intellect (INT)
+    - Base (1): Provides 50 MP and base magic damage.
+    - Primary: Boosts Magic and Status Damage.
+    - Secondary: Increases Max Mana (+10 MP per point).
+
+• Focus (FOC)
+    - Base (1): Base support/healing scaling and standard cooldown rates.
+    - Primary: Boosts Healing power.
+    - Secondary: Reduces turn cooldowns for skills across equipped weapons.
+
+• Character Allocation: Each attribute starts at 1. The player receives 10 starting points to allocate freely (Total: 15 stat points at start).
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3. Weapon Roster & Resource Identities 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[Pure STR Weapons]
+• Warhammer : Slower attack speed with high physical damage and massive stamina/posture damage. Ideal for causing staggers. 
+    - Scaling: 100% STR 
+    - Cost: 
+        Attack: Very High SP (cost lowered with higher STR)
+        Block: N/A
+        Dodge: Very High SP
+
+• Sword and Shield : Balanced offensive/defensive weapon with high block stability and counter-attack potential. 
+    - Scaling: 100% STR
+    - Cost: 
+        Attack: Low SP (lowered with higher STR) 
+        Block: Moderate SP (lowered with higher STR)
+        Dodge: Executes a Parry for High SP (lowered with higher STR)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[Pure AGI Weapons]
+• Daggers : Faster attack speed allowing multi-hits in a single turn. High critical hit chance and rapid Bleed buildup.
+    - Scaling: 100% AGI
+    - Cost:
+        Attack: Moderate SP (lower cost, higher multi-hit chance, and faster buildup with higher AGI)
+        Block: Low SP (Parry stance)
+        Dodge: Low SP (lowered with higher AGI)
+
+• Bow : Ranged physical damage. Capable of quick shots or sacrificing turns to aim for massive damage.
+    - Scaling: 100% AGI
+    - Cost:
+        Attack: Low SP (higher AGI adds dodge chance while aiming and increases aim damage multiplier)
+        Block: N/A
+        Dodge: Low SP (lowered with higher AGI)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[Pure INT Weapons]
+• Fire Staff : High magic damage with Burn status buildup that causes damage over time.
+    - Scaling: 100% INT
+    - Cost:
+        Attack: High MP (lower cost and faster status buildup with higher INT)
+        Block: High MP (Mana Barrier)
+        Dodge: Moderate SP
+
+• Ice Staff : Control and mitigation. Reduces enemy stamina regeneration and absorbs incoming damage.
+    - Scaling: 100% INT
+    - Cost:
+        Attack: Moderate MP (lower cost and higher stamina drain on hit with higher INT)
+        Block: Moderate MP (Ice Wall / Block potential increased with higher INT)
+        Dodge: Moderate SP
+
+[Pure FOC Weapons]
+• Life Staff : Essential sustain. Provides self-healing and reduces skill cooldowns across equipped weapons.
+    - Scaling: 100% FOC
+    - Cost:
+        Attack: Moderate MP (lower cost, higher healing, and greater cooldown reduction with higher FOC)
+        Block: Moderate MP (Ward Shield)
+        Dodge: Moderate SP
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[Hybrid Weapons]
+• Greatsword : Mixed physical damage capable of light or heavy attacks. Heavy attacks scale off STR; Light attacks multi-hit scaling off AGI.
+    - Scaling: 50% STR / 50% AGI
+    - Cost:
+        Attack (Heavy): High SP (lowered with higher STR)
+        Attack (Light): Moderate SP (lowered with higher AGI, increased multi-hit chance)
+        Block: Moderate SP (Stance Block)
+        Dodge: Moderate SP
+
+• Rapier : Finesse weapon blending light physical thrusts with cross-resource detonation (Bleed applied by AGI is detonated with MP; Burn applied by INT is detonated with SP).
+    - Scaling: 50% AGI / 50% INT
+    - Cost:
+        Attack (Light): Very Low SP
+        Detonate Bleed: Moderate MP (lowered with higher AGI)
+        Detonate Burn: Moderate SP (lowered with higher INT)
+        Block: Low SP (Parry)
+        Dodge: Low SP (lowered with higher AGI)
+
+• Flail and Shield : Paladin drain-tanking. Low attack, moderate block, low stamina damage, with a small self-heal on attack or block (requires FOC > 2).
+    - Scaling: 50% STR / 50% FOC
+    - Cost:
+        Attack: Low SP (damage/posture drain increased with higher STR; heal amount increased with higher FOC)
+        Block: Moderate SP (lowered with higher STR; heal amount increased with higher FOC)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Weapon Skills Blueprint *** Come Back To Later ***
+-------------------------------------------------------------------------------------------------------------------------------
+| Weapon           | Short Cooldown (1–2 Turns)                | Long Cooldown (3–4 Turns)                                    |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Warhammer        | Crushing Blow (High posture/guard damage) | Earthshaker (Massive posture damage, interrupts intent)      |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Sword & Shield   | Shield Bash (Damage mitigation next hit)  | Fortress Wall (100% block reduction, 0 SP cost)              |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Daggers          | Flurry Strike (3x hits, rapid Bleed)      | Shadow Step (Guaranteed Dodge + Bleed stack)                 |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Bow              | Quick Shot (Instant shot + dodge chance)  | Rain of Arrows (Multi-turn DoT & speed slow)                 |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Fire Staff       | Fireball (Direct damage + 1x Burn stack)  | Pillar of Fire (High elemental burst + 3x Burn stacks)       |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Ice Staff        | Ice Spike (Frostbite -50% enemy SP regen) | Entomb (Invulnerability + MP recovery)                       |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Life Staff       | Divine Flash (Heal + -1 turn off-cooldown)| Sacred Ground (3-turn healing zone + DEF boost)              |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Greatsword       | Relentless Onslaught (AGI multi-hit)      | Executioner's Cleave (STR heavy swing, +50% vs Staggered)    |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Rapier           | Evade Thrust (Thrust + bonus dodge chance)| Detonate Stance (Inverted resource detonation Bleed/Burn)    |
+|------------------|-------------------------------------------|--------------------------------------------------------------|
+| Flail & Shield   | Smite & Shield (Posture hit + HP heal)    | Aegis Blessed (1-turn block converting 50% blocked dmg to HP)|
+-------------------------------------------------------------------------------------------------------------------------------

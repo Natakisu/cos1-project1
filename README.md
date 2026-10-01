@@ -33,18 +33,28 @@ Hello my name is [enter name]. I am a student from [where are you from?]. The pu
 Each week I will summarize my milestone activity and progress by writing a stand-up. A stand-up is meant to be a succinct update on how things are going. Use these prompts as a guide on what to write about:
 
 ⚙️ Overview - What I worked on this past week
-<br>
+
 🌵 Challenges - What problems did I have & how I'm addressing them
-<br>
+
 🏆 Accomplishments - What is something I "leveled up" on this week
-<br>
+
 🔮 Next Steps - What I plan to prioritize and do next
 
 <br>
 
 ### Week 1
 
-Replace this paragraph with your stand up for this week. Use the prompts above to summarize your most recent milestone activity and work.
+⚙️ Overview - What I worked on this past week:
+
+so far this week I have started working on what I want to create for my project.
+
+A tactical, turn-based C++ console RPG featuring real-time action combat mechanics inspired by _Dark Souls_ and _New World_. Players manage Stamina and Mana across a dual-weapon swapping system to execute strategic Light/Heavy attacks, block or dodge telegraphed boss actions, and inflict threshold-based status effects (Bleed, Burn, Frostbite) to break enemy Posture.
+
+🌵 Challenges - What problems did I have & how I'm addressing them
+
+🏆 Accomplishments - What is something I "leveled up" on this week
+
+🔮 Next Steps - What I plan to prioritize and do next
 
 ### Week 2
 
