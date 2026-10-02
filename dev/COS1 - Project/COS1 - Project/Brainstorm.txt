@@ -136,7 +136,7 @@ Turn-Based RPG Design Planning: "The Relic Switcher"
         Attack: Low SP (damage/posture drain increased with higher STR; heal amount increased with higher FOC)
         Block: Moderate SP (lowered with higher STR; heal amount increased with higher FOC)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-4. Weapon Skills Blueprint *** Come Back To Later ***
+4. *** Come Back To Later *** Weapon Skills Blueprint *** Come Back To Later ***  Come Back To Later ***  Come Back To Later *** 
 -------------------------------------------------------------------------------------------------------------------------------
 | Weapon           | Short Cooldown (1–2 Turns)                | Long Cooldown (3–4 Turns)                                    |
 |------------------|-------------------------------------------|--------------------------------------------------------------|
@@ -160,3 +160,9 @@ Turn-Based RPG Design Planning: "The Relic Switcher"
 |------------------|-------------------------------------------|--------------------------------------------------------------|
 | Flail & Shield   | Smite & Shield (Posture hit + HP heal)    | Aegis Blessed (1-turn block converting 50% blocked dmg to HP)|
 -------------------------------------------------------------------------------------------------------------------------------
+*** Come Back To Later ***  Come Back To Later ***  Come Back To Later *** Come Back To Later ***  Come Back To Later ***  Come Back To Later *** Come Back To Later ***  
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Current Focus - Milestone 1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Right now I built the basic code needed just to get the game to compile and run without error. Where it is currently there are no errors and it does run. It's not great, but it works.
+I plan to start implementing the code needed for more user specific information, what stats, weapons, etc. they want. As wells as start working on all the actual weapons themselves.
