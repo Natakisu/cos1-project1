@@ -2,6 +2,8 @@
 #include <string>
 #include "Weapon.h"
 
+class Enemy; // Fix Sytax Error
+
 class Player 
 {
 private:

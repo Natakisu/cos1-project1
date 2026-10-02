@@ -44,8 +44,8 @@ bool Player::SwapWeapon()
     return true;
 }
 
-int Player::PerformLightAttack(Enemy& target) 
-{
+int Player::PerformLightAttack(Enemy& target) {
+    // Use GetActiveWeapon() directly (not Player::GetActiveWeapon())
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon || currentSP < activeWeapon->GetAttackStaminaCost()) {
         return 0;
@@ -58,8 +58,7 @@ int Player::PerformLightAttack(Enemy& target)
     return damage;
 }
 
-int Player::PerformHeavyAttack(Enemy& target) 
-{
+int Player::PerformHeavyAttack(Enemy& target) {
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon) return 0;
 
