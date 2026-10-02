@@ -145,6 +145,7 @@
     <Text Include="Brainstorm.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
