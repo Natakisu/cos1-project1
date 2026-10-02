@@ -44,7 +44,22 @@ Each week I will summarize my milestone activity and progress by writing a stand
 
 ### Week 1
 
-Replace this paragraph with your stand up for this week. Use the prompts above to summarize your most recent milestone activity and work.
+⚙️ Overview - What I worked on this past week:
+
+[So far this week, I have started working on what I want to create for my project and writing and testing the basic code structure for my game,
+A tactical, turn-based C++ console RPG featuring real-time action combat mechanics inspired by _Dark Souls and New World: Aeternum_. Players manage Stamina and Mana across a dual-weapon swapping system to execute strategic Light/Heavy attacks, block or dodge telegraphed boss actions, and inflict threshold-based status effects (Bleed, Burn, Frostbite) to break enemy Posture.
+
+🌵 Challenges - What problems did I have & how I'm addressing them
+
+[I had set up the Git repo Starter files incorrectly, and I spent a good 3 to 4 hours working up a brainstorm and fleshing out the mechanics of the game and how I planned to implement them. I tried to fix the Starter Files, and ended up somehow deleting the 3-4 hours of work and having to start over because I was just typing out ideas in a .txt file in Visual Studio. I now believe I have fixed the Starter Files and have restarted fleshing out the game and planning my ideas. I am still putting them in a .txt file (just to make it easier for me when I get to the coding part), BUT I'm typing it out in a separate Word Document (plan to switch to Obsidian when I get a better understanding of how to use it), and having Google Gemini help format it from the Word Document to a Markdown style to put into the .txt file.
+
+🏆 Accomplishments - What is something I "leveled up" on this week
+
+[Definitely learned why something like Version Control is really important and useful, because instead of starting over completely, I could have figured out how to pull back the brainstorm.txt file I pushed a couple of times, but I hadn't even thought of that. Going through some trial and error and doing my best to dance in the fire, even though the healer is screaming at me not to.
+
+🔮 Next Steps - What I plan to prioritize and do next
+
+[I want to start getting my code built for all the basic systems I will need to even get my game running ( i.e., Player Class, Enemy Class, Basic Combat Loop). Once I can get all that figured out and working properly, I'll start implementing some of the systems that aren't needed to run the game, but make the combat more like I want it to (Weapons, Items, Blocking/Dodging) into the program
 
 ### Week 2
 
