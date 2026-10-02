@@ -144,6 +144,9 @@
   <ItemGroup>
     <Text Include="Brainstorm.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Weapon.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
