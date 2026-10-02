@@ -1,6 +1,8 @@
-#include <iostream>
+#include "Game.h"
 
-int main()
-{
-    std::cout << "Hello World!\n";
+int main() {
+    Game game;
+    game.Initialize();
+    game.RunCombatLoop();
+    return 0;
 }
