@@ -33,11 +33,11 @@ Hello my name is [enter name]. I am a student from [where are you from?]. The pu
 Each week I will summarize my milestone activity and progress by writing a stand-up. A stand-up is meant to be a succinct update on how things are going. Use these prompts as a guide on what to write about:
 
 ⚙️ Overview - What I worked on this past week
-<br>
+
 🌵 Challenges - What problems did I have & how I'm addressing them
-<br>
+
 🏆 Accomplishments - What is something I "leveled up" on this week
-<br>
+
 🔮 Next Steps - What I plan to prioritize and do next
 
 <br>
@@ -63,12 +63,54 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 ### Week 2
 
-My next stand up will go here...
+⚙️ Overview - What I worked on this past week:
+
+[This week, I focused on implementing the manual attribute allocation system with a point cap for core stats (CON, STR, AGI, INT, FOC), refining weapon inspection details in combat, and building input validation to prevent console crashes.]
+
+🌵 Challenges - What problems did I have & how I'm addressing them
+
+[My biggest challenge this week was dealing with illness, which significantly limited my development time and focus. I addressed this by keeping my goals scoped strictly to the core attribute allocation and input fixes, breaking the work down into short, high-efficiency coding blocks when I had the energy.]
+
+🏆 Accomplishments - What is something I "leveled up" on this week
+
+[I successfully implemented a constrained point-buy pool system for character stats and fixed state-retention issues ensuring every new session initializes cleanly.]
+
+🔮 Next Steps - What I plan to prioritize and do next
+
+[Next, I plan to focus on implementing the telegraphed boss intent and reactive defense system, along with tracking boss posture stagger meters.]
 
 ### Week 3
 
-Stay tuned, this stand up is coming soon...
+⚙️ Overview - What I worked on this past week:
+
+[]
+
+🌵 Challenges - What problems did I have & how I'm addressing them
+
+[]
+
+🏆 Accomplishments - What is something I "leveled up" on this week
+
+[]
+
+🔮 Next Steps - What I plan to prioritize and do next
+
+[]
 
 ### Week 4
 
-My final stand up...
+⚙️ Overview - What I worked on this past week:
+
+[]
+
+🌵 Challenges - What problems did I have & how I'm addressing them
+
+[]
+
+🏆 Accomplishments - What is something I "leveled up" on this week
+
+[]
+
+🔮 Next Steps - What I plan to prioritize and do next
+
+[]
