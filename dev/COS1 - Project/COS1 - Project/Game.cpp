@@ -22,12 +22,37 @@ void Game::Initialize()
     currentBoss = new Enemy("Relic Guardian", 200, 50);
 }
 
-void Game::CharacterCreation() 
-{
+void Game::CharacterCreation() {
     std::string playerName;
     std::cout << "Enter your character's name: ";
     std::cin >> playerName;
     player = new Player(playerName);
+
+    int totalPoints = 30; // Points available to distribute
+    int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base values
+
+    std::cout << "\n--- Character Creation ---\n";
+    std::cout << "You have " << totalPoints << " bonus attribute points to distribute among CON, STR, AGI, INT, FOC.\n";
+
+    int p;
+    std::cout << "Add to Constitution (CON - increases HP): ";
+    std::cin >> p; con += p; totalPoints -= p;
+
+    std::cout << "Add to Strength (STR - increases heavy physical damage): ";
+    std::cin >> p; str += p; totalPoints -= p;
+
+    std::cout << "Add to Agility (AGI - increases stamina pools & light attacks): ";
+    std::cin >> p; agi += p; totalPoints -= p;
+
+    std::cout << "Add to Intellect (INT - increases mana pools & magic scaling): ";
+    std::cin >> p; intel += p; totalPoints -= p;
+
+    std::cout << "Add to Focus (FOC - increases support scaling): ";
+    std::cin >> p; foc += p; totalPoints -= p;
+
+    // Apply stats to the player
+    player->SetAttributes(con, str, agi, intel, foc);
+    player->DisplayStats();
 }
 
 void Game::RenderUI() const 
