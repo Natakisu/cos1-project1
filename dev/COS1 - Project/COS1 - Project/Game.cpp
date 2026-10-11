@@ -28,30 +28,57 @@ void Game::CharacterCreation() {
     std::cin >> playerName;
     player = new Player(playerName);
 
-    int totalPoints = 30; // Points available to distribute
-    int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base values
+    int totalPoints = 30; // Total points available to spend
+    int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base starting stats
 
-    std::cout << "\n--- Character Creation ---\n";
-    std::cout << "You have " << totalPoints << " bonus attribute points to distribute among CON, STR, AGI, INT, FOC.\n";
+    std::cout << "\n--- Character Stat Allocation ---\n";
+    std::cout << "You have " << totalPoints << " points to distribute across your attributes.\n";
+    std::cout << "(Base stats start at 10. Enter how many points to *add* to each stat)\n";
 
-    int p;
-    std::cout << "Add to Constitution (CON - increases HP): ";
-    std::cin >> p; con += p; totalPoints -= p;
+    int p = 0;
 
-    std::cout << "Add to Strength (STR - increases heavy physical damage): ";
-    std::cin >> p; str += p; totalPoints -= p;
+    // Constitution
+    std::cout << "Points for Constitution (CON - current pool left: " << totalPoints << "): ";
+    std::cin >> p;
+    if (p > totalPoints) p = totalPoints; // Prevent spending more than available
+    con += p;
+    totalPoints -= p;
 
-    std::cout << "Add to Agility (AGI - increases stamina pools & light attacks): ";
-    std::cin >> p; agi += p; totalPoints -= p;
+    // Strength
+    if (totalPoints > 0) {
+        std::cout << "Points for Strength (STR - current pool left: " << totalPoints << "): ";
+        std::cin >> p;
+        if (p > totalPoints) p = totalPoints;
+        str += p;
+        totalPoints -= p;
+    }
 
-    std::cout << "Add to Intellect (INT - increases mana pools & magic scaling): ";
-    std::cin >> p; intel += p; totalPoints -= p;
+    // Agility
+    if (totalPoints > 0) {
+        std::cout << "Points for Agility (AGI - current pool left: " << totalPoints << "): ";
+        std::cin >> p;
+        if (p > totalPoints) p = totalPoints;
+        agi += p;
+        totalPoints -= p;
+    }
 
-    std::cout << "Add to Focus (FOC - increases support scaling): ";
-    std::cin >> p; foc += p; totalPoints -= p;
+    // Intellect
+    if (totalPoints > 0) {
+        std::cout << "Points for Intellect (INT - current pool left: " << totalPoints << "): ";
+        std::cin >> p;
+        if (p > totalPoints) p = totalPoints;
+        intel += p;
+        totalPoints -= p;
+    }
 
-    // Apply stats to the player
+    // Focus (dumps any remaining pool points automatically)
+    foc += totalPoints;
+    std::cout << "Remaining " << totalPoints << " points automatically allocated to Focus (FOC).\n";
+
+    // Apply the configured values to the player
     player->SetAttributes(con, str, agi, intel, foc);
+
+    std::cout << "\nAttributes configured successfully!\n";
     player->DisplayStats();
 }
 
@@ -79,7 +106,8 @@ void Game::DisplayMenu() const
     std::cout << "Choice: ";
 }
 
-void Game::RunCombatLoop() {
+void Game::RunCombatLoop() 
+{
     while (isRunning && player->IsAlive() && currentBoss->IsAlive()) {
         currentBoss->GenerateIntent();
         RenderUI();
@@ -97,7 +125,8 @@ void Game::RunCombatLoop() {
             std::cin >> choice;
         }
 
-        switch (choice) {
+        switch (choice) 
+        {
         case 1:
             player->PerformLightAttack(*currentBoss);
             break;
@@ -127,10 +156,12 @@ void Game::RunCombatLoop() {
         currentBoss->ResetTurnState();
     }
 
-    if (!player->IsAlive()) {
+    if (!player->IsAlive()) 
+    {
         std::cout << "\nYou were defeated!\n";
     }
-    else if (!currentBoss->IsAlive()) {
+    else if (!currentBoss->IsAlive()) 
+    {
         std::cout << "\nYou defeated the Relic Guardian!\n";
     }
 

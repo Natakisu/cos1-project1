@@ -2,11 +2,21 @@
 #include "Player.h"
 #include "Enemy.h"
 
-Player::Player(std::string name)
-    : name(name), constitution(10), strength(10), agility(10), intellect(10), focus(10),
-    maxHP(100), currentHP(100), maxSP(100), currentSP(100), maxMP(100), currentMP(100),
-    primaryWeapon(nullptr), secondaryWeapon(nullptr), isPrimaryActive(true),
-    isBlocking(false), isDodging(false) {
+Player::Player(std::string name) {
+    this->name = name;
+    // Ensure fresh base attributes on creation
+    constitution = 10;
+    strength = 10;
+    agility = 10;
+    intellect = 10;
+    focus = 10;
+
+    RecalculatePools();
+    currentHP = maxHP;
+    currentSP = maxSP;
+    currentMP = maxMP;
+
+    // Default weapon setup if you have it here
 }
 
 Player::~Player() 
