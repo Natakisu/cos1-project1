@@ -48,4 +48,7 @@ public:
 
     // Scaled Damage Calculation
     int CalculateDamage(int str, int agi, int intel, int foc) const;
+
+    void DisplayWeaponInfo() const;
+
 };

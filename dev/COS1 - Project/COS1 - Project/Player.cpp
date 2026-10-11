@@ -125,3 +125,13 @@ void Player::DisplayStats() const {
     std::cout << "Focus        (FOC): " << focus << "\n";
     std::cout << "---------------------------\n";
 }
+
+void Player::InspectWeapons() const {
+    std::cout << "\n=== EQUIPPED WEAPONS ===\n";
+    std::cout << (isPrimaryActive ? "[ACTIVE] " : "[STOWED] ");
+    if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
+
+    std::cout << "\n" << (!isPrimaryActive ? "[ACTIVE] " : "[STOWED] ");
+    if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
+    std::cout << "========================\n";
+}

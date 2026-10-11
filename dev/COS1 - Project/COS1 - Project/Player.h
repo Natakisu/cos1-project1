@@ -61,4 +61,6 @@ public:
     void SetAttributes(int con, int str, int agi, int intel, int foc);
     void DisplayStats() const;
 
+    void InspectWeapons() const;
+
 };
