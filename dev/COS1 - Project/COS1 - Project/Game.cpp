@@ -75,6 +75,7 @@ void Game::DisplayMenu() const
     std::cout << "3. Swap Weapon\n";
     std::cout << "4. Block\n";
     std::cout << "5. Dodge\n";
+    std::cout << "6. Inspect Weapons\n";
     std::cout << "Choice: ";
 }
 
@@ -88,11 +89,11 @@ void Game::RunCombatLoop() {
         std::cout << "Choice: ";
         std::cin >> choice;
 
-        // Usability Improvement: Input validation loop 
-        while (std::cin.fail() || choice < 1 || choice > 5) {
-            std::cin.clear(); // Clear the error state on cin
+        // Update validation range
+        while (std::cin.fail() || choice < 1 || choice > 6) {
+            std::cin.clear();
             std::cin.ignore(32767, '\n');
-            std::cout << "[!] Invalid input. Please enter a number between 1 and 5: ";
+            std::cout << "[!] Invalid input. Please enter a number between 1 and 6: ";
             std::cin >> choice;
         }
 
@@ -105,15 +106,18 @@ void Game::RunCombatLoop() {
             break;
         case 3:
             player->SwapWeapon();
-            break;
+            std::cout << "Swapped weapons!\n";
+            continue; // Free action / check stats.
         case 4:
             player->Block();
             break;
         case 5:
             player->Dodge();
             break;
+        case 6:
+            player->InspectWeapons();
+            continue; // Inspecting weapons doesn't use up the turn.
         default:
-            std::cout << "Invalid action!\n";
             continue;
         }
 
