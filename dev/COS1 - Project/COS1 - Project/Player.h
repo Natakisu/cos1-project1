@@ -57,4 +57,8 @@ public:
     int GetCurrentMP() const { return currentMP; }
     Weapon* GetActiveWeapon() const { return isPrimaryActive ? primaryWeapon : secondaryWeapon; }
     bool IsAlive() const { return currentHP > 0; }
+
+    void SetAttributes(int con, int str, int agi, int intel, int foc);
+    void DisplayStats() const;
+
 };

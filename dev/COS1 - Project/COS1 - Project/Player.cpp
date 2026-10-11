@@ -102,3 +102,25 @@ void Player::TakeDamage(int damage)
     currentHP -= damage;
     if (currentHP < 0) currentHP = 0;
 }
+
+void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
+    constitution = con;
+    strength = str;
+    agility = agi;
+    intellect = intel;
+    focus = foc;
+    RecalculatePools(); // Automatically updates Max HP, SP, MP based on new stats!
+    currentHP = maxHP;  // Refill current pools on setup
+    currentSP = maxSP;
+    currentMP = maxMP;
+}
+
+void Player::DisplayStats() const {
+    std::cout << "\n--- " << name << "'s Attributes ---\n";
+    std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
+    std::cout << "Strength     (STR): " << strength << "\n";
+    std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
+    std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
+    std::cout << "Focus        (FOC): " << focus << "\n";
+    std::cout << "---------------------------\n";
+}
