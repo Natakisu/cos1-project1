@@ -53,18 +53,25 @@ void Game::DisplayMenu() const
     std::cout << "Choice: ";
 }
 
-void Game::RunCombatLoop() 
-{
+void Game::RunCombatLoop() {
     while (isRunning && player->IsAlive() && currentBoss->IsAlive()) {
         currentBoss->GenerateIntent();
         RenderUI();
         DisplayMenu();
 
-        int choice;
+        int choice = 0;
+        std::cout << "Choice: ";
         std::cin >> choice;
 
-        switch (choice) 
-        {
+        // Usability Improvement: Input validation loop 
+        while (std::cin.fail() || choice < 1 || choice > 5) {
+            std::cin.clear(); // Clear the error state on cin
+            std::cin.ignore(32767, '\n');
+            std::cout << "[!] Invalid input. Please enter a number between 1 and 5: ";
+            std::cin >> choice;
+        }
+
+        switch (choice) {
         case 1:
             player->PerformLightAttack(*currentBoss);
             break;
@@ -91,12 +98,10 @@ void Game::RunCombatLoop()
         currentBoss->ResetTurnState();
     }
 
-    if (!player->IsAlive()) 
-    {
+    if (!player->IsAlive()) {
         std::cout << "\nYou were defeated!\n";
     }
-    else if (!currentBoss->IsAlive()) 
-    {
+    else if (!currentBoss->IsAlive()) {
         std::cout << "\nYou defeated the Relic Guardian!\n";
     }
 
