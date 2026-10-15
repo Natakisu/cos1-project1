@@ -1,7 +1,8 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true) {
+Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true) 
+{
 }
 
 Game::~Game() 
@@ -22,7 +23,8 @@ void Game::Initialize()
     currentBoss = new Enemy("Relic Guardian", 200, 50);
 }
 
-void Game::CharacterCreation() {
+void Game::CharacterCreation() 
+{
     std::string playerName;
     std::cout << "Enter your character's name: ";
     std::cin >> playerName;
@@ -45,7 +47,8 @@ void Game::CharacterCreation() {
     totalPoints -= p;
 
     // Strength
-    if (totalPoints > 0) {
+    if (totalPoints > 0) 
+    {
         std::cout << "Points for Strength (STR - current pool left: " << totalPoints << "): ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
@@ -54,7 +57,8 @@ void Game::CharacterCreation() {
     }
 
     // Agility
-    if (totalPoints > 0) {
+    if (totalPoints > 0) 
+    {
         std::cout << "Points for Agility (AGI - current pool left: " << totalPoints << "): ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
@@ -63,7 +67,8 @@ void Game::CharacterCreation() {
     }
 
     // Intellect
-    if (totalPoints > 0) {
+    if (totalPoints > 0) 
+    {
         std::cout << "Points for Intellect (INT - current pool left: " << totalPoints << "): ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
@@ -106,64 +111,86 @@ void Game::DisplayMenu() const
     std::cout << "Choice: ";
 }
 
-void Game::RunCombatLoop() 
+int Game::GetValidatedPlayerChoice()
 {
-    while (isRunning && player->IsAlive() && currentBoss->IsAlive()) {
+    int choice = 0;
+    std::cout << "Choice: ";
+    std::cin >> choice;
+
+    while (std::cin.fail() || choice < 1 || choice > 6) 
+    {
+        std::cin.clear();
+        std::cin.ignore(32767, '\n');
+        std::cout << "[!] Invalid input. Please enter a number between 1 and 6: ";
+        std::cin >> choice;
+    }
+    return choice;
+}
+
+void Game::HandlePlayerAction(int choice)
+{
+    switch (choice)
+    {
+    case 1:
+        player->PerformLightAttack(*currentBoss);
+        break;
+    case 2:
+        player->PerformHeavyAttack(*currentBoss);
+        break;
+    case 3:
+        player->SwapWeapon();
+        std::cout << "Swapped weapons!\n";
+        break;
+    case 4:
+        player->Block();
+        break;
+    case 5:
+        player->Dodge();
+        break;
+    case 6:
+        player->InspectWeapons();
+        break;
+    }
+}
+
+void Game::HandleCombatOutcome() const
+{
+    if (!player->IsAlive())
+    {
+        std::cout << "\nYou were defeated!\n";
+    }
+    else if (!currentBoss->IsAlive())
+    {
+        std::cout << "\nYou defeated the Relic Guardian!\n";
+    }
+}
+
+void Game::RunCombatLoop()
+{
+    while (isRunning && player->IsAlive() && currentBoss->IsAlive())
+    {
         currentBoss->GenerateIntent();
         RenderUI();
         DisplayMenu();
 
-        int choice = 0;
-        std::cout << "Choice: ";
-        std::cin >> choice;
+        int choice = GetValidatedPlayerChoice();
+        HandlePlayerAction(choice);
 
-        // Update validation range
-        while (std::cin.fail() || choice < 1 || choice > 6) {
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
-            std::cout << "[!] Invalid input. Please enter a number between 1 and 6: ";
-            std::cin >> choice;
-        }
-
-        switch (choice) 
+        // If player inspected or swapped weapons, skip enemy turn / free action flow
+        if (choice == 3 || choice == 6) 
         {
-        case 1:
-            player->PerformLightAttack(*currentBoss);
-            break;
-        case 2:
-            player->PerformHeavyAttack(*currentBoss);
-            break;
-        case 3:
-            player->SwapWeapon();
-            std::cout << "Swapped weapons!\n";
-            continue; // Free action / check stats.
-        case 4:
-            player->Block();
-            break;
-        case 5:
-            player->Dodge();
-            break;
-        case 6:
-            player->InspectWeapons();
-            continue; // Inspecting weapons doesn't use up the turn.
-        default:
             continue;
         }
 
         // Boss resolves action after player turn
-        currentBoss->ExecuteIntent(*player);
-        player->RegainResourcesPerTurn();
-        currentBoss->ResetTurnState();
+        if (currentBoss->IsAlive()) 
+        {
+            currentBoss->ExecuteIntent(*player);
+            player->RegainResourcesPerTurn();
+            currentBoss->ResetTurnState();
+        }
     }
 
-    if (!player->IsAlive()) 
-    {
-        std::cout << "\nYou were defeated!\n";
-    }
-    else if (!currentBoss->IsAlive()) 
-    {
-        std::cout << "\nYou defeated the Relic Guardian!\n";
-    }
-
+    HandleCombatOutcome();
     isRunning = false;
 }
