@@ -102,7 +102,7 @@ void Game::CharacterCreation()
     std::cout << " - Focus        (FOC): Increases your healing potency and recovery\n";
 
     std::cout << "\n--- Stat Allocation (30 Points Available) ---\n";
-    std::cout << "(Base stats start at 10. Enter how many points to *add* to each)\n";
+    std::cout << "(Base stats start at 10. Enter how many points to [ADD] to each)\n";
 
     int p = 0;
 
@@ -227,20 +227,38 @@ void Game::HandlePlayerAction(int choice)
     switch (choice)
     {
     case 1:
-        player->PerformLightAttack(*currentBoss);
+    {
+        std::string weaponName = player->GetActiveWeapon()->GetName();
+        int damageDealt = player->PerformLightAttack(*currentBoss);
+
+        if (weaponName != "Life Staff") 
+        {
+            std::cout << " > You dealt " << damageDealt << " damage to " << currentBoss->GetName() << "!\n";
+        }
         break;
+    }
     case 2:
-        player->PerformHeavyAttack(*currentBoss);
+    {
+        std::string weaponName = player->GetActiveWeapon()->GetName();
+        int damageDealt = player->PerformHeavyAttack(*currentBoss);
+
+        if (weaponName != "Life Staff") 
+        {
+            std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
+        }
         break;
+    }
     case 3:
         player->SwapWeapon();
         std::cout << "Swapped weapons!\n";
         break;
     case 4:
         player->Block();
+        std::cout << "You raise your guard to block incoming damage.\n";
         break;
     case 5:
         player->Dodge();
+        std::cout << "You prepare to dodge the next attack.\n";
         break;
     case 6:
         player->InspectWeapons();
@@ -409,7 +427,7 @@ void Game::WeaponSelectionMenu()
             filteredWeapons[i]->DisplayWeaponInfo();
 
             std::string name = filteredWeapons[i]->GetName();
-            std::cout << "   -> Description: ";
+            std::cout << "   -> Identity: ";
             if (name == "Warhammer")
                 std::cout << "Slower attack speed, high physical damage, massive posture damage.\n";
             else if (name == "Sword and Shield")
@@ -423,13 +441,13 @@ void Game::WeaponSelectionMenu()
             else if (name == "Ice Staff")
                 std::cout << "Control & mitigation; reduces enemy stamina regeneration.\n";
             else if (name == "Life Staff")
-                std::cout << "Essential sustain; self-healing and cooldown reduction.\n";
+                std::cout << "Support: Can heal the user instead of attacking.\n";
             else if (name == "Greatsword")
                 std::cout << "Hybrid: Heavy attacks scale with STR; light multi-hits scale with AGI.\n";
             else if (name == "Rapier")
                 std::cout << "Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).\n";
             else if (name == "Flail and Shield")
-                std::cout << "Hybrid: Paladin drain-tanking with a small self-heal on attack/block.\n";
+                std::cout << "Hybrid: Heals on attack if Focus is 2 or higher.\n";
             else
                 std::cout << "Standard combat weapon.\n";
 

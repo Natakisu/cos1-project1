@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "Player.h"
 #include <cstdlib> 
+#include <iostream>
 
 Enemy::Enemy(std::string name, int hp, int posture)
     : name(name), maxHP(hp), currentHP(hp), maxPosture(posture), currentPosture(posture),
@@ -43,20 +44,27 @@ std::string Enemy::GetIntentDescription() const
 
 void Enemy::ExecuteIntent(Player& player)
 {
-    if (isStaggered) return;
+    int damage = 0;
 
-    switch (currentIntent)
+    if (currentIntent == BossIntent::LightSweep)
     {
-    case BossIntent::HeavyCleave:
-        player.TakeDamage(25);
-        break;
-    case BossIntent::LightSweep:
-        player.TakeDamage(12);
-        break;
-    case BossIntent::DefensiveGuard:
-        break;
-    default:
-        break;
+        damage = 30; 
+        std::cout << " > " << name << " uses [Light Sweep] for " << damage << " damage!\n";
+    }
+    else if (currentIntent == BossIntent::HeavyCleave)
+    {
+        damage = 55; // Or your calculated damage value
+        std::cout << " > " << name << " unleashes [Heavy Cleave] for " << damage << " damage!\n";
+    }
+    else if (currentIntent == BossIntent::DefensiveGuard)
+    {
+        std::cout << " > " << name << " takes a [Defensive Guard] stance, bolstering its posture!\n";
+        damage = 0;
+    }
+
+    if (damage > 0)
+    {
+        player.TakeDamage(damage);
     }
 }
 

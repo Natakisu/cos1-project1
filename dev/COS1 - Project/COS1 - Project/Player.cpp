@@ -55,10 +55,29 @@ bool Player::SwapWeapon()
     return true;
 }
 
-int Player::PerformLightAttack(Enemy& target) 
+int Player::PerformLightAttack(Enemy& target)
 {
     Weapon* activeWeapon = GetActiveWeapon();
-    if (!activeWeapon || currentSP < activeWeapon->GetAttackStaminaCost()) {
+    if (!activeWeapon) {
+        return 0;
+    }
+
+    std::string weaponName = activeWeapon->GetName();
+
+    // 1. Life Staff Heals the player instead of dealing damage
+    if (weaponName == "Life Staff")
+    {
+        int healingAmount = 25 + (focus * 2); 
+        currentHP += healingAmount;
+        if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+
+        std::cout << " > " << name << " channels the Life Staff, restoring " << healingAmount << " HP!\n";
+        return 0; // Skips dealing damage to the boss
+    }
+
+    // Check stamina cost for standard weapons
+    if (currentSP < activeWeapon->GetAttackStaminaCost()) {
+        std::cout << "[!] Not enough stamina for light attack!\n";
         return 0;
     }
 
@@ -66,6 +85,23 @@ int Player::PerformLightAttack(Enemy& target)
     int damage = activeWeapon->CalculateDamage(strength, agility, intellect, focus);
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage());
+
+    // 2. Flail and Shield heal on attack if Focus >= 12
+    if (weaponName == "Flail and Shield")
+    {
+        if (focus >= 12)
+        {
+            int drainHeal = 10 + focus;
+            currentHP += drainHeal;
+            if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+            std::cout << " > Flail & Shield life-drain actived! Restored " << drainHeal << " HP.\n";
+        }
+        else
+        {
+            std::cout << "[-] Focus too low (<12 FOC) to trigger Flail life-drain!\n";
+        }
+    }
+
     return damage;
 }
 
@@ -73,13 +109,40 @@ int Player::PerformHeavyAttack(Enemy& target) {
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon) return 0;
 
+    std::string weaponName = activeWeapon->GetName();
+
+    // Life Staff doesn't do heavy physical attacks, but a stronger heal
+    if (weaponName == "Life Staff")
+    {
+        int healingAmount = 50 + (focus * 4);
+        currentHP += healingAmount;
+        if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+
+        std::cout << " > " << name << " heavily channels the Life Staff, restoring " << healingAmount << " HP!\n";
+        return 0;
+    }
+
     int staminaCost = activeWeapon->GetAttackStaminaCost() * 2;
-    if (currentSP < staminaCost) return 0;
+    if (currentSP < staminaCost) {
+        std::cout << "[!] Not enough stamina for heavy attack!\n";
+        return 0;
+    }
 
     currentSP -= staminaCost;
-    int damage = static_cast<int>(activeWeapon->CalculateDamage(strength, agility, intellect, focus) * 1.5f);
+
+    int damage = (activeWeapon->CalculateDamage(strength, agility, intellect, focus) * 3) / 2; 
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage() * 2);
+
+    // Flail and shield heavy attack drain check
+    if (weaponName == "Flail and Shield" && focus >= 2)
+    {
+        int drainHeal = 20 + (focus * 2);
+        currentHP += drainHeal;
+        if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+        std::cout << " < Flail & Shield life-drain active! Restored " << drainHeal << " HP.\n";
+    }
+
     return damage;
 }
 
