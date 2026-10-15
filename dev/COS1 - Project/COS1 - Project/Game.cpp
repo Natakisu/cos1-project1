@@ -2,11 +2,11 @@
 #include <iostream>
 #include <string>
 
-Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true) 
+Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true)
 {
 }
 
-Game::~Game() 
+Game::~Game()
 {
     delete player;
     delete currentBoss;
@@ -19,15 +19,15 @@ void Game::DisplayWelcomeMenu()
 
     while (inWelcomeMenu)
     {
-        std::cout << "\n==================================================\n";
-        std::cout << "               [ RELIC SWITCHER ]                    \n";
+        std::cout << "\n\033[36m==================================================\033[0m\n";
+        std::cout << "\033[36m               [ RELIC SWITCHER ]                 \033[0m\n";
         std::cout << "          A C++ Console RPG Experience            \n";
-        std::cout << "==================================================\n";
+        std::cout << "\033[36m==================================================\033[0m\n";
         std::cout << " 1. Start New Game                                \n";
         std::cout << " 2. View Instructions                             \n";
         std::cout << " 3. Exit Game                                     \n";
-        std::cout << "==================================================\n";
-        std::cout << "Choice (1-3): ";
+        std::cout << "\033[36m==================================================\033[0m\n";
+        std::cout << "\033[36mChoice (1-3): \033[0m";
 
         std::string input;
         std::getline(std::cin, input);
@@ -46,28 +46,28 @@ void Game::DisplayWelcomeMenu()
         }
         else if (choice == 2)
         {
-            std::cout << "\n--------------------------------------------------\n";
-            std::cout << "                 GAME INSTRUCTIONS                \n";
-            std::cout << "--------------------------------------------------\n";
+            std::cout << "\n\033[36m--------------------------------------------------\033[0m\n";
+            std::cout << "\033[36m                 GAME INSTRUCTIONS                \033[0m\n";
+            std::cout << "\033[36m--------------------------------------------------\033[0m\n";
             std::cout << " - Relic Switcher is a Turn-Based RPG with elements\n";
             std::cout << "    from New World Aeternum and Dark Souls        \n";
             std::cout << " - Allocate attributes wisely during creation.    \n";
             std::cout << " - Choose a Primary and Secondary weapon loadout. \n";
             std::cout << " - Fight the Relic Guardian using Attacks, Blocks,\n";
             std::cout << "    and Dodges while managing your HP, SP, and MP. \n";
-            std::cout << "--------------------------------------------------\n";
+            std::cout << "\033[36m--------------------------------------------------\033[0m\n";
             std::cout << "Press Enter to return to the main menu...";
             std::string dummy;
             std::getline(std::cin, dummy);
         }
         else if (choice == 3)
         {
-            std::cout << "\nExiting game. Thanks for playing!\n";
+            std::cout << "\n\033[32mExiting game. Thanks for playing!\033[0m\n";
             exit(0); // Clean exit
         }
         else
         {
-            std::cout << "[!] Invalid choice. Please enter 1, 2, or 3.\n";
+            std::cout << "\033[31m[!] Invalid choice. Please enter 1, 2, or 3.\033[0m\n";
         }
     }
 }
@@ -83,10 +83,10 @@ void Game::Initialize()
 void Game::CharacterCreation()
 {
     std::string playerName;
-    std::cout << "========================================\n";
-    std::cout << "        [ CHARACTER CREATION ]          \n";
-    std::cout << "========================================\n";
-    std::cout << "Enter your character's name: ";
+    std::cout << "\n\033[36m========================================\033[0m\n";
+    std::cout << "\033[36m        [ CHARACTER CREATION ]          \033[0m\n";
+    std::cout << "\033[36m========================================\033[0m\n";
+    std::cout << "\033[36mEnter your character's name: \033[0m";
     std::cin >> playerName;
     player = new Player(playerName);
 
@@ -94,14 +94,14 @@ void Game::CharacterCreation()
     int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base starting stats
 
     // Breif Description of what Stats do
-    std::cout << "\n--- Attribute Descriptions ---\n";
+    std::cout << "\n\033[36m--- Attribute Descriptions ---\033[0m\n";
     std::cout << " - Constitution (CON): Increases your Max HP.\n";
     std::cout << " - Strength     (STR): Increases physical weapon damage.\n";
     std::cout << " - Agility      (AGI): Increases Stamina (SP) and dodging/speed.\n";
     std::cout << " - Intellect    (INT): Increases Mana (MP) and magical effectiveness.\n";
     std::cout << " - Focus        (FOC): Increases your healing potency and recovery\n";
 
-    std::cout << "\n--- Stat Allocation (30 Points Available) ---\n";
+    std::cout << "\n\033[36m--- Stat Allocation (30 Points Available) ---\033[0m\n";
     std::cout << "(Base stats start at 10. Enter how many points to [ADD] to each)\n";
 
     int p = 0;
@@ -150,26 +150,26 @@ void Game::CharacterCreation()
     // Apply the configured values
     player->SetAttributes(con, str, agi, intel, foc);
 
-    std::cout << "\n========================================\n";
-    std::cout << "     [ ATTRIBUTES CONFIGURED! ]         \n";
-    std::cout << "========================================\n";
+    std::cout << "\n\033[36m========================================\033[0m\n";
+    std::cout << "\033[36m     [ ATTRIBUTES CONFIGURED! ]         \033[0m\n";
+    std::cout << "\033[36m========================================\033[0m\n";
     player->DisplayStats();
 }
 
-void Game::RenderUI() const 
+void Game::RenderUI() const
 {
     if (!player || !currentBoss) return;
 
-    std::cout << "\n========================================\n";
+    std::cout << "\n\033[36m========================================\033[0m\n";
     std::cout << "PLAYER: " << player->GetName() << " | HP: " << player->GetCurrentHP()
         << " | SP: " << player->GetCurrentSP() << " | MP: " << player->GetCurrentMP() << "\n";
     std::cout << "BOSS: " << currentBoss->GetName() << " | HP: " << currentBoss->GetCurrentHP()
         << " | Posture: " << currentBoss->GetCurrentPosture() << "\n";
     std::cout << "BOSS INTENT: " << currentBoss->GetIntentDescription() << "\n";
-    std::cout << "========================================\n";
+    std::cout << "\033[36m========================================\033[0m\n";
 }
 
-void Game::DisplayMenu() const 
+void Game::DisplayMenu() const
 {
     std::cout << "1. Light Attack\n";
     std::cout << "2. Heavy Attack\n";
@@ -177,7 +177,6 @@ void Game::DisplayMenu() const
     std::cout << "4. Block\n";
     std::cout << "5. Dodge\n";
     std::cout << "6. Inspect Weapons\n";
-    std::cout << "Choice: ";
 }
 
 int Game::GetValidatedPlayerChoice()
@@ -188,7 +187,7 @@ int Game::GetValidatedPlayerChoice()
 
     while (!isValid)
     {
-        std::cout << "Choice: ";
+        std::cout << "\033[36mChoice: \033[0m";
         // Grab the entire line of input
         std::getline(std::cin, inputLine);
 
@@ -204,18 +203,18 @@ int Game::GetValidatedPlayerChoice()
             }
             else
             {
-                std::cout << "[!] Invalid choice. Please enter a number between 1 and 6.\n";
+                std::cout << "\033[31m[!] Invalid choice. Please enter a number between 1 and 6.\033[0m\n";
             }
         }
         catch (const std::invalid_argument&)
         {
             // Catch if the user types letters or symbols instead of a number
-            std::cout << "[!] Invalid input. Please enter a valid number.\n";
+            std::cout << "\033[31m[!] Invalid input. Please enter a valid number.\033[0m\n";
         }
         catch (const std::out_of_range&)
         {
             // Catch if the number is way too large/small 
-            std::cout << "[!] Number out of range. Please enter a valid menu number.\n";
+            std::cout << "\033[31m[!] Number out of range. Please enter a valid menu number.\033[0m\n";
         }
     }
 
@@ -231,7 +230,7 @@ void Game::HandlePlayerAction(int choice)
         std::string weaponName = player->GetActiveWeapon()->GetName();
         int damageDealt = player->PerformLightAttack(*currentBoss);
 
-        if (weaponName != "Life Staff") 
+        if (weaponName != "Life Staff")
         {
             std::cout << " > You dealt " << damageDealt << " damage to " << currentBoss->GetName() << "!\n";
         }
@@ -242,7 +241,7 @@ void Game::HandlePlayerAction(int choice)
         std::string weaponName = player->GetActiveWeapon()->GetName();
         int damageDealt = player->PerformHeavyAttack(*currentBoss);
 
-        if (weaponName != "Life Staff") 
+        if (weaponName != "Life Staff")
         {
             std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
         }
@@ -250,7 +249,7 @@ void Game::HandlePlayerAction(int choice)
     }
     case 3:
         player->SwapWeapon();
-        std::cout << "Swapped weapons!\n";
+        std::cout << "\033[32mSwapped weapons!\033[0m\n";
         break;
     case 4:
         player->Block();
@@ -270,11 +269,21 @@ void Game::HandleCombatOutcome() const
 {
     if (!player->IsAlive())
     {
-        std::cout << "\nYou were defeated!\n";
+        std::cout << "\033[31m";
+        std::cout << "========================\n";
+        std::cout << "[ You Died! ]\n";
+        std::cout << "========================\n";
+        std::cout << "\033[0m";
     }
+
     else if (!currentBoss->IsAlive())
     {
-        std::cout << "\nYou defeated the Relic Guardian!\n";
+        std::cout << "\033[36m";
+        std::cout << "======================================\n";
+        std::cout << "           Congratulations!           \n";
+        std::cout << "\n[ You defeated the Relic Guardian! ]\n";
+        std::cout << "======================================\n";
+        std::cout << "\033[0m";
     }
 }
 
@@ -290,13 +299,13 @@ void Game::RunCombatLoop()
         HandlePlayerAction(choice);
 
         // If player inspected or swapped weapons, skip enemy turn / free action flow
-        if (choice == 3 || choice == 6) 
+        if (choice == 3 || choice == 6)
         {
             continue;
         }
 
         // Boss resolves action after player turn
-        if (currentBoss->IsAlive()) 
+        if (currentBoss->IsAlive())
         {
             currentBoss->ExecuteIntent(*player);
             player->RegainResourcesPerTurn();
@@ -355,28 +364,28 @@ void Game::WeaponSelectionMenu()
 
     while (!weaponsConfirmed)
     {
-        std::cout << "\n==================================================\n";
-        std::cout << "              [ WEAPON SELECTION MENU ]           \n";
-        std::cout << "==================================================\n";
+        std::cout << "\n\033[36m==================================================\033[0m\n";
+        std::cout << "\033[36m              [ WEAPON SELECTION MENU ]           \033[0m\n";
+        std::cout << "\033[36m==================================================\033[0m\n";
         std::cout << " Current Loadout:\n";
         std::cout << "  - Primary:   " << (chosenPrimary ? chosenPrimary->GetName() : "[None Selected]") << "\n";
         std::cout << "  - Secondary: " << (chosenSecondary ? chosenSecondary->GetName() : "[None Selected]") << "\n";
-        std::cout << "--------------------------------------------------\n";
+        std::cout << "\033[36m--------------------------------------------------\033[0m\n";
         std::cout << " Select a Weapon Scaling Category:\n";
         std::cout << "  1. [STR] Strength Weapons\n";
         std::cout << "  2. [AGI] Agility Weapons\n";
         std::cout << "  3. [INT] Intellect Weapons\n";
         std::cout << "  4. [FOC] Focus Weapons\n";
         std::cout << "  5. [HYB] Hybrid Weapons\n";
-        std::cout << "  6. [ALL] View All Weapons [WARNING]: This will Word Bomb your console\n";
+        std::cout << "  6. [ALL] View All Weapons \033[31m[WARNING]: This will Word Bomb your console\033[0m\n";
 
         if (chosenPrimary != nullptr && chosenSecondary != nullptr)
         {
-            std::cout << "  7. [OK]  Finish & Confirm Loadout\n";
+            std::cout << "\033[32m  7. [OK]  Finish & Confirm Loadout\033[0m\n";
         }
 
-        std::cout << "==================================================\n";
-        std::cout << "Choice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
+        std::cout << "\033[36m==================================================\033[0m\n";
+        std::cout << "\033[36mChoice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): \033[0m";
 
         if (std::cin.peek() == '\n') {
             std::cin.ignore();
@@ -417,9 +426,9 @@ void Game::WeaponSelectionMenu()
             filteredWeapons = availableWeapons;
         }
 
-        std::cout << "\n========================================\n";
-        std::cout << "       [ AVAILABLE WEAPONS IN GROUP ]   \n";
-        std::cout << "========================================\n";
+        std::cout << "\n\033[36m========================================\033[0m\n";
+        std::cout << "\033[36m       [ AVAILABLE WEAPONS IN GROUP ]   \033[0m\n";
+        std::cout << "\033[36m========================================\033[0m\n";
 
         for (size_t i = 0; i < filteredWeapons.size(); ++i)
         {
@@ -447,7 +456,7 @@ void Game::WeaponSelectionMenu()
             else if (name == "Rapier")
                 std::cout << "Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).\n";
             else if (name == "Flail and Shield")
-                std::cout << "Hybrid: Heals on attack if Focus is 2 or higher.\n";
+                std::cout << "Hybrid: Heals on attack if Focus is 12 or higher.\n";
             else
                 std::cout << "Standard combat weapon.\n";
 
@@ -455,7 +464,7 @@ void Game::WeaponSelectionMenu()
         }
 
         std::cout << "Enter 0 to go back to category menu without picking.\n";
-        std::cout << "Select a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): ";
+        std::cout << "\033[36mSelect a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): \033[0m";
 
         std::string wInput;
         std::getline(std::cin, wInput);
@@ -468,9 +477,9 @@ void Game::WeaponSelectionMenu()
             Weapon* selected = filteredWeapons[weaponChoice - 1];
 
             std::cout << "\nAssign " << selected->GetName() << " to:\n";
-                std::cout << "1. Primary Slot\n";
+            std::cout << "1. Primary Slot\n";
             std::cout << "2. Secondary Slot\n";
-            std::cout << "Choice: ";
+            std::cout << "\033[36mChoice: \033[0m";
 
             std::string slotInput;
             std::getline(std::cin, slotInput);
@@ -481,12 +490,12 @@ void Game::WeaponSelectionMenu()
             if (slotChoice == 1)
             {
                 chosenPrimary = selected;
-                std::cout << "[+] " << selected->GetName() << " equipped as Primary!\n";
+                std::cout << "\033[32m[+] " << selected->GetName() << " equipped as Primary!\033[0m\n";
             }
             else
             {
                 chosenSecondary = selected;
-                std::cout << "[+] " << selected->GetName() << " equipped as Secondary!\n";
+                std::cout << "\033[32m[+] " << selected->GetName() << " equipped as Secondary!\033[0m\n";
             }
         }
     }

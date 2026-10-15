@@ -21,7 +21,7 @@ int Weapon::CalculateDamage(int str, int agi, int intel, int foc) const
 }
 
 void Weapon::DisplayWeaponInfo() const {
-    std::cout << "--- " << name << " ---\n";
+    std::cout << "\033[36m--- " << name << " ---\033[0m\n";
     std::cout << "Base Damage: " << baseDamage << " | Posture Damage: " << postureDamage << "\n";
     std::cout << "Stamina Cost: " << attackStaminaCost << " | Mana Cost: " << attackManaCost << "\n";
     std::cout << "Scaling Ratios -> STR: " << (strScaling * 100) << "% | AGI: " << (agiScaling * 100)

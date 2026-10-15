@@ -11,8 +11,7 @@ Enemy::Enemy(std::string name, int hp, int posture)
 
 void Enemy::GenerateIntent()
 {
-    
-    int roll = rand() % 3; 
+    int roll = rand() % 3;
 
     switch (roll)
     {
@@ -48,17 +47,17 @@ void Enemy::ExecuteIntent(Player& player)
 
     if (currentIntent == BossIntent::LightSweep)
     {
-        damage = 30; 
-        std::cout << " > " << name << " uses [Light Sweep] for " << damage << " damage!\n";
+        damage = 30;
+        std::cout << " \033[36m> " << name << " uses [Light Sweep] for " << damage << " damage!\033[0m\n";
     }
     else if (currentIntent == BossIntent::HeavyCleave)
     {
-        damage = 55; // Or your calculated damage value
-        std::cout << " > " << name << " unleashes [Heavy Cleave] for " << damage << " damage!\n";
+        damage = 55;
+        std::cout << " \033[36m> " << name << " unleashes [Heavy Cleave] for " << damage << " damage!\033[0m\n";
     }
     else if (currentIntent == BossIntent::DefensiveGuard)
     {
-        std::cout << " > " << name << " takes a [Defensive Guard] stance, bolstering its posture!\n";
+        std::cout << " \033[33m> " << name << " takes a [Defensive Guard] stance, bolstering its posture!\033[0m\n";
         damage = 0;
     }
 
