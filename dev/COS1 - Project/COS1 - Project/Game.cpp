@@ -312,7 +312,7 @@ void Game::RunCombatLoop()
 {
     while (isRunning && player->IsAlive() && currentBoss->IsAlive())
     {
-        system("cls"); // Clear old text so the UI stays fresh every turn
+        system("cls"); // Clear screen for the current turn's UI
         currentBoss->GenerateIntent();
         RenderUI();
         DisplayMenu();
@@ -320,21 +320,44 @@ void Game::RunCombatLoop()
         int choice = GetValidatedPlayerChoice();
         HandlePlayerAction(choice);
 
-        // If player inspected or swapped weapons, skip enemy turn / free action flow
-        if (choice == 3 || choice == 6)
+        // If player inspected weapons, they didn't take a combat turn, so let them read the stats
+        if (choice == 6)
         {
+            ConsoleHelper::print("\nPress Enter to return to combat...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
             continue;
         }
+
+        // If player swapped weapons, pause briefly so they can see the confirmation message
+        if (choice == 3)
+        {
+            ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
+            continue;
+        }
+
+        // For attack, block, or dodge actions, let the damage/healing messages print, 
+        // then pause so the user can read the results before the boss takes their turn or screen clear
+        ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
+        std::string pauseInput;
+        std::getline(std::cin, pauseInput);
 
         // Boss resolves action after player turn
         if (currentBoss->IsAlive())
         {
             currentBoss->ExecuteIntent(*player);
+
+            ConsoleHelper::print("Press Enter to end turn...", ConsoleHelper::White, false);
+            std::getline(std::cin, pauseInput);
+
             player->RegainResourcesPerTurn();
             currentBoss->ResetTurnState();
         }
     }
 
+    system("cls");
     HandleCombatOutcome();
     isRunning = false;
 }
