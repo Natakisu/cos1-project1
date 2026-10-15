@@ -12,10 +12,70 @@ Game::~Game()
     delete currentBoss;
 }
 
+// Main Menu
+void Game::DisplayWelcomeMenu()
+{
+    bool inWelcomeMenu = true;
+
+    while (inWelcomeMenu)
+    {
+        std::cout << "\n==================================================\n";
+        std::cout << "               [ RELIC SWITCHER ]                    \n";
+        std::cout << "          A C++ Console RPG Experience            \n";
+        std::cout << "==================================================\n";
+        std::cout << " 1. Start New Game                                \n";
+        std::cout << " 2. View Instructions                             \n";
+        std::cout << " 3. Exit Game                                     \n";
+        std::cout << "==================================================\n";
+        std::cout << "Choice (1-3): ";
+
+        std::string input;
+        std::getline(std::cin, input);
+        int choice = 0;
+
+        try {
+            choice = std::stoi(input);
+        }
+        catch (...) {
+            choice = 0;
+        }
+
+        if (choice == 1)
+        {
+            inWelcomeMenu = false; // Proceeds forward into character creation & game
+        }
+        else if (choice == 2)
+        {
+            std::cout << "\n--------------------------------------------------\n";
+            std::cout << "                 GAME INSTRUCTIONS                \n";
+            std::cout << "--------------------------------------------------\n";
+            std::cout << " - Relic Switcher is a Turn-Based RPG with elements\n";
+            std::cout << "    from New World Aeternum and Dark Souls        \n";
+            std::cout << " - Allocate attributes wisely during creation.    \n";
+            std::cout << " - Choose a Primary and Secondary weapon loadout. \n";
+            std::cout << " - Fight the Relic Guardian using Attacks, Blocks,\n";
+            std::cout << "    and Dodges while managing your HP, SP, and MP. \n";
+            std::cout << "--------------------------------------------------\n";
+            std::cout << "Press Enter to return to the main menu...";
+            std::string dummy;
+            std::getline(std::cin, dummy);
+        }
+        else if (choice == 3)
+        {
+            std::cout << "\nExiting game. Thanks for playing!\n";
+            exit(0); // Clean exit
+        }
+        else
+        {
+            std::cout << "[!] Invalid choice. Please enter 1, 2, or 3.\n";
+        }
+    }
+}
+
 void Game::Initialize()
 {
+    DisplayWelcomeMenu();
     CharacterCreation();
-    //Add weapon menu to UI to let character select weapon
     WeaponSelectionMenu();
     currentBoss = new Enemy("Relic Guardian", 1000, 50);
 }
@@ -24,7 +84,7 @@ void Game::CharacterCreation()
 {
     std::string playerName;
     std::cout << "========================================\n";
-    std::cout << "          CHARACTER CREATION            \n";
+    std::cout << "        [ CHARACTER CREATION ]          \n";
     std::cout << "========================================\n";
     std::cout << "Enter your character's name: ";
     std::cin >> playerName;
@@ -91,7 +151,7 @@ void Game::CharacterCreation()
     player->SetAttributes(con, str, agi, intel, foc);
 
     std::cout << "\n========================================\n";
-    std::cout << "       ATTRIBUTES CONFIGURED!           \n";
+    std::cout << "     [ ATTRIBUTES CONFIGURED! ]         \n";
     std::cout << "========================================\n";
     player->DisplayStats();
 }
@@ -271,29 +331,34 @@ void Game::WeaponSelectionMenu()
     // Initialize the master weapon pool once
     InitializeWeaponPool();
 
-    // Track chosen weapon pointers temporarily
+    // Track chosen weapon pointers temporarily across category
     Weapon* chosenPrimary = nullptr;
     Weapon* chosenSecondary = nullptr;
 
     while (!weaponsConfirmed)
     {
-        // Display current loadout status so the player knows what they've locked in so far
-        std::cout << "\n========================================\n";
-        std::cout << "          WEAPON SELECTION MENU         \n";
-        std::cout << "========================================\n";
-        std::cout << "Current Primary:   " << (chosenPrimary ? chosenPrimary->GetName() : "[None Selected]") << "\n";
-        std::cout << "Current Secondary: " << (chosenSecondary ? chosenSecondary->GetName() : "[None Selected]") << "\n";
-        std::cout << "----------------------------------------\n";
-        std::cout << "1. Pure Strength (STR) Weapons\n";
-        std::cout << "2. Pure Agility (AGI) Weapons\n";
-        std::cout << "3. Pure Intellect (INT) Weapons\n";
-        std::cout << "4. Pure Focus (FOC) Weapons\n";
-        std::cout << "5. Hybrid Weapons\n";
-        std::cout << "6. View All Weapons\n";
-        if (chosenPrimary != nullptr && chosenSecondary != nullptr) {
-            std::cout << "7. Finish & Confirm Loadout\n";
+        std::cout << "\n==================================================\n";
+        std::cout << "              [ WEAPON SELECTION MENU ]           \n";
+        std::cout << "==================================================\n";
+        std::cout << " Current Loadout:\n";
+        std::cout << "  - Primary:   " << (chosenPrimary ? chosenPrimary->GetName() : "[None Selected]") << "\n";
+        std::cout << "  - Secondary: " << (chosenSecondary ? chosenSecondary->GetName() : "[None Selected]") << "\n";
+        std::cout << "--------------------------------------------------\n";
+        std::cout << " Select a Weapon Scaling Category:\n";
+        std::cout << "  1. [STR] Strength Weapons\n";
+        std::cout << "  2. [AGI] Agility Weapons\n";
+        std::cout << "  3. [INT] Intellect Weapons\n";
+        std::cout << "  4. [FOC] Focus Weapons\n";
+        std::cout << "  5. [HYB] Hybrid Weapons\n";
+        std::cout << "  6. [ALL] View All Weapons [WARNING]: This will Word Bomb your console\n";
+
+        if (chosenPrimary != nullptr && chosenSecondary != nullptr)
+        {
+            std::cout << "  7. [OK]  Finish & Confirm Loadout\n";
         }
-        std::cout << "Select a category (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
+
+        std::cout << "==================================================\n";
+        std::cout << "Choice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
 
         if (std::cin.peek() == '\n') {
             std::cin.ignore();
@@ -335,7 +400,7 @@ void Game::WeaponSelectionMenu()
         }
 
         std::cout << "\n========================================\n";
-        std::cout << "         AVAILABLE WEAPONS IN GROUP     \n";
+        std::cout << "       [ AVAILABLE WEAPONS IN GROUP ]   \n";
         std::cout << "========================================\n";
 
         for (size_t i = 0; i < filteredWeapons.size(); ++i)

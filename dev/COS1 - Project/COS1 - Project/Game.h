@@ -25,6 +25,7 @@ public:
     Game();
     ~Game();
 
+    void DisplayWelcomeMenu();
     void Initialize();
     void CharacterCreation();
     void RunCombatLoop();
