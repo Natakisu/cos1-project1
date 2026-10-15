@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
+
 Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true) {
 }
 
