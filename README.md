@@ -83,19 +83,25 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 ⚙️ Overview - What I worked on this past week:
 
-[]
+[Focused on expanding and balancing combat loop mechanics in _Relic Switcher_, adding player weapon selection menu, increased the boss' HP so he doesn't die so quickly, and added healing-based scaling. Specifically, implemented life-drain and healing thresholds for the _Life Staff_ and _Flail and Shield_, tuned Focus (FOC) requirements to 12 for the _Flail and Shield_ life-drain to activate, and worked on cleaning up the console UI by expanding on boarder, menu, and added basic colors to break up the black and white ASCII Hell and addressed feedback from Milestone 2 regarding dynamic allocations, pointers, and memory leaks. ALSO a Main Menu with an Instructions page.]
 
 🌵 Challenges - What problems did I have & how I'm addressing them
 
-[]
+[- **Challenge 1:** Dealing with a logic flow issue where player healing felt like it wasn't registering because the boss's attack seemed to cancel out the health gain on the same turn.
+    
+[- **Solution:** Added clear, explicit damage and healing readouts  and refactored turn logging so that damage taken and recovery numbers can be directly tracked turn-by-turn to easily verify and show the heal actually does something. As long as you remember you CANNOT increase your max HP through healing. No matter how much you heal for it does not take you above the threshold.]
+
+[- **Challenge 2:** When I had originally created the weapon selection menu the console just got completely word bombed right after the user finished allocating their stats. Needless to say it made it very confusing and impossible to read. Was like Gojo just used Limitless on you.]
+    
+[- **Solution 2:** I decided to create a loop inside of a loop to handle sub menus within the weapon selection.]
 
 🏆 Accomplishments - What is something I "leveled up" on this week
 
-[]
+[Leveled up my implementation refactoring by cleaning up  the console UI and user experience by adding menus, warnings, and success states visual identities, making the text-based RPG much more readable and immersive. I also got a refresher course and learned some new techniques for handling loops within loops and being able to carry over information when switching between the loops.]
 
 🔮 Next Steps - What I plan to prioritize and do next
 
-[]
+[I plan to start working on the Burn and Bleed statuses and their interactions next as well as continue refining the console UI to keep making it more readable and understandable. I'm also going to start getting started on implementing elements for Milestone 4, and adding more feature to my game. I feel the Experience System I have planned is really going to be elevated a file save-load/read/write system. Maybe add a menu for user's to input their own values for the boss' HP, or a difficulty selection. I don't know we'll see how much I can squeeze in.]
 
 ### Week 4
 
