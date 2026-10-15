@@ -5,19 +5,12 @@
 class Game 
 {
 private:
-    Player* player;
-    Enemy* currentBoss;
-    bool isRunning;
+    void RenderHUD() const;
+    void DisplayActionMenu() const;
+    int GetValidatedPlayerChoice() const;
+    void ProcessPlayerTurn(int choice);
+    void ProcessEnemyTurn();
 
 public:
-    Game();
-    ~Game();
-
-    void Initialize();
-    void CharacterCreation();
     void RunCombatLoop();
-    void RenderUI() const;
-    void DisplayMenu() const;
-
-    bool IsRunning() const { return isRunning; }
 };
