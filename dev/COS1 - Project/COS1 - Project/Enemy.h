@@ -1,40 +1,36 @@
 #pragma once
 #include <string>
 
-enum class BossIntent 
-{
-    HeavyCleave,
+enum class BossIntent {
     LightSweep,
-    DefensiveGuard,
-    ChargingUp
+    HeavyCleave,
+    DefensiveGuard
 };
 
-class Enemy 
-{
+class Player; 
+
+class Enemy {
 private:
     std::string name;
-    int maxHP, currentHP;
-    int maxPosture, currentPosture;
+    int maxHP;
+    int currentHP;
+    int maxPosture;
+    int currentPosture;
     bool isStaggered;
 
-    // Status Meter Buildups
     int bleedMeter;
     int burnMeter;
     int frostbiteMeter;
 
-    // Telegraphed Intent
     BossIntent currentIntent;
 
 public:
     Enemy(std::string name, int hp, int posture);
 
-    // Intent System
     void GenerateIntent();
-    BossIntent GetCurrentIntent() const { return currentIntent; }
     std::string GetIntentDescription() const;
-    void ExecuteIntent(class Player& player);
+    void ExecuteIntent(Player& player);
 
-    // Combat & Posture
     void TakeDamage(int damage, int postureDmg);
     void ApplyStatusBuildup(int bleed, int burn, int frostbite);
     void CheckPostureBreak();
@@ -44,6 +40,5 @@ public:
     std::string GetName() const { return name; }
     int GetCurrentHP() const { return currentHP; }
     int GetCurrentPosture() const { return currentPosture; }
-    bool IsStaggered() const { return isStaggered; }
     bool IsAlive() const { return currentHP > 0; }
 };

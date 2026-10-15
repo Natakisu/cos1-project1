@@ -1,5 +1,7 @@
 #include "Enemy.h"
 #include "Player.h"
+#include <cstdlib> 
+#include <iostream>
 
 Enemy::Enemy(std::string name, int hp, int posture)
     : name(name), maxHP(hp), currentHP(hp), maxPosture(posture), currentPosture(posture),
@@ -7,42 +9,65 @@ Enemy::Enemy(std::string name, int hp, int posture)
     currentIntent(BossIntent::LightSweep) {
 }
 
-void Enemy::GenerateIntent() 
+void Enemy::GenerateIntent()
 {
-    // Simple placeholder intent cycle logic
-    currentIntent = BossIntent::HeavyCleave;
+    int roll = rand() % 3;
+
+    switch (roll)
+    {
+    case 0:
+        currentIntent = BossIntent::LightSweep;
+        break;
+    case 1:
+        currentIntent = BossIntent::HeavyCleave;
+        break;
+    case 2:
+        currentIntent = BossIntent::DefensiveGuard;
+        break;
+    default:
+        currentIntent = BossIntent::LightSweep;
+        break;
+    }
 }
 
-std::string Enemy::GetIntentDescription() const 
+std::string Enemy::GetIntentDescription() const
 {
-    switch (currentIntent) 
+    switch (currentIntent)
     {
     case BossIntent::HeavyCleave: return "Preparing a heavy attack!";
     case BossIntent::LightSweep: return "Preparing a quick sweep!";
     case BossIntent::DefensiveGuard: return "Raising guard!";
-    case BossIntent::ChargingUp: return "Gathering energy!";
     default: return "Unknown intent";
     }
 }
 
-void Enemy::ExecuteIntent(Player& player) 
+void Enemy::ExecuteIntent(Player& player)
 {
-    if (isStaggered) return;
+    int damage = 0;
 
-    switch (currentIntent) 
+    if (currentIntent == BossIntent::LightSweep)
     {
-    case BossIntent::HeavyCleave:
-        player.TakeDamage(25);
-        break;
-    case BossIntent::LightSweep:
-        player.TakeDamage(12);
-        break;
-    default:
-        break;
+        damage = 30;
+        std::cout << " \033[36m> " << name << " uses [Light Sweep] for " << damage << " damage!\033[0m\n";
+    }
+    else if (currentIntent == BossIntent::HeavyCleave)
+    {
+        damage = 55;
+        std::cout << " \033[36m> " << name << " unleashes [Heavy Cleave] for " << damage << " damage!\033[0m\n";
+    }
+    else if (currentIntent == BossIntent::DefensiveGuard)
+    {
+        std::cout << " \033[33m> " << name << " takes a [Defensive Guard] stance, bolstering its posture!\033[0m\n";
+        damage = 0;
+    }
+
+    if (damage > 0)
+    {
+        player.TakeDamage(damage);
     }
 }
 
-void Enemy::TakeDamage(int damage, int postureDmg) 
+void Enemy::TakeDamage(int damage, int postureDmg)
 {
     currentHP -= damage;
     if (currentHP < 0) currentHP = 0;
@@ -51,27 +76,27 @@ void Enemy::TakeDamage(int damage, int postureDmg)
     CheckPostureBreak();
 }
 
-void Enemy::ApplyStatusBuildup(int bleed, int burn, int frostbite) 
+void Enemy::ApplyStatusBuildup(int bleed, int burn, int frostbite)
 {
     bleedMeter += bleed;
     burnMeter += burn;
     frostbiteMeter += frostbite;
 }
 
-void Enemy::CheckPostureBreak() 
+void Enemy::CheckPostureBreak()
 {
-    if (currentPosture <= 0) 
+    if (currentPosture <= 0)
     {
         isStaggered = true;
         currentPosture = 0;
     }
 }
 
-void Enemy::ResetTurnState() 
+void Enemy::ResetTurnState()
 {
-    if (isStaggered) 
+    if (isStaggered)
     {
         isStaggered = false;
-        currentPosture = maxPosture; // Reset posture after stagger turn finishes
+        currentPosture = maxPosture;
     }
 }
