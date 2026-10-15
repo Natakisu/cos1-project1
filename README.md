@@ -83,7 +83,7 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 ⚙️ Overview - What I worked on this past week:
 
-[Focused on expanding and balancing combat loop mechanics in _Relic Switcher_, adding player weapon selection menu, increased the boss' HP so he doesn't die so quickly, and added healing-based scaling. Specifically, implemented life-drain and healing thresholds for the _Life Staff_ and _Flail and Shield_, tuned Focus (FOC) requirements to 12 for the _Flail and Shield_ life-drain to activate, and worked on cleaning up the console UI by expanding on boarders, menus, and added lambdas and basic colors to break up the black and white ASCII Hell to make the console more readable and addressed feedback from Milestone 2 regarding dynamic allocations, pointers, and memory leaks. ALSO a Main Menu with an Instructions page.]
+[Focused on expanding and balancing combat loop mechanics in _Relic Switcher_, adding player weapon selection menu, increased the boss' HP so he doesn't die so quickly, and added healing-based scaling. Specifically, implemented life-drain and healing thresholds for the _Life Staff_ and _Flail and Shield_, tuned Focus (FOC) requirements to 12 for the _Flail and Shield_ life-drain to activate, and worked on cleaning up the console UI by expanding on boarder, menu, and added basic colors to break up the black and white ASCII Hell and addressed feedback from Milestone 2 regarding dynamic allocations, pointers, and memory leaks. ALSO a Main Menu with an Instructions page.]
 
 🌵 Challenges - What problems did I have & how I'm addressing them
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-enum class WeaponType 
+enum class WeaponType
 {
     PureSTR,
     PureAGI,
@@ -10,7 +10,7 @@ enum class WeaponType
     Hybrid
 };
 
-class Weapon 
+class Weapon
 {
 private:
     std::string name;
@@ -45,10 +45,10 @@ public:
     int GetAttackManaCost() const { return attackManaCost; }
     int GetBlockStaminaCost() const { return blockStaminaCost; }
     int GetDodgeStaminaCost() const { return dodgeStaminaCost; }
+    WeaponType GetType() const { return type; }
 
     // Scaled Damage Calculation
     int CalculateDamage(int str, int agi, int intel, int foc) const;
 
     void DisplayWeaponInfo() const;
-
 };

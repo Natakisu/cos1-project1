@@ -55,6 +55,8 @@ public:
     int GetCurrentHP() const { return currentHP; }
     int GetCurrentSP() const { return currentSP; }
     int GetCurrentMP() const { return currentMP; }
+    int GetMaxHP() const { return maxHP; }
+
     Weapon* GetActiveWeapon() const { return isPrimaryActive ? primaryWeapon : secondaryWeapon; }
     bool IsAlive() const { return currentHP > 0; }
 
@@ -62,5 +64,4 @@ public:
     void DisplayStats() const;
 
     void InspectWeapons() const;
-
 };
