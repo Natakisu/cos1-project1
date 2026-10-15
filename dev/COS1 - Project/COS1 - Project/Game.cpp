@@ -1,4 +1,5 @@
 ﻿#include "Game.h"
+#include "ConsoleHelper.h"
 #include <iostream>
 #include <string>
 
@@ -19,15 +20,15 @@ void Game::DisplayWelcomeMenu()
 
     while (inWelcomeMenu)
     {
-        std::cout << "\n\033[36m==================================================\033[0m\n";
-        std::cout << "\033[36m               [ RELIC SWITCHER ]                 \033[0m\n";
-        std::cout << "          A C++ Console RPG Experience            \n";
-        std::cout << "\033[36m==================================================\033[0m\n";
-        std::cout << " 1. Start New Game                                \n";
-        std::cout << " 2. View Instructions                             \n";
-        std::cout << " 3. Exit Game                                     \n";
-        std::cout << "\033[36m==================================================\033[0m\n";
-        std::cout << "\033[36mChoice (1-3): \033[0m";
+        ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("               [ RELIC SWITCHER ]                 ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("          A C++ Console RPG Experience            ", ConsoleHelper::White);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 1. Start New Game                                ", ConsoleHelper::White);
+        ConsoleHelper::print(" 2. View Instructions                             ", ConsoleHelper::White);
+        ConsoleHelper::print(" 3. Exit Game                                     ", ConsoleHelper::White);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("Choice (1-3): ", ConsoleHelper::Cyan, false);
 
         std::string input;
         std::getline(std::cin, input);
@@ -46,28 +47,28 @@ void Game::DisplayWelcomeMenu()
         }
         else if (choice == 2)
         {
-            std::cout << "\n\033[36m--------------------------------------------------\033[0m\n";
-            std::cout << "\033[36m                 GAME INSTRUCTIONS                \033[0m\n";
-            std::cout << "\033[36m--------------------------------------------------\033[0m\n";
-            std::cout << " - Relic Switcher is a Turn-Based RPG with elements\n";
-            std::cout << "    from New World Aeternum and Dark Souls        \n";
-            std::cout << " - Allocate attributes wisely during creation.    \n";
-            std::cout << " - Choose a Primary and Secondary weapon loadout. \n";
-            std::cout << " - Fight the Relic Guardian using Attacks, Blocks,\n";
-            std::cout << "    and Dodges while managing your HP, SP, and MP. \n";
-            std::cout << "\033[36m--------------------------------------------------\033[0m\n";
-            std::cout << "Press Enter to return to the main menu...";
+            ConsoleHelper::print("\n--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("                 GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
+            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
+            ConsoleHelper::print("    from New World Aeternum and Dark Souls        ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Allocate attributes wisely during creation.    ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout. ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks,", ConsoleHelper::White);
+            ConsoleHelper::print("    and Dodges while managing your HP, SP, and MP. ", ConsoleHelper::White);
+            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
         }
         else if (choice == 3)
         {
-            std::cout << "\n\033[32mExiting game. Thanks for playing!\033[0m\n";
+            ConsoleHelper::print("\nExiting game. Thanks for playing!", ConsoleHelper::Green);
             exit(0); // Clean exit
         }
         else
         {
-            std::cout << "\033[31m[!] Invalid choice. Please enter 1, 2, or 3.\033[0m\n";
+            ConsoleHelper::print("[!] Invalid choice. Please enter 1, 2, or 3.", ConsoleHelper::Red);
         }
     }
 }
@@ -83,10 +84,10 @@ void Game::Initialize()
 void Game::CharacterCreation()
 {
     std::string playerName;
-    std::cout << "\n\033[36m========================================\033[0m\n";
-    std::cout << "\033[36m        [ CHARACTER CREATION ]          \033[0m\n";
-    std::cout << "\033[36m========================================\033[0m\n";
-    std::cout << "\033[36mEnter your character's name: \033[0m";
+    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
     std::cin >> playerName;
     player = new Player(playerName);
 
@@ -94,15 +95,15 @@ void Game::CharacterCreation()
     int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base starting stats
 
     // Breif Description of what Stats do
-    std::cout << "\n\033[36m--- Attribute Descriptions ---\033[0m\n";
-    std::cout << " - Constitution (CON): Increases your Max HP.\n";
-    std::cout << " - Strength     (STR): Increases physical weapon damage.\n";
-    std::cout << " - Agility      (AGI): Increases Stamina (SP) and dodging/speed.\n";
-    std::cout << " - Intellect    (INT): Increases Mana (MP) and magical effectiveness.\n";
-    std::cout << " - Focus        (FOC): Increases your healing potency and recovery\n";
+    ConsoleHelper::print("\n--- Attribute Descriptions ---", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" - Constitution (CON): Increases your Max HP.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Strength     (STR): Increases physical weapon damage.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery", ConsoleHelper::White);
 
-    std::cout << "\n\033[36m--- Stat Allocation (30 Points Available) ---\033[0m\n";
-    std::cout << "(Base stats start at 10. Enter how many points to [ADD] to each)\n";
+    ConsoleHelper::print("\n--- Stat Allocation (30 Points Available) ---", ConsoleHelper::Cyan);
+    ConsoleHelper::print("(Base stats start at 10. Enter how many points to [ADD] to each)", ConsoleHelper::White);
 
     int p = 0;
 
@@ -150,9 +151,9 @@ void Game::CharacterCreation()
     // Apply the configured values
     player->SetAttributes(con, str, agi, intel, foc);
 
-    std::cout << "\n\033[36m========================================\033[0m\n";
-    std::cout << "\033[36m     [ ATTRIBUTES CONFIGURED! ]         \033[0m\n";
-    std::cout << "\033[36m========================================\033[0m\n";
+    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     player->DisplayStats();
 }
 
@@ -160,7 +161,7 @@ void Game::RenderUI() const
 {
     if (!player || !currentBoss) return;
 
-    // Lambda helper function using safe standard characters
+    // Lambda helper function using ConsoleHelper colors for the progress bar
     auto drawBar = [](int current, int max, int totalBlocks = 10) {
         if (max <= 0) max = 1;
         float ratio = static_cast<float>(current) / max;
@@ -172,35 +173,35 @@ void Game::RenderUI() const
         std::cout << "[";
         for (int i = 0; i < totalBlocks; ++i) {
             if (i < filledCount) {
-                std::cout << "\033[32m#\033[0m"; // Green filled block
+                ConsoleHelper::print("#", ConsoleHelper::Green, false); // Green filled block
             }
             else {
-                std::cout << "\033[31m-\033[0m"; // Red empty block slot
+                ConsoleHelper::print("-", ConsoleHelper::Red, false);   // Red empty block slot
             }
         }
         std::cout << "] " << current << "/" << max;
         };
 
-    std::cout << "\n\033[36m==================================================\033[0m\n";
-    std::cout << " PLAYER: " << player->GetName() << "\n";
+    ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" PLAYER: " + player->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(player->GetCurrentHP(), player->GetMaxHP()); std::cout << "\n";
     std::cout << " SP: "; drawBar(player->GetCurrentSP(), player->GetMaxSP()); std::cout << "\n";
     std::cout << " MP: "; drawBar(player->GetCurrentMP(), player->GetMaxMP()); std::cout << "\n";
-    std::cout << "\033[36m--------------------------------------------------\033[0m\n";
-    std::cout << " BOSS:   " << currentBoss->GetName() << "\n";
+    ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(currentBoss->GetCurrentHP(), 1000); std::cout << " | Posture: " << currentBoss->GetCurrentPosture() << "\n";
-    std::cout << " BOSS INTENT: \033[33m" << currentBoss->GetIntentDescription() << "\033[0m\n";
-    std::cout << "\033[36m==================================================\033[0m\n";
+    std::cout << " BOSS INTENT: "; ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
 void Game::DisplayMenu() const
 {
-    std::cout << "1. Light Attack\n";
-    std::cout << "2. Heavy Attack\n";
-    std::cout << "3. Swap Weapon\n";
-    std::cout << "4. Block\n";
-    std::cout << "5. Dodge\n";
-    std::cout << "6. Inspect Weapons\n";
+    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
+    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
+    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
+    ConsoleHelper::print("4. Block", ConsoleHelper::White);
+    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
+    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
 }
 
 int Game::GetValidatedPlayerChoice()
@@ -211,7 +212,7 @@ int Game::GetValidatedPlayerChoice()
 
     while (!isValid)
     {
-        std::cout << "\033[36mChoice: \033[0m";
+        ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
         // Grab the entire line of input
         std::getline(std::cin, inputLine);
 
@@ -227,18 +228,18 @@ int Game::GetValidatedPlayerChoice()
             }
             else
             {
-                std::cout << "\033[31m[!] Invalid choice. Please enter a number between 1 and 6.\033[0m\n";
+                ConsoleHelper::print("[!] Invalid choice. Please enter a number between 1 and 6.", ConsoleHelper::Red);
             }
         }
         catch (const std::invalid_argument&)
         {
             // Catch if the user types letters or symbols instead of a number
-            std::cout << "\033[31m[!] Invalid input. Please enter a valid number.\033[0m\n";
+            ConsoleHelper::print("[!] Invalid input. Please enter a valid number.", ConsoleHelper::Red);
         }
         catch (const std::out_of_range&)
         {
             // Catch if the number is way too large/small 
-            std::cout << "\033[31m[!] Number out of range. Please enter a valid menu number.\033[0m\n";
+            ConsoleHelper::print("[!] Number out of range. Please enter a valid menu number.", ConsoleHelper::Red);
         }
     }
 
@@ -273,15 +274,15 @@ void Game::HandlePlayerAction(int choice)
     }
     case 3:
         player->SwapWeapon();
-        std::cout << "\033[32mSwapped weapons!\033[0m\n";
+        ConsoleHelper::print("Swapped weapons!", ConsoleHelper::Green);
         break;
     case 4:
         player->Block();
-        std::cout << "You raise your guard to block incoming damage.\n";
+        ConsoleHelper::print("You raise your guard to block incoming damage.", ConsoleHelper::White);
         break;
     case 5:
         player->Dodge();
-        std::cout << "You prepare to dodge the next attack.\n";
+        ConsoleHelper::print("You prepare to dodge the next attack.", ConsoleHelper::White);
         break;
     case 6:
         player->InspectWeapons();
@@ -293,21 +294,17 @@ void Game::HandleCombatOutcome() const
 {
     if (!player->IsAlive())
     {
-        std::cout << "\033[31m";
-        std::cout << "========================\n";
-        std::cout << "[ You Died! ]\n";
-        std::cout << "========================\n";
-        std::cout << "\033[0m";
+        ConsoleHelper::print("========================", ConsoleHelper::Red);
+        ConsoleHelper::print("\n[ You Died! ]", ConsoleHelper::Red);
+        ConsoleHelper::print("========================", ConsoleHelper::Red);
     }
 
     else if (!currentBoss->IsAlive())
     {
-        std::cout << "\033[36m";
-        std::cout << "======================================\n";
-        std::cout << "           Congratulations!           \n";
-        std::cout << "\n[ You defeated the Relic Guardian! ]\n";
-        std::cout << "======================================\n";
-        std::cout << "\033[0m";
+        ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("\n[ You defeated the Relic Guardian! ]", ConsoleHelper::Cyan);
+        ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
     }
 }
 
@@ -388,28 +385,31 @@ void Game::WeaponSelectionMenu()
 
     while (!weaponsConfirmed)
     {
-        std::cout << "\n\033[36m==================================================\033[0m\n";
-        std::cout << "\033[36m              [ WEAPON SELECTION MENU ]           \033[0m\n";
-        std::cout << "\033[36m==================================================\033[0m\n";
-        std::cout << " Current Loadout:\n";
+        ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("              [ WEAPON SELECTION MENU ]           ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" Current Loadout:", ConsoleHelper::White);
         std::cout << "  - Primary:   " << (chosenPrimary ? chosenPrimary->GetName() : "[None Selected]") << "\n";
         std::cout << "  - Secondary: " << (chosenSecondary ? chosenSecondary->GetName() : "[None Selected]") << "\n";
-        std::cout << "\033[36m--------------------------------------------------\033[0m\n";
-        std::cout << " Select a Weapon Scaling Category:\n";
-        std::cout << "  1. [STR] Strength Weapons\n";
-        std::cout << "  2. [AGI] Agility Weapons\n";
-        std::cout << "  3. [INT] Intellect Weapons\n";
-        std::cout << "  4. [FOC] Focus Weapons\n";
-        std::cout << "  5. [HYB] Hybrid Weapons\n";
-        std::cout << "  6. [ALL] View All Weapons \033[31m[WARNING]: This will Word Bomb your console\033[0m\n";
+        ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" Select a Weapon Scaling Category:", ConsoleHelper::White);
+        ConsoleHelper::print("  1. [STR] Strength Weapons", ConsoleHelper::White);
+        ConsoleHelper::print("  2. [AGI] Agility Weapons", ConsoleHelper::White);
+        ConsoleHelper::print("  3. [INT] Intellect Weapons", ConsoleHelper::White);
+        ConsoleHelper::print("  4. [FOC] Focus Weapons", ConsoleHelper::White);
+        ConsoleHelper::print("  5. [HYB] Hybrid Weapons", ConsoleHelper::White);
+
+        std::cout << "  6. [ALL] View All Weapons ";
+        ConsoleHelper::print("[WARNING]: This will Word Bomb your console", ConsoleHelper::Red);
 
         if (chosenPrimary != nullptr && chosenSecondary != nullptr)
         {
-            std::cout << "\033[32m  7. [OK]  Finish & Confirm Loadout\033[0m\n";
+            ConsoleHelper::print("  7. [OK]  Finish & Confirm Loadout", ConsoleHelper::Green);
         }
 
-        std::cout << "\033[36m==================================================\033[0m\n";
-        std::cout << "\033[36mChoice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): \033[0m";
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        std::cout << "Choice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
+        ConsoleHelper::print("", ConsoleHelper::Cyan, false);
 
         if (std::cin.peek() == '\n') {
             std::cin.ignore();
@@ -450,9 +450,9 @@ void Game::WeaponSelectionMenu()
             filteredWeapons = availableWeapons;
         }
 
-        std::cout << "\n\033[36m========================================\033[0m\n";
-        std::cout << "\033[36m       [ AVAILABLE WEAPONS IN GROUP ]   \033[0m\n";
-        std::cout << "\033[36m========================================\033[0m\n";
+        ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("       [ AVAILABLE WEAPONS IN GROUP ]   ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
 
         for (size_t i = 0; i < filteredWeapons.size(); ++i)
         {
@@ -462,33 +462,34 @@ void Game::WeaponSelectionMenu()
             std::string name = filteredWeapons[i]->GetName();
             std::cout << "   -> Identity: ";
             if (name == "Warhammer")
-                std::cout << "Slower attack speed, high physical damage, massive posture damage.\n";
+                ConsoleHelper::print("Slower attack speed, high physical damage, massive posture damage.", ConsoleHelper::White);
             else if (name == "Sword and Shield")
-                std::cout << "Balanced offensive/defensive with high block stability.\n";
+                ConsoleHelper::print("Balanced offensive/defensive with high block stability.", ConsoleHelper::White);
             else if (name == "Daggers")
-                std::cout << "Fast attack speed, multi-hits, rapid Bleed buildup.\n";
+                ConsoleHelper::print("Fast attack speed, multi-hits, rapid Bleed buildup.", ConsoleHelper::White);
             else if (name == "Bow")
-                std::cout << "Ranged physical damage; quick shots or aimed high damage.\n";
+                ConsoleHelper::print("Ranged physical damage; quick shots or aimed high damage.", ConsoleHelper::White);
             else if (name == "Fire Staff")
-                std::cout << "High magic damage with Burn status buildup (damage over time).\n";
+                ConsoleHelper::print("High magic damage with Burn status buildup (damage over time).", ConsoleHelper::White);
             else if (name == "Ice Staff")
-                std::cout << "Control & mitigation; reduces enemy stamina regeneration.\n";
+                ConsoleHelper::print("Control & mitigation; reduces enemy stamina regeneration.", ConsoleHelper::White);
             else if (name == "Life Staff")
-                std::cout << "Support: Can heal the user instead of attacking.\n";
+                ConsoleHelper::print("Support: Can heal the user instead of attacking.", ConsoleHelper::White);
             else if (name == "Greatsword")
-                std::cout << "Hybrid: Heavy attacks scale with STR; light multi-hits scale with AGI.\n";
+                ConsoleHelper::print("Hybrid: Heavy attacks scale with STR; light multi-hits scale with AGI.", ConsoleHelper::White);
             else if (name == "Rapier")
-                std::cout << "Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).\n";
+                ConsoleHelper::print("Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).", ConsoleHelper::White);
             else if (name == "Flail and Shield")
-                std::cout << "Hybrid: Heals on attack if Focus is 12 or higher.\n";
+                ConsoleHelper::print("Hybrid: Heals on attack if Focus is 12 or higher.", ConsoleHelper::White);
             else
-                std::cout << "Standard combat weapon.\n";
+                ConsoleHelper::print("Standard combat weapon.", ConsoleHelper::White);
 
-            std::cout << "----------------------------------------\n";
+            ConsoleHelper::print("----------------------------------------", ConsoleHelper::Cyan);
         }
 
-        std::cout << "Enter 0 to go back to category menu without picking.\n";
-        std::cout << "\033[36mSelect a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): \033[0m";
+        ConsoleHelper::print("Enter 0 to go back to category menu without picking.", ConsoleHelper::White);
+        std::cout << "Select a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): ";
+        ConsoleHelper::print("", ConsoleHelper::Cyan, false);
 
         std::string wInput;
         std::getline(std::cin, wInput);
@@ -501,9 +502,9 @@ void Game::WeaponSelectionMenu()
             Weapon* selected = filteredWeapons[weaponChoice - 1];
 
             std::cout << "\nAssign " << selected->GetName() << " to:\n";
-            std::cout << "1. Primary Slot\n";
-            std::cout << "2. Secondary Slot\n";
-            std::cout << "\033[36mChoice: \033[0m";
+            ConsoleHelper::print("1. Primary Slot", ConsoleHelper::White);
+            ConsoleHelper::print("2. Secondary Slot", ConsoleHelper::White);
+            ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
 
             std::string slotInput;
             std::getline(std::cin, slotInput);
@@ -514,12 +515,12 @@ void Game::WeaponSelectionMenu()
             if (slotChoice == 1)
             {
                 chosenPrimary = selected;
-                std::cout << "\033[32m[+] " << selected->GetName() << " equipped as Primary!\033[0m\n";
+                ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Primary!", ConsoleHelper::Green);
             }
             else
             {
                 chosenSecondary = selected;
-                std::cout << "\033[32m[+] " << selected->GetName() << " equipped as Secondary!\033[0m\n";
+                ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Secondary!", ConsoleHelper::Green);
             }
         }
     }
