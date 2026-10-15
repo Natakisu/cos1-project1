@@ -95,6 +95,10 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
     
 [- **Solution 2:** I decided to create a loop inside of a loop to handle sub menus within the weapon selection.]
 
+[- **Challenge 3:** Added cls to clear the screen when starting the combat loop, but inadvertently made the boss immortal, and made it to where you could no longer see what damage and healing was being done, and you couldn't inspect weapons and swap anymore because of it]
+    
+[- **Solution 3:** Added a pause statement into the CombatLoop to display the information that happened based on user input and require confirmation before clearing the screen and showing the updated information.]
+
 🏆 Accomplishments - What is something I "leveled up" on this week
 
 [Leveled up my implementation refactoring by cleaning up  the console UI and user experience by adding menus, warnings, and success states visual identities, making the text-based RPG much more readable and immersive. I also got a refresher course and learned some new techniques for handling loops within loops and being able to carry over information when switching between the loops.]
