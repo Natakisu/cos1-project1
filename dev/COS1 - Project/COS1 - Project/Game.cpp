@@ -160,9 +160,9 @@ void Game::RenderUI() const
 {
     if (!player || !currentBoss) return;
 
-    // Lambda helper function to draw a visual progress/health bar
+    // Lambda helper function using safe standard characters
     auto drawBar = [](int current, int max, int totalBlocks = 10) {
-        if (max <= 0) max = 1; // Prevent division by zero
+        if (max <= 0) max = 1;
         float ratio = static_cast<float>(current) / max;
         if (ratio < 0.0f) ratio = 0.0f;
         if (ratio > 1.0f) ratio = 1.0f;
@@ -172,10 +172,10 @@ void Game::RenderUI() const
         std::cout << "[";
         for (int i = 0; i < totalBlocks; ++i) {
             if (i < filledCount) {
-                std::cout << "\033[32m█\033[0m"; // Green filled block
+                std::cout << "\033[32m#\033[0m"; // Green filled block
             }
             else {
-                std::cout << "\033[31m░\033[0m"; // Red/Empty block slot
+                std::cout << "\033[31m-\033[0m"; // Red empty block slot
             }
         }
         std::cout << "] " << current << "/" << max;
