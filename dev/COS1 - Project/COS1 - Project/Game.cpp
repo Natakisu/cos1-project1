@@ -161,7 +161,6 @@ void Game::RenderUI() const
     if (!player || !currentBoss) return;
 
     // Lambda helper function to draw a visual progress/health bar
-    // Usage: drawBar(currentValue, maxValue, totalBlocks)
     auto drawBar = [](int current, int max, int totalBlocks = 10) {
         if (max <= 0) max = 1; // Prevent division by zero
         float ratio = static_cast<float>(current) / max;
