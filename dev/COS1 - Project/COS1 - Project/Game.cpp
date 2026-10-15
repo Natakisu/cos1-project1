@@ -17,7 +17,7 @@ void Game::Initialize()
     CharacterCreation();
     //Add weapon menu to UI to let character select weapon
     WeaponSelectionMenu();
-    currentBoss = new Enemy("Relic Guardian", 10000000, 500);
+    currentBoss = new Enemy("Relic Guardian", 1000, 50);
 }
 
 void Game::CharacterCreation()
