@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Enemy.h"
+#include <vector>
 
 class Game
 {
@@ -8,6 +9,12 @@ private:
     Player* player;
     Enemy* currentBoss;
     bool isRunning;
+
+    // Vector and Helper Methods for weapon selection
+    std::vector<Weapon*> availableWeapons;
+
+    void InitializeWeaponPool();
+    void WeaponSelectionMenu();
 
     // Helper Methods (Cleaned up duplicates and typos)
     int GetValidatedPlayerChoice();

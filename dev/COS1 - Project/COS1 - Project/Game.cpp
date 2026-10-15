@@ -14,18 +14,17 @@ Game::~Game()
 void Game::Initialize()
 {
     CharacterCreation();
-
-    // Create starter weapons and boss using dynamic allocation
-    Weapon* sword = new Weapon("Longsword", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 15, 0, 10, 15);
-    Weapon* staff = new Weapon("Flame Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15);
-
-    player->EquipWeapons(sword, staff);
+    //Add weapon menu to UI to let character select weapon
+    WeaponSelectionMenu();
     currentBoss = new Enemy("Relic Guardian", 200, 50);
 }
 
-void Game::CharacterCreation() 
+void Game::CharacterCreation()
 {
     std::string playerName;
+    std::cout << "========================================\n";
+    std::cout << "          CHARACTER CREATION            \n";
+    std::cout << "========================================\n";
     std::cout << "Enter your character's name: ";
     std::cin >> playerName;
     player = new Player(playerName);
@@ -33,23 +32,30 @@ void Game::CharacterCreation()
     int totalPoints = 30; // Total points available to spend
     int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base starting stats
 
-    std::cout << "\n--- Character Stat Allocation ---\n";
-    std::cout << "You have " << totalPoints << " points to distribute across your attributes.\n";
-    std::cout << "(Base stats start at 10. Enter how many points to *add* to each stat)\n";
+    // Breif Description of what Stats do
+    std::cout << "\n--- Attribute Descriptions ---\n";
+    std::cout << " - Constitution (CON): Increases your Max HP.\n";
+    std::cout << " - Strength     (STR): Increases physical weapon damage.\n";
+    std::cout << " - Agility      (AGI): Increases Stamina (SP) and dodging/speed.\n";
+    std::cout << " - Intellect    (INT): Increases Mana (MP) and magical effectiveness.\n";
+    std::cout << " - Focus        (FOC): Increases your healing potency and recovery\n";
+
+    std::cout << "\n--- Stat Allocation (30 Points Available) ---\n";
+    std::cout << "(Base stats start at 10. Enter how many points to *add* to each)\n";
 
     int p = 0;
 
     // Constitution
-    std::cout << "Points for Constitution (CON - current pool left: " << totalPoints << "): ";
+    std::cout << "\n[1/5] Constitution (CON) [Pool Left: " << totalPoints << "]: ";
     std::cin >> p;
-    if (p > totalPoints) p = totalPoints; // Prevent spending more than available
+    if (p > totalPoints) p = totalPoints;
     con += p;
     totalPoints -= p;
 
     // Strength
-    if (totalPoints > 0) 
+    if (totalPoints > 0)
     {
-        std::cout << "Points for Strength (STR - current pool left: " << totalPoints << "): ";
+        std::cout << "[2/5] Strength (STR) [Pool Left: " << totalPoints << "]: ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
         str += p;
@@ -57,9 +63,9 @@ void Game::CharacterCreation()
     }
 
     // Agility
-    if (totalPoints > 0) 
+    if (totalPoints > 0)
     {
-        std::cout << "Points for Agility (AGI - current pool left: " << totalPoints << "): ";
+        std::cout << "[3/5] Agility (AGI) [Pool Left: " << totalPoints << "]: ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
         agi += p;
@@ -67,9 +73,9 @@ void Game::CharacterCreation()
     }
 
     // Intellect
-    if (totalPoints > 0) 
+    if (totalPoints > 0)
     {
-        std::cout << "Points for Intellect (INT - current pool left: " << totalPoints << "): ";
+        std::cout << "[4/5] Intellect (INT) [Pool Left: " << totalPoints << "]: ";
         std::cin >> p;
         if (p > totalPoints) p = totalPoints;
         intel += p;
@@ -78,12 +84,14 @@ void Game::CharacterCreation()
 
     // Focus (dumps any remaining pool points automatically)
     foc += totalPoints;
-    std::cout << "Remaining " << totalPoints << " points automatically allocated to Focus (FOC).\n";
+    std::cout << "[5/5] Focus (FOC): Remaining " << totalPoints << " points automatically allocated.\n";
 
-    // Apply the configured values to the player
+    // Apply the configured values
     player->SetAttributes(con, str, agi, intel, foc);
 
-    std::cout << "\nAttributes configured successfully!\n";
+    std::cout << "\n========================================\n";
+    std::cout << "       ATTRIBUTES CONFIGURED!           \n";
+    std::cout << "========================================\n";
     player->DisplayStats();
 }
 
@@ -193,4 +201,87 @@ void Game::RunCombatLoop()
 
     HandleCombatOutcome();
     isRunning = false;
+}
+
+void Game::InitializeWeaponPool()
+{
+    // Populate weapon Vector 
+    availableWeapons.push_back(new Weapon("Longsword", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 15, 0, 10, 15));
+    availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15));
+    availableWeapons.push_back(new Weapon("Battle Axe", WeaponType::PureSTR, 22, 14, 0.9f, 0.1f, 0.0f, 0.0f, 20, 0, 15, 20));
+    availableWeapons.push_back(new Weapon("Dagger", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10));
+}
+
+// Weapon Menu
+void Game::WeaponSelectionMenu()
+{
+    bool weaponsConfirmed = false;
+
+    while (!weaponsConfirmed)
+    {
+        InitializeWeaponPool();
+
+        std::cout << "\n========================================\n";
+        std::cout << "          CHOOSE YOUR WEAPONS           \n";
+        std::cout << "========================================\n";
+
+        for (size_t i = 0; i < availableWeapons.size(); ++i) {
+            std::cout << i + 1 << ". ";
+            availableWeapons[i]->DisplayWeaponInfo();
+            std::cout << "----------------------------------------\n";
+        }
+
+        int primaryChoice = 0;
+        int secondaryChoice = 0;
+
+        std::cout << "Select your Primary Weapon (1-" << availableWeapons.size() << "): ";
+        std::cin >> primaryChoice;
+
+        std::cout << "Select your Secondary Weapon (1-" << availableWeapons.size() << "): ";
+        std::cin >> secondaryChoice;
+
+        // Get weapon count as a clean int to avoid size_t comparison issues
+        int weaponCount = (int)availableWeapons.size();
+
+        // Bounds checking
+        if (primaryChoice < 1 || primaryChoice > weaponCount) primaryChoice = 1;
+        if (secondaryChoice < 1 || secondaryChoice > weaponCount) secondaryChoice = 2;
+
+        // Display confirmation summary
+        std::cout << "\n========================================\n";
+        std::cout << "         YOUR SELECTED LOADOUT          \n";
+        std::cout << "========================================\n";
+        std::cout << "[Primary]: ";
+        availableWeapons[primaryChoice - 1]->DisplayWeaponInfo();
+        std::cout << "\n[Secondary]: ";
+        availableWeapons[secondaryChoice - 1]->DisplayWeaponInfo();
+        std::cout << "========================================\n";
+
+        std::cout << "Are you happy with this loadout?\n";
+        std::cout << "1. Confirm and Start Boss Fight\n";
+        std::cout << "2. Reselect Weapons\n";
+        std::cout << "Choice: ";
+
+        int confirmChoice = 0;
+        std::cin >> confirmChoice;
+
+        if (confirmChoice == 1)
+        {
+            // Allocate selected weapons to player
+            Weapon* selectedPrimary = new Weapon(*availableWeapons[primaryChoice - 1]);
+            Weapon* selectedSecondary = new Weapon(*availableWeapons[secondaryChoice - 1]);
+            player->EquipWeapons(selectedPrimary, selectedSecondary);
+            weaponsConfirmed = true;
+        }
+        else
+        {
+            std::cout << "\n[!] Resetting weapon selection...\n";
+        }
+
+        // Clean up the temporary vector pool memory for this loop iteration
+        for (Weapon* w : availableWeapons) {
+            delete w;
+        }
+        availableWeapons.clear();
+    }
 }
