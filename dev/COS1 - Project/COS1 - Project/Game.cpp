@@ -17,7 +17,7 @@ void Game::Initialize()
     CharacterCreation();
     //Add weapon menu to UI to let character select weapon
     WeaponSelectionMenu();
-    currentBoss = new Enemy("Relic Guardian", 200, 50);
+    currentBoss = new Enemy("Relic Guardian", 10000000, 500);
 }
 
 void Game::CharacterCreation()
@@ -264,101 +264,159 @@ void Game::InitializeWeaponPool()
 }
 
 // Weapon Menu
-        void Game::WeaponSelectionMenu()
+void Game::WeaponSelectionMenu()
+{
+    bool weaponsConfirmed = false;
+
+    // Initialize the master weapon pool once
+    InitializeWeaponPool();
+
+    // Track chosen weapon pointers temporarily
+    Weapon* chosenPrimary = nullptr;
+    Weapon* chosenSecondary = nullptr;
+
+    while (!weaponsConfirmed)
+    {
+        // Display current loadout status so the player knows what they've locked in so far
+        std::cout << "\n========================================\n";
+        std::cout << "          WEAPON SELECTION MENU         \n";
+        std::cout << "========================================\n";
+        std::cout << "Current Primary:   " << (chosenPrimary ? chosenPrimary->GetName() : "[None Selected]") << "\n";
+        std::cout << "Current Secondary: " << (chosenSecondary ? chosenSecondary->GetName() : "[None Selected]") << "\n";
+        std::cout << "----------------------------------------\n";
+        std::cout << "1. Pure Strength (STR) Weapons\n";
+        std::cout << "2. Pure Agility (AGI) Weapons\n";
+        std::cout << "3. Pure Intellect (INT) Weapons\n";
+        std::cout << "4. Pure Focus (FOC) Weapons\n";
+        std::cout << "5. Hybrid Weapons\n";
+        std::cout << "6. View All Weapons\n";
+        if (chosenPrimary != nullptr && chosenSecondary != nullptr) {
+            std::cout << "7. Finish & Confirm Loadout\n";
+        }
+        std::cout << "Select a category (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
+
+        if (std::cin.peek() == '\n') {
+            std::cin.ignore();
+        }
+
+        std::string catInput;
+        std::getline(std::cin, catInput);
+        int categoryChoice = 0;
+
+        try {
+            categoryChoice = std::stoi(catInput);
+        }
+        catch (...) {
+            categoryChoice = 6;
+        }
+
+        // If they chose option 7 to finish
+        if (categoryChoice == 7 && chosenPrimary != nullptr && chosenSecondary != nullptr)
         {
-            bool weaponsConfirmed = false;
+            weaponsConfirmed = true;
+            break;
+        }
 
-            while (!weaponsConfirmed)
+        // Filter weapons based on the chosen category
+        std::vector<Weapon*> filteredWeapons;
+        for (Weapon* w : availableWeapons)
+        {
+            WeaponType type = w->GetType();
+            if (categoryChoice == 1 && type == WeaponType::PureSTR) filteredWeapons.push_back(w);
+            else if (categoryChoice == 2 && type == WeaponType::PureAGI) filteredWeapons.push_back(w);
+            else if (categoryChoice == 3 && type == WeaponType::PureINT) filteredWeapons.push_back(w);
+            else if (categoryChoice == 4 && type == WeaponType::PureFOC) filteredWeapons.push_back(w);
+            else if (categoryChoice == 5 && type == WeaponType::Hybrid) filteredWeapons.push_back(w);
+        }
+
+        if (categoryChoice == 6 || filteredWeapons.empty())
+        {
+            filteredWeapons = availableWeapons;
+        }
+
+        std::cout << "\n========================================\n";
+        std::cout << "         AVAILABLE WEAPONS IN GROUP     \n";
+        std::cout << "========================================\n";
+
+        for (size_t i = 0; i < filteredWeapons.size(); ++i)
+        {
+            std::cout << i + 1 << ". ";
+            filteredWeapons[i]->DisplayWeaponInfo();
+
+            std::string name = filteredWeapons[i]->GetName();
+            std::cout << "   -> Description: ";
+            if (name == "Warhammer")
+                std::cout << "Slower attack speed, high physical damage, massive posture damage.\n";
+            else if (name == "Sword and Shield")
+                std::cout << "Balanced offensive/defensive with high block stability.\n";
+            else if (name == "Daggers")
+                std::cout << "Fast attack speed, multi-hits, rapid Bleed buildup.\n";
+            else if (name == "Bow")
+                std::cout << "Ranged physical damage; quick shots or aimed high damage.\n";
+            else if (name == "Fire Staff")
+                std::cout << "High magic damage with Burn status buildup (damage over time).\n";
+            else if (name == "Ice Staff")
+                std::cout << "Control & mitigation; reduces enemy stamina regeneration.\n";
+            else if (name == "Life Staff")
+                std::cout << "Essential sustain; self-healing and cooldown reduction.\n";
+            else if (name == "Greatsword")
+                std::cout << "Hybrid: Heavy attacks scale with STR; light multi-hits scale with AGI.\n";
+            else if (name == "Rapier")
+                std::cout << "Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).\n";
+            else if (name == "Flail and Shield")
+                std::cout << "Hybrid: Paladin drain-tanking with a small self-heal on attack/block.\n";
+            else
+                std::cout << "Standard combat weapon.\n";
+
+            std::cout << "----------------------------------------\n";
+        }
+
+        std::cout << "Enter 0 to go back to category menu without picking.\n";
+        std::cout << "Select a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): ";
+
+        std::string wInput;
+        std::getline(std::cin, wInput);
+        int weaponChoice = 0;
+        try { weaponChoice = std::stoi(wInput); }
+        catch (...) { weaponChoice = 0; }
+
+        if (weaponChoice > 0 && weaponChoice <= (int)filteredWeapons.size())
+        {
+            Weapon* selected = filteredWeapons[weaponChoice - 1];
+
+            std::cout << "\nAssign " << selected->GetName() << " to:\n";
+                std::cout << "1. Primary Slot\n";
+            std::cout << "2. Secondary Slot\n";
+            std::cout << "Choice: ";
+
+            std::string slotInput;
+            std::getline(std::cin, slotInput);
+            int slotChoice = 0;
+            try { slotChoice = std::stoi(slotInput); }
+            catch (...) { slotChoice = 1; }
+
+            if (slotChoice == 1)
             {
-                InitializeWeaponPool();
-
-                std::cout << "\n========================================\n";
-                std::cout << "          CHOOSE YOUR WEAPONS           \n";
-                std::cout << "========================================\n";
-
-                for (size_t i = 0; i < availableWeapons.size(); ++i)
-                {
-                    std::cout << i + 1 << ". ";
-                    availableWeapons[i]->DisplayWeaponInfo(); // Shows base stats
-
-                    // Print out specific scaling & identity descriptions based on weapon name
-                    std::string name = availableWeapons[i]->GetName();
-                    std::cout << "   -> Description: ";
-                    if (name == "Warhammer")
-                        std::cout << "Slower attack speed, high physical damage, massive posture damage.\n";
-                    else if (name == "Sword and Shield")
-                        std::cout << "Balanced offensive/defensive with high block stability.\n";
-                    else if (name == "Daggers")
-                        std::cout << "Fast attack speed, multi-hits, rapid Bleed buildup.\n";
-                    else if (name == "Bow")
-                        std::cout << "Ranged physical damage; quick shots or aimed high damage.\n";
-                    else if (name == "Fire Staff")
-                        std::cout << "High magic damage with Burn status buildup (damage over time).\n";
-                    else if (name == "Ice Staff")
-                        std::cout << "Control & mitigation; reduces enemy stamina regeneration.\n";
-                    else if (name == "Life Staff")
-                        std::cout << "Essential sustain; self-healing and cooldown reduction.\n";
-                    else if (name == "Greatsword")
-                        std::cout << "Hybrid: Heavy attacks scale with STR; light multi-hits scale with AGI.\n";
-                    else if (name == "Rapier")
-                        std::cout << "Hybrid: Finesse weapon with cross-resource detonation (Bleed/Burn).\n";
-                    else if (name == "Flail and Shield")
-                        std::cout << "Hybrid: Paladin drain-tanking with a small self-heal on attack/block.\n";
-                    else
-                        std::cout << "Standard combat weapon.\n";
-
-                    std::cout << "----------------------------------------\n";
-                }
-
-                int primaryChoice = 0;
-                int secondaryChoice = 0;
-
-                std::cout << "Select your Primary Weapon (1-" << availableWeapons.size() << "): ";
-                std::cin >> primaryChoice;
-
-                std::cout << "Select your Secondary Weapon (1-" << availableWeapons.size() << "): ";
-                std::cin >> secondaryChoice;
-
-                int weaponCount = (int)availableWeapons.size();
-
-                // Bounds checking
-                if (primaryChoice < 1 || primaryChoice > weaponCount) primaryChoice = 1;
-                if (secondaryChoice < 1 || secondaryChoice > weaponCount) secondaryChoice = 2;
-
-                // Display confirmation
-                std::cout << "\n========================================\n";
-                std::cout << "         YOUR SELECTED LOADOUT          \n";
-                std::cout << "========================================\n";
-                std::cout << "[Primary]: ";
-                availableWeapons[primaryChoice - 1]->DisplayWeaponInfo();
-                std::cout << "\n[Secondary]: ";
-                availableWeapons[secondaryChoice - 1]->DisplayWeaponInfo();
-                std::cout << "========================================\n";
-
-                std::cout << "Are you happy with this loadout?\n";
-                std::cout << "1. Confirm and Start Boss Fight\n";
-                std::cout << "2. Reselect Weapons\n";
-                std::cout << "Choice: ";
-
-                int confirmChoice = 0;
-                std::cin >> confirmChoice;
-
-                if (confirmChoice == 1)
-                {
-                    Weapon* selectedPrimary = new Weapon(*availableWeapons[primaryChoice - 1]);
-                    Weapon* selectedSecondary = new Weapon(*availableWeapons[secondaryChoice - 1]);
-                    player->EquipWeapons(selectedPrimary, selectedSecondary);
-                    weaponsConfirmed = true;
-                }
-                else
-                {
-                    std::cout << "\n[!] Resetting weapon selection...\n";
-                }
-
-                // Clean up temporary vector
-                for (Weapon* w : availableWeapons) {
-                    delete w;
-                }
-                availableWeapons.clear();
+                chosenPrimary = selected;
+                std::cout << "[+] " << selected->GetName() << " equipped as Primary!\n";
+            }
+            else
+            {
+                chosenSecondary = selected;
+                std::cout << "[+] " << selected->GetName() << " equipped as Secondary!\n";
             }
         }
+    }
+
+    // Equip final selections to player
+    if (chosenPrimary && chosenSecondary)
+    {
+        player->EquipWeapons(new Weapon(*chosenPrimary), new Weapon(*chosenSecondary));
+    }
+
+    // Clean up master pool memory
+    for (Weapon* w : availableWeapons) {
+        delete w;
+    }
+    availableWeapons.clear();
+}

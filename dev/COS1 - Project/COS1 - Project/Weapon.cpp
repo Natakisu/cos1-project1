@@ -10,7 +10,7 @@ Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     blockStaminaCost(blockSP), dodgeStaminaCost(dodgeSP) {
 }
 
-int Weapon::CalculateDamage(int str, int agi, int intel, int foc) const 
+int Weapon::CalculateDamage(int str, int agi, int intel, int foc) const
 {
     float bonusDamage = (str * strScaling) +
         (agi * agiScaling) +
