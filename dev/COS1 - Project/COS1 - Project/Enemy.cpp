@@ -91,4 +91,5 @@ void Enemy::ResetTurnState()
     {
         isStaggered = false;
         currentPosture = maxPosture;
+    }
 }

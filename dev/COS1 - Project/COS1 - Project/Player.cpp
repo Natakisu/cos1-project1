@@ -2,26 +2,26 @@
 #include "Player.h"
 #include "Enemy.h"
 
-Player::Player(std::string name) {
-    this->name = name;
-    // Ensure fresh base attributes on creation
-    constitution = 10;
-    strength = 10;
-    agility = 10;
-    intellect = 10;
-    focus = 10;
-
+Player::Player(std::string name)
+    : name(name),
+    constitution(10), strength(10), agility(10), intellect(10), focus(10),
+    maxHP(100), currentHP(100), maxSP(100), currentSP(100), maxMP(100), currentMP(100),
+    primaryWeapon(nullptr), secondaryWeapon(nullptr), isPrimaryActive(true),
+    isBlocking(false), isDodging(false)
+{
     RecalculatePools();
     currentHP = maxHP;
     currentSP = maxSP;
     currentMP = maxMP;
-
-    // Default weapon setup if you have it here
 }
 
-Player::~Player() 
+Player::~Player()
 {
-    // Memory cleanup 
+    // Memory Cleanup Addressed
+    delete primaryWeapon;
+    delete secondaryWeapon;
+    primaryWeapon = nullptr;
+    secondaryWeapon = nullptr;
 }
 
 void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
@@ -55,8 +55,8 @@ bool Player::SwapWeapon()
     return true;
 }
 
-int Player::PerformLightAttack(Enemy& target) {
-    // Use GetActiveWeapon() directly (not Player::GetActiveWeapon())
+int Player::PerformLightAttack(Enemy& target) 
+{
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon || currentSP < activeWeapon->GetAttackStaminaCost()) {
         return 0;
@@ -120,8 +120,8 @@ void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
     agility = agi;
     intellect = intel;
     focus = foc;
-    RecalculatePools(); // Automatically updates Max HP, SP, MP based on new stats!
-    currentHP = maxHP;  // Refill current pools on setup
+    RecalculatePools(); 
+    currentHP = maxHP;  
     currentSP = maxSP;
     currentMP = maxMP;
 }

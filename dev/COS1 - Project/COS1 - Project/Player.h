@@ -62,5 +62,4 @@ public:
     void DisplayStats() const;
 
     void InspectWeapons() const;
-
 };

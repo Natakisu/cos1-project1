@@ -11,11 +11,11 @@ Game::~Game()
     delete currentBoss;
 }
 
-void Game::Initialize() 
+void Game::Initialize()
 {
     CharacterCreation();
 
-    // Create starter weapons and boss
+    // Create starter weapons and boss using dynamic allocation
     Weapon* sword = new Weapon("Longsword", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 15, 0, 10, 15);
     Weapon* staff = new Weapon("Flame Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15);
 
