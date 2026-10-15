@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <iostream>
+#include <string>
 
 Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true) 
 {
@@ -122,16 +123,42 @@ void Game::DisplayMenu() const
 int Game::GetValidatedPlayerChoice()
 {
     int choice = 0;
-    std::cout << "Choice: ";
-    std::cin >> choice;
+    std::string inputLine;
+    bool isValid = false;
 
-    while (std::cin.fail() || choice < 1 || choice > 6) 
+    while (!isValid)
     {
-        std::cin.clear();
-        std::cin.ignore(32767, '\n');
-        std::cout << "[!] Invalid input. Please enter a number between 1 and 6: ";
-        std::cin >> choice;
+        std::cout << "Choice: ";
+        // Grab the entire line of input
+        std::getline(std::cin, inputLine);
+
+        try
+        {
+            // Attempt to convert string to integer
+            choice = std::stoi(inputLine);
+
+            // Check range for the 6 menu items
+            if (choice >= 1 && choice <= 6)
+            {
+                isValid = true;
+            }
+            else
+            {
+                std::cout << "[!] Invalid choice. Please enter a number between 1 and 6.\n";
+            }
+        }
+        catch (const std::invalid_argument&)
+        {
+            // Catch if the user types letters or symbols instead of a number
+            std::cout << "[!] Invalid input. Please enter a valid number.\n";
+        }
+        catch (const std::out_of_range&)
+        {
+            // Catch if the number is way too large/small 
+            std::cout << "[!] Number out of range. Please enter a valid menu number.\n";
+        }
     }
+
     return choice;
 }
 
