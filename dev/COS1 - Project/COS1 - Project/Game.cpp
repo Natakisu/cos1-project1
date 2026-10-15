@@ -312,6 +312,7 @@ void Game::RunCombatLoop()
 {
     while (isRunning && player->IsAlive() && currentBoss->IsAlive())
     {
+        system("cls"); // Clear old text so the UI stays fresh every turn
         currentBoss->GenerateIntent();
         RenderUI();
         DisplayMenu();
