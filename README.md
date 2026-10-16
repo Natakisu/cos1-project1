@@ -87,13 +87,17 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 🌵 Challenges - What problems did I have & how I'm addressing them
 
-[- **Challenge 1:** Dealing with a logic flow issue where player healing felt like it wasn't registering because the boss's attack seemed to cancel out the health gain on the same turn.
+- **Challenge 1:** [Dealing with a logic flow issue where player healing felt like it wasn't registering because the boss's attack seemed to cancel out the health gain on the same turn.
     
-[- **Solution:** Added clear, explicit damage and healing readouts  and refactored turn logging so that damage taken and recovery numbers can be directly tracked turn-by-turn to easily verify and show the heal actually does something. As long as you remember you CANNOT increase your max HP through healing. No matter how much you heal for it does not take you above the threshold.]
+- **Solution:** [Added clear, explicit damage and healing readouts  and refactored turn logging so that damage taken and recovery numbers can be directly tracked turn-by-turn to easily verify and show the heal actually does something. As long as you remember you CANNOT increase your max HP through healing. No matter how much you heal for it does not take you above the threshold.]
 
-[- **Challenge 2:** When I had originally created the weapon selection menu the console just got completely word bombed right after the user finished allocating their stats. Needless to say it made it very confusing and impossible to read. Was like Gojo just used Limitless on you.]
+- **Challenge 2:** [When I had originally created the weapon selection menu the console just got completely word bombed right after the user finished allocating their stats. Needless to say it made it very confusing and impossible to read. Was like Gojo just used Limitless on you.]
     
-[- **Solution 2:** I decided to create a loop inside of a loop to handle sub menus within the weapon selection.]
+- **Solution 2:** [I decided to create a loop inside of a loop to handle sub menus within the weapon selection.]
+
+- **Challenge 3:** [Added cls to clear the screen when starting the combat loop, but inadvertently made the boss immortal, and made it to where you could no longer see what damage and healing was being done, and you couldn't inspect weapons and swap anymore because of it]
+    
+- **Solution 3:** [Added a pause statement into the CombatLoop to display the information that happened based on user input and require confirmation before clearing the screen and showing the updated information.]
 
 🏆 Accomplishments - What is something I "leveled up" on this week
 
@@ -101,7 +105,7 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 🔮 Next Steps - What I plan to prioritize and do next
 
-[I plan to start working on the Burn and Bleed statuses and their interactions next as well as continue refining the console UI to keep making it more readable and understandable. I'm also going to start getting started on implementing elements for Milestone 4, and adding more feature to my game. I feel the Experience System I have planned is really going to be elevated a file save-load/read/write system. Maybe add a menu for user's to input their own values for the boss' HP, or a difficulty selection. I don't know we'll see how much I can squeeze in.]
+[I plan to start working on the Burn and Bleed statuses and their interactions next as well as continue refining the console UI to keep making it more readable and understandable. I'm also going to start getting started on implementing elements for Milestone 4, and adding more feature to my game. I feel the Experience System I have planned is really going to be elevated by a file save-load/read-write system. Maybe add a menu for user's to input their own values for the boss' HP, or a difficulty selection. I don't know we'll see how much I can squeeze in.]
 
 ### Week 4
 
