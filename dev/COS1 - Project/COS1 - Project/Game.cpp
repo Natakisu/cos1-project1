@@ -204,8 +204,12 @@ void Game::RenderUI() const
     ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(currentBoss->GetCurrentHP(), 1000); std::cout << " | Posture: " << currentBoss->GetCurrentPosture() << "\n";
+    std::cout << " STATUS BUILDS -> ";
+    std::cout << "Bleed: " << currentBoss->GetBleedMeter() << "/100 | ";
+    std::cout << "Burn: " << currentBoss->GetBurnMeter() << "/100\n";
     std::cout << " BOSS INTENT: "; ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+
 }
 
 // Combat Action Menu
@@ -320,16 +324,16 @@ void Game::HandleCombatOutcome() const
 {
     if (!player->IsAlive())
     {
-        ConsoleHelper::print("========================", ConsoleHelper::Red);
-        ConsoleHelper::print("\n[ You Died! ]", ConsoleHelper::Red);
-        ConsoleHelper::print("========================", ConsoleHelper::Red);
+        ConsoleHelper::print("=========================", ConsoleHelper::Red);
+        ConsoleHelper::print("      [ You Died! ]      ", ConsoleHelper::Red);
+        ConsoleHelper::print("=========================", ConsoleHelper::Red);
     }
 
     else if (!currentBoss->IsAlive())
     {
         ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("\n[ You defeated the Relic Guardian! ]", ConsoleHelper::Cyan);
+        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Green);
+        ConsoleHelper::print(" [ You defeated the Relic Guardian! ] ", ConsoleHelper::Cyan);
         ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
     }
 }

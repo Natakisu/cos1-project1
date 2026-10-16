@@ -36,8 +36,8 @@ public:
     void CheckPostureBreak();
     void ResetTurnState();
     void ResolveStatusEffects();
-
-    // Getters
+    int GetBleedMeter() const { return bleedMeter; }
+    int GetBurnMeter() const { return burnMeter; }
     std::string GetName() const { return name; }
     int GetCurrentHP() const { return currentHP; }
     int GetCurrentPosture() const { return currentPosture; }
