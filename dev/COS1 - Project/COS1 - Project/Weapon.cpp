@@ -1,5 +1,7 @@
 #include <iostream>
+#include <string>
 #include "Weapon.h"
+#include "ConsoleHelper.h"
 
 Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     float strScale, float agiScale, float intScale, float focScale,
@@ -21,7 +23,7 @@ int Weapon::CalculateDamage(int str, int agi, int intel, int foc) const
 }
 
 void Weapon::DisplayWeaponInfo() const {
-    std::cout << "\033[36m--- " << name << " ---\033[0m\n";
+    ConsoleHelper::print("--- " + name + " ---", ConsoleHelper::Cyan);
     std::cout << "Base Damage: " << baseDamage << " | Posture Damage: " << postureDamage << "\n";
     std::cout << "Stamina Cost: " << attackStaminaCost << " | Mana Cost: " << attackManaCost << "\n";
     std::cout << "Scaling Ratios -> STR: " << (strScaling * 100) << "% | AGI: " << (agiScaling * 100)

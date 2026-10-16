@@ -1,6 +1,8 @@
 #include <iostream>
+#include <string>
 #include "Player.h"
 #include "Enemy.h"
+#include "ConsoleHelper.h"
 
 Player::Player(std::string name)
     : name(name),
@@ -71,13 +73,13 @@ int Player::PerformLightAttack(Enemy& target)
         currentHP += healingAmount;
         if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
 
-        std::cout << " \033[32m> " << name << " channels the Life Staff, restoring " << healingAmount << " HP!\033[0m\n";
+        ConsoleHelper::print(" > " + name + " channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0; // Skips dealing damage to the boss
     }
 
     // Check stamina cost for standard weapons
     if (currentSP < activeWeapon->GetAttackStaminaCost()) {
-        std::cout << "\033[31m[!] Not enough stamina for light attack!\033[0m\n";
+        ConsoleHelper::print("[!] Not enough stamina for light attack!", ConsoleHelper::Red);
         return 0;
     }
 
@@ -94,11 +96,11 @@ int Player::PerformLightAttack(Enemy& target)
             int drainHeal = 10 + focus;
             currentHP += drainHeal;
             if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
-            std::cout << " \033[32m[+] Flail & Shield life-drain active! Restored " << drainHeal << " HP.\033[0m\n";
+            ConsoleHelper::print(" [+] Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else
         {
-            std::cout << " \033[31m[-] Focus too low (<12 FOC) to trigger Flail life-drain!\033[0m\n";
+            ConsoleHelper::print(" [-] Focus too low (<12 FOC) to trigger Flail life-drain!", ConsoleHelper::Red);
         }
     }
 
@@ -118,13 +120,13 @@ int Player::PerformHeavyAttack(Enemy& target) {
         currentHP += healingAmount;
         if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
 
-        std::cout << " \033[32m> " << name << " heavily channels the Life Staff, restoring " << healingAmount << " HP!\033[0m\n";
+        ConsoleHelper::print(" > " + name + " heavily channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0;
     }
 
     int staminaCost = activeWeapon->GetAttackStaminaCost() * 2;
     if (currentSP < staminaCost) {
-        std::cout << "\033[31m[!] Not enough stamina for heavy attack!\033[0m\n";
+        ConsoleHelper::print("[!] Not enough stamina for heavy attack!", ConsoleHelper::Red);
         return 0;
     }
 
@@ -142,11 +144,11 @@ int Player::PerformHeavyAttack(Enemy& target) {
             int drainHeal = 20 + (focus * 2);
             currentHP += drainHeal;
             if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
-            std::cout << " \033[32m[+] Heavy Flail & Shield life-drain active! Restored " << drainHeal << " HP.\033[0m\n";
+            ConsoleHelper::print(" [+] Heavy Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else
         {
-            std::cout << " \033[31m[-] Focus too low (<12 FOC) to trigger Heavy Flail life-drain!\033[0m\n";
+            ConsoleHelper::print(" [-] Focus too low (<12 FOC) to trigger Heavy Flail life-drain!", ConsoleHelper::Red);
         }
     }
 
@@ -197,21 +199,24 @@ void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
 }
 
 void Player::DisplayStats() const {
-    std::cout << "\n\033[36m--- " << name << "'s Attributes ---\033[0m\n";
+    ConsoleHelper::print("\n--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
     std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
     std::cout << "Strength     (STR): " << strength << "\n";
     std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
     std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
     std::cout << "Focus        (FOC): " << focus << "\n";
-    std::cout << "\033[36m---------------------------\033[0m\n";
+    ConsoleHelper::print("---------------------------", ConsoleHelper::Cyan);
 }
 
 void Player::InspectWeapons() const {
-    std::cout << "\n\033[36m=== EQUIPPED WEAPONS ===\033[0m\n";
-    std::cout << (isPrimaryActive ? "\033[32m[ACTIVE] \033[0m" : "[STOWED] ");
+    ConsoleHelper::print("\n=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
+    if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+    else std::cout << "[STOWED] ";
     if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
 
-    std::cout << "\n" << (!isPrimaryActive ? "\033[32m[ACTIVE] \033[0m" : "[STOWED] ");
+    std::cout << "\n";
+    if (!isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+    else std::cout << "[STOWED] ";
     if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
-    std::cout << "\033[36m========================\033[0m\n";
+    ConsoleHelper::print("========================", ConsoleHelper::Cyan);
 }
