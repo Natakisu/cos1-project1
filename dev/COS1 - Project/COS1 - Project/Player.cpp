@@ -199,17 +199,26 @@ void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
 }
 
 void Player::DisplayStats() const {
-    ConsoleHelper::print("\n--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
+    system("cls"); // Clear the main menu away
+
+    ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
     std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
     std::cout << "Strength     (STR): " << strength << "\n";
     std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
     std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
     std::cout << "Focus        (FOC): " << focus << "\n";
-    ConsoleHelper::print("---------------------------", ConsoleHelper::Cyan);
+    ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
+
+    // Pause so the player can read their stats before returning to the main menu
+    ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
 }
 
 void Player::InspectWeapons() const {
-    ConsoleHelper::print("\n=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
+    system("cls"); // Clear previous screen
+
+    ConsoleHelper::print("=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
     if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
     else std::cout << "[STOWED] ";
     if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
@@ -219,4 +228,9 @@ void Player::InspectWeapons() const {
     else std::cout << "[STOWED] ";
     if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
     ConsoleHelper::print("========================", ConsoleHelper::Cyan);
+
+    // Pause so they can look over both weapons
+    ConsoleHelper::print("\nPress Enter to return to the main menu...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
 }

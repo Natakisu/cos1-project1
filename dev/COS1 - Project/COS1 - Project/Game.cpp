@@ -20,7 +20,9 @@ void Game::DisplayWelcomeMenu()
 
     while (inWelcomeMenu)
     {
-        ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
+        system("cls"); // Clears the screen at the start of every loop iteration
+
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("               [ RELIC SWITCHER ]                 ", ConsoleHelper::Cyan);
         ConsoleHelper::print("          A C++ Console RPG Experience            ", ConsoleHelper::White);
         ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
@@ -47,7 +49,9 @@ void Game::DisplayWelcomeMenu()
         }
         else if (choice == 2)
         {
-            ConsoleHelper::print("\n--------------------------------------------------", ConsoleHelper::Cyan);
+            system("cls"); // Clear the menu before showing instructions
+
+            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print("                 GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
             ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
@@ -69,10 +73,15 @@ void Game::DisplayWelcomeMenu()
         else
         {
             ConsoleHelper::print("[!] Invalid choice. Please enter 1, 2, or 3.", ConsoleHelper::Red);
+            // Optional pause here so the player can actually read the error message before the screen clears again!
+            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
         }
     }
 }
 
+// Initialize the game and Define Boss
 void Game::Initialize()
 {
     DisplayWelcomeMenu();
@@ -81,14 +90,20 @@ void Game::Initialize()
     currentBoss = new Enemy("Relic Guardian", 1000, 50);
 }
 
+// Character Creation Menu
 void Game::CharacterCreation()
 {
+    system("cls"); // Clear the welcome menu away instantly
+
+    // Consume any lingering newline character in the input buffer from previous inputs
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     std::string playerName;
     ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
-    std::cin >> playerName;
+    std::getline(std::cin, playerName);
     player = new Player(playerName);
 
     int totalPoints = 30; // Total points available to spend
@@ -151,12 +166,15 @@ void Game::CharacterCreation()
     // Apply the configured values
     player->SetAttributes(con, str, agi, intel, foc);
 
+    system("cls"); // Clear allocation text before showing final summary if desired
+
     ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     player->DisplayStats();
 }
 
+// HP, SP, MP Bars
 void Game::RenderUI() const
 {
     if (!player || !currentBoss) return;
@@ -194,6 +212,7 @@ void Game::RenderUI() const
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
+// Combat Action Menu
 void Game::DisplayMenu() const
 {
     ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
@@ -204,6 +223,7 @@ void Game::DisplayMenu() const
     ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
 }
 
+// Try-Catch
 int Game::GetValidatedPlayerChoice()
 {
     int choice = 0;
@@ -246,6 +266,7 @@ int Game::GetValidatedPlayerChoice()
     return choice;
 }
 
+// Weapon Swap and Healing
 void Game::HandlePlayerAction(int choice)
 {
     switch (choice)
@@ -290,6 +311,7 @@ void Game::HandlePlayerAction(int choice)
     }
 }
 
+// Game End Screen
 void Game::HandleCombatOutcome() const
 {
     if (!player->IsAlive())
@@ -308,6 +330,7 @@ void Game::HandleCombatOutcome() const
     }
 }
 
+// Combat Updates / Combat Loop
 void Game::RunCombatLoop()
 {
     while (isRunning && player->IsAlive() && currentBoss->IsAlive())
@@ -362,6 +385,7 @@ void Game::RunCombatLoop()
     isRunning = false;
 }
 
+// Creates Weapons
 void Game::InitializeWeaponPool()
 {
     // [Pure STR Weapons]
