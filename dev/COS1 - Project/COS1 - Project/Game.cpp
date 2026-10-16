@@ -85,6 +85,7 @@ void Game::DisplayWelcomeMenu()
 void Game::Initialize()
 {
     DisplayWelcomeMenu();
+    system("cls");
     CharacterCreation();
     WeaponSelectionMenu();
     currentBoss = new Enemy("Relic Guardian", 1000, 50);
@@ -93,11 +94,6 @@ void Game::Initialize()
 // Character Creation Menu
 void Game::CharacterCreation()
 {
-    system("cls"); // Clear the welcome menu away instantly
-
-    // Consume any lingering newline character in the input buffer from previous inputs
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
     std::string playerName;
     ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
@@ -509,6 +505,8 @@ void Game::WeaponSelectionMenu()
 
             std::string name = filteredWeapons[i]->GetName();
             std::cout << "   -> Identity: ";
+
+            std::cout << "   -> Identity: ";
             if (name == "Warhammer")
                 ConsoleHelper::print("Slower attack speed, high physical damage, massive posture damage.", ConsoleHelper::White);
             else if (name == "Sword and Shield")
@@ -576,12 +574,14 @@ void Game::WeaponSelectionMenu()
     // Equip final selections to player
     if (chosenPrimary && chosenSecondary)
     {
-        player->EquipWeapons(new Weapon(*chosenPrimary), new Weapon(*chosenSecondary));
+        player->EquipWeapons(chosenPrimary, chosenSecondary);
     }
 
-    // Clean up master pool memory
+    // Clean up master pool memory (deleting unchosen weapons, leaving player-owned ones safe)
     for (Weapon* w : availableWeapons) {
-        delete w;
+        if (w != chosenPrimary && w != chosenSecondary) {
+            delete w;
+        }
     }
     availableWeapons.clear();
 }
