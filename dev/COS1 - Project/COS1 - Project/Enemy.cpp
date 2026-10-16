@@ -101,3 +101,28 @@ void Enemy::ResetTurnState()
         currentPosture = maxPosture;
     }
 }
+
+void Enemy::ResolveStatusEffects()
+{
+    // Bleed Check 
+    if (bleedMeter >= 100)
+    {
+        int bleedDmg = 75;
+        currentHP -= bleedDmg;
+        if (currentHP < 0) currentHP = 0;
+
+        ConsoleHelper::print(" [!] BLOOD LOSS! Relic Guardian suffers " + std::to_string(bleedDmg) + " Hemorrhage damage!", ConsoleHelper::Red);
+        bleedMeter = 0; // Reset meter after triggering
+    }
+
+    // Burn Check 
+    if (burnMeter >= 100)
+    {
+        int burnDmg = 40;
+        currentHP -= burnDmg;
+        if (currentHP < 0) currentHP = 0;
+
+        ConsoleHelper::print(" [!] BLAZING! Relic Guardian burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
+        burnMeter = 0; // Reset meter after triggering
+    }
+}

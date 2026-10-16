@@ -35,6 +35,7 @@ public:
     void ApplyStatusBuildup(int bleed, int burn, int frostbite);
     void CheckPostureBreak();
     void ResetTurnState();
+    void ResolveStatusEffects();
 
     // Getters
     std::string GetName() const { return name; }

@@ -265,28 +265,36 @@ int Game::GetValidatedPlayerChoice()
 // Weapon Swap and Healing
 void Game::HandlePlayerAction(int choice)
 {
+    Weapon* activeWeapon = player->GetActiveWeapon(); // Grab active weapon pointer
+
     switch (choice)
     {
     case 1:
     {
-        std::string weaponName = player->GetActiveWeapon()->GetName();
+        std::string weaponName = activeWeapon->GetName();
         int damageDealt = player->PerformLightAttack(*currentBoss);
 
         if (weaponName != "Life Staff")
         {
             std::cout << " > You dealt " << damageDealt << " damage to " << currentBoss->GetName() << "!\n";
         }
+
+        // Apply status buildup on light attack
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp(), activeWeapon->GetBurnBuildUp(), 0);
         break;
     }
     case 2:
     {
-        std::string weaponName = player->GetActiveWeapon()->GetName();
+        std::string weaponName = activeWeapon->GetName();
         int damageDealt = player->PerformHeavyAttack(*currentBoss);
 
         if (weaponName != "Life Staff")
         {
             std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
         }
+
+        // ---> Apply status buildup on heavy attack
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, 0);
         break;
     }
     case 3:
@@ -362,6 +370,8 @@ void Game::RunCombatLoop()
         ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
         std::string pauseInput;
         std::getline(std::cin, pauseInput);
+        // Check and trigger Burn/Bleed effects right after player turn
+        currentBoss->ResolveStatusEffects();
 
         // Boss resolves action after player turn
         if (currentBoss->IsAlive())
@@ -384,35 +394,37 @@ void Game::RunCombatLoop()
 // Creates Weapons
 void Game::InitializeWeaponPool()
 {
+    // Parameters: (Name, Type, BaseDmg, PostureDmg, StrScale, AgiScale, IntScale, FocScale, AtkSP, AtkMP, BlockSP, DodgeSP, BleedVal, BurnVal)
+
     // [Pure STR Weapons]
     // Warhammer:
-    availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25));
+    availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25, 0, 0));
     // Sword and Shield: Balanced offensive/defensive with high block stability.
-    availableWeapons.push_back(new Weapon("Sword and Shield", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 12, 5, 15, 18));
+    availableWeapons.push_back(new Weapon("Sword and Shield", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 12, 5, 15, 18, 0, 0));
 
     // [Pure AGI Weapons]
-    // Daggers:
-    availableWeapons.push_back(new Weapon("Daggers", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10));
+    // Daggers: Exclusive Bleed Applier
+    availableWeapons.push_back(new Weapon("Daggers", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10, 35, 0));
     // Bow: Ranged physical damage, quick shots or aimed high damage.
-    availableWeapons.push_back(new Weapon("Bow", WeaponType::PureAGI, 14, 8, 0.1f, 0.9f, 0.0f, 0.0f, 10, 0, 10, 12));
+    availableWeapons.push_back(new Weapon("Bow", WeaponType::PureAGI, 14, 8, 0.1f, 0.9f, 0.0f, 0.0f, 10, 0, 10, 12, 0, 0));
 
     // [Pure INT Weapons]
-    // Fire Staff:
-    availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15));
+    // Fire Staff: Exclusive Burn Applier
+    availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15, 0, 40));
     // Ice Staff: Control and mitigation; reduces enemy stamina regeneration.
-    availableWeapons.push_back(new Weapon("Ice Staff", WeaponType::PureINT, 16, 6, 0.0f, 0.0f, 0.9f, 0.1f, 8, 16, 6, 12));
+    availableWeapons.push_back(new Weapon("Ice Staff", WeaponType::PureINT, 16, 6, 0.0f, 0.0f, 0.9f, 0.1f, 8, 16, 6, 12, 0, 0));
 
     // [Pure FOC Weapons]
     // Life Staff:
-    availableWeapons.push_back(new Weapon("Life Staff", WeaponType::PureFOC, 12, 4, 0.0f, 0.0f, 0.0f, 1.0f, 6, 12, 10, 15));
+    availableWeapons.push_back(new Weapon("Life Staff", WeaponType::PureFOC, 12, 4, 0.0f, 0.0f, 0.0f, 1.0f, 6, 12, 10, 15, 0, 0));
 
     // [Hybrid Weapons]
     // Greatsword (STR / AGI):
-    availableWeapons.push_back(new Weapon("Greatsword", WeaponType::Hybrid, 22, 14, 0.5f, 0.5f, 0.0f, 0.0f, 20, 0, 15, 20));
+    availableWeapons.push_back(new Weapon("Greatsword", WeaponType::Hybrid, 22, 14, 0.5f, 0.5f, 0.0f, 0.0f, 20, 0, 15, 20, 0, 0));
     // Rapier (AGI / INT):
-    availableWeapons.push_back(new Weapon("Rapier", WeaponType::Hybrid, 13, 7, 0.2f, 0.4f, 0.4f, 0.0f, 9, 8, 7, 12));
+    availableWeapons.push_back(new Weapon("Rapier", WeaponType::Hybrid, 13, 7, 0.2f, 0.4f, 0.4f, 0.0f, 9, 8, 7, 12, 0, 0));
     // Flail and Shield (STR / FOC):
-    availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18));
+    availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18, 0, 0));
 }
 
 // Weapon Menu
