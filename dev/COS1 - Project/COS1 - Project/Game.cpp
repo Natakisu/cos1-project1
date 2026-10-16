@@ -663,4 +663,5 @@ GameDifficulty Game::SelectDifficulty()
     }
 
     return chosenDifficulty;
+
 }
