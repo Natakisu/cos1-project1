@@ -20,7 +20,9 @@ void Game::DisplayWelcomeMenu()
 
     while (inWelcomeMenu)
     {
-        ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
+        system("cls"); // Clears the screen at the start of every loop iteration
+
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("               [ RELIC SWITCHER ]                 ", ConsoleHelper::Cyan);
         ConsoleHelper::print("          A C++ Console RPG Experience            ", ConsoleHelper::White);
         ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
@@ -47,16 +49,19 @@ void Game::DisplayWelcomeMenu()
         }
         else if (choice == 2)
         {
-            ConsoleHelper::print("\n--------------------------------------------------", ConsoleHelper::Cyan);
-            ConsoleHelper::print("                 GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
-            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            system("cls"); // Clear the menu before showing instructions
+
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("                  GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
-            ConsoleHelper::print("    from New World Aeternum and Dark Souls        ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Allocate attributes wisely during creation.    ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout. ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks,", ConsoleHelper::White);
+            ConsoleHelper::print("    from New World Aeternum and Dark Souls         ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Allocate attributes wisely during creation.     ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout.  ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Choose a Difficulty you would like to play.     ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks, ", ConsoleHelper::White);
             ConsoleHelper::print("    and Dodges while managing your HP, SP, and MP. ", ConsoleHelper::White);
-            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
@@ -69,18 +74,35 @@ void Game::DisplayWelcomeMenu()
         else
         {
             ConsoleHelper::print("[!] Invalid choice. Please enter 1, 2, or 3.", ConsoleHelper::Red);
+            // Optional pause here so the player can actually read the error message before the screen clears again!
+            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
         }
     }
 }
 
+// Initialize the game and Define Boss
 void Game::Initialize()
 {
     DisplayWelcomeMenu();
+    system("cls");
     CharacterCreation();
     WeaponSelectionMenu();
-    currentBoss = new Enemy("Relic Guardian", 1000, 50);
+
+    currentDifficulty = SelectDifficulty();
+
+    int bossHP = 5000;
+    if (currentDifficulty == GameDifficulty::Easy) bossHP = 500;
+    else if (currentDifficulty == GameDifficulty::Normal) bossHP = 5000;
+    else if (currentDifficulty == GameDifficulty::Hard) bossHP = 50000;
+    else if (currentDifficulty == GameDifficulty::Insane) bossHP = 500000;
+    else if (currentDifficulty == GameDifficulty::Impossible) bossHP = 5000000;
+
+    currentBoss = new Enemy("Relic Guardian", bossHP, 50, currentDifficulty);
 }
 
+// Character Creation Menu
 void Game::CharacterCreation()
 {
     std::string playerName;
@@ -88,7 +110,7 @@ void Game::CharacterCreation()
     ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
-    std::cin >> playerName;
+    std::getline(std::cin, playerName);
     player = new Player(playerName);
 
     int totalPoints = 30; // Total points available to spend
@@ -151,12 +173,15 @@ void Game::CharacterCreation()
     // Apply the configured values
     player->SetAttributes(con, str, agi, intel, foc);
 
+    system("cls"); // Clear allocation text before showing final summary if desired
+
     ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     player->DisplayStats();
 }
 
+// HP, SP, MP Bars
 void Game::RenderUI() const
 {
     if (!player || !currentBoss) return;
@@ -167,9 +192,7 @@ void Game::RenderUI() const
         float ratio = static_cast<float>(current) / max;
         if (ratio < 0.0f) ratio = 0.0f;
         if (ratio > 1.0f) ratio = 1.0f;
-
         int filledCount = static_cast<int>(ratio * totalBlocks);
-
         std::cout << "[";
         for (int i = 0; i < totalBlocks; ++i) {
             if (i < filledCount) {
@@ -181,7 +204,6 @@ void Game::RenderUI() const
         }
         std::cout << "] " << current << "/" << max;
         };
-
     ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
     ConsoleHelper::print(" PLAYER: " + player->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(player->GetCurrentHP(), player->GetMaxHP()); std::cout << "\n";
@@ -189,11 +211,23 @@ void Game::RenderUI() const
     std::cout << " MP: "; drawBar(player->GetCurrentMP(), player->GetMaxMP()); std::cout << "\n";
     ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
-    std::cout << " HP: "; drawBar(currentBoss->GetCurrentHP(), 1000); std::cout << " | Posture: " << currentBoss->GetCurrentPosture() << "\n";
-    std::cout << " BOSS INTENT: "; ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
+
+    // Boss HP Bar
+    std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
+
+    // Boss Posture Bar
+    std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
+
+    // Status Effect Buildup Bars
+    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
+    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
+
+    ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
+    ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
+// Combat Action Menu
 void Game::DisplayMenu() const
 {
     ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
@@ -204,6 +238,7 @@ void Game::DisplayMenu() const
     ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
 }
 
+// Try-Catch
 int Game::GetValidatedPlayerChoice()
 {
     int choice = 0;
@@ -246,30 +281,39 @@ int Game::GetValidatedPlayerChoice()
     return choice;
 }
 
+// Weapon Swap and Healing
 void Game::HandlePlayerAction(int choice)
 {
+    Weapon* activeWeapon = player->GetActiveWeapon(); // Grab active weapon pointer
+
     switch (choice)
     {
     case 1:
     {
-        std::string weaponName = player->GetActiveWeapon()->GetName();
+        std::string weaponName = activeWeapon->GetName();
         int damageDealt = player->PerformLightAttack(*currentBoss);
 
         if (weaponName != "Life Staff")
         {
             std::cout << " > You dealt " << damageDealt << " damage to " << currentBoss->GetName() << "!\n";
         }
+
+        // Apply status buildup on light attack
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp(), activeWeapon->GetBurnBuildUp(), 0);
         break;
     }
     case 2:
     {
-        std::string weaponName = player->GetActiveWeapon()->GetName();
+        std::string weaponName = activeWeapon->GetName();
         int damageDealt = player->PerformHeavyAttack(*currentBoss);
 
         if (weaponName != "Life Staff")
         {
             std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
         }
+
+        // ---> Apply status buildup on heavy attack
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, 0);
         break;
     }
     case 3:
@@ -290,24 +334,26 @@ void Game::HandlePlayerAction(int choice)
     }
 }
 
+// Game End Screen
 void Game::HandleCombatOutcome() const
 {
     if (!player->IsAlive())
     {
-        ConsoleHelper::print("========================", ConsoleHelper::Red);
-        ConsoleHelper::print("\n[ You Died! ]", ConsoleHelper::Red);
-        ConsoleHelper::print("========================", ConsoleHelper::Red);
+        ConsoleHelper::print("=========================", ConsoleHelper::Red);
+        ConsoleHelper::print("      [ You Died! ]      ", ConsoleHelper::Red);
+        ConsoleHelper::print("=========================", ConsoleHelper::Red);
     }
 
     else if (!currentBoss->IsAlive())
     {
         ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("\n[ You defeated the Relic Guardian! ]", ConsoleHelper::Cyan);
+        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Green);
+        ConsoleHelper::print(" [ You defeated the Relic Guardian! ] ", ConsoleHelper::Cyan);
         ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
     }
 }
 
+// Combat Updates / Combat Loop
 void Game::RunCombatLoop()
 {
     while (isRunning && player->IsAlive() && currentBoss->IsAlive())
@@ -343,6 +389,8 @@ void Game::RunCombatLoop()
         ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
         std::string pauseInput;
         std::getline(std::cin, pauseInput);
+        // Check and trigger Burn/Bleed effects right after player turn
+        currentBoss->ResolveStatusEffects();
 
         // Boss resolves action after player turn
         if (currentBoss->IsAlive())
@@ -362,37 +410,40 @@ void Game::RunCombatLoop()
     isRunning = false;
 }
 
+// Creates Weapons
 void Game::InitializeWeaponPool()
 {
+    // Parameters: (Name, Type, BaseDmg, PostureDmg, StrScale, AgiScale, IntScale, FocScale, AtkSP, AtkMP, BlockSP, DodgeSP, BleedVal, BurnVal)
+
     // [Pure STR Weapons]
     // Warhammer:
-    availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25));
+    availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25, 0, 0));
     // Sword and Shield: Balanced offensive/defensive with high block stability.
-    availableWeapons.push_back(new Weapon("Sword and Shield", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 12, 5, 15, 18));
+    availableWeapons.push_back(new Weapon("Sword and Shield", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 12, 5, 15, 18, 0, 0));
 
     // [Pure AGI Weapons]
-    // Daggers:
-    availableWeapons.push_back(new Weapon("Daggers", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10));
+    // Daggers: Exclusive Bleed Applier
+    availableWeapons.push_back(new Weapon("Daggers", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10, 35, 0));
     // Bow: Ranged physical damage, quick shots or aimed high damage.
-    availableWeapons.push_back(new Weapon("Bow", WeaponType::PureAGI, 14, 8, 0.1f, 0.9f, 0.0f, 0.0f, 10, 0, 10, 12));
+    availableWeapons.push_back(new Weapon("Bow", WeaponType::PureAGI, 14, 8, 0.1f, 0.9f, 0.0f, 0.0f, 10, 0, 10, 12, 0, 0));
 
     // [Pure INT Weapons]
-    // Fire Staff:
-    availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15));
+    // Fire Staff: Exclusive Burn Applier
+    availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15, 0, 40));
     // Ice Staff: Control and mitigation; reduces enemy stamina regeneration.
-    availableWeapons.push_back(new Weapon("Ice Staff", WeaponType::PureINT, 16, 6, 0.0f, 0.0f, 0.9f, 0.1f, 8, 16, 6, 12));
+    availableWeapons.push_back(new Weapon("Ice Staff", WeaponType::PureINT, 16, 6, 0.0f, 0.0f, 0.9f, 0.1f, 8, 16, 6, 12, 0, 0));
 
     // [Pure FOC Weapons]
     // Life Staff:
-    availableWeapons.push_back(new Weapon("Life Staff", WeaponType::PureFOC, 12, 4, 0.0f, 0.0f, 0.0f, 1.0f, 6, 12, 10, 15));
+    availableWeapons.push_back(new Weapon("Life Staff", WeaponType::PureFOC, 12, 4, 0.0f, 0.0f, 0.0f, 1.0f, 6, 12, 10, 15, 0, 0));
 
     // [Hybrid Weapons]
     // Greatsword (STR / AGI):
-    availableWeapons.push_back(new Weapon("Greatsword", WeaponType::Hybrid, 22, 14, 0.5f, 0.5f, 0.0f, 0.0f, 20, 0, 15, 20));
+    availableWeapons.push_back(new Weapon("Greatsword", WeaponType::Hybrid, 22, 14, 0.5f, 0.5f, 0.0f, 0.0f, 20, 0, 15, 20, 0, 0));
     // Rapier (AGI / INT):
-    availableWeapons.push_back(new Weapon("Rapier", WeaponType::Hybrid, 13, 7, 0.2f, 0.4f, 0.4f, 0.0f, 9, 8, 7, 12));
+    availableWeapons.push_back(new Weapon("Rapier", WeaponType::Hybrid, 13, 7, 0.2f, 0.4f, 0.4f, 0.0f, 9, 8, 7, 12, 0, 0));
     // Flail and Shield (STR / FOC):
-    availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18));
+    availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18, 0, 0));
 }
 
 // Weapon Menu
@@ -485,6 +536,8 @@ void Game::WeaponSelectionMenu()
 
             std::string name = filteredWeapons[i]->GetName();
             std::cout << "   -> Identity: ";
+
+            std::cout << "   -> Identity: ";
             if (name == "Warhammer")
                 ConsoleHelper::print("Slower attack speed, high physical damage, massive posture damage.", ConsoleHelper::White);
             else if (name == "Sword and Shield")
@@ -552,12 +605,62 @@ void Game::WeaponSelectionMenu()
     // Equip final selections to player
     if (chosenPrimary && chosenSecondary)
     {
-        player->EquipWeapons(new Weapon(*chosenPrimary), new Weapon(*chosenSecondary));
+        player->EquipWeapons(chosenPrimary, chosenSecondary);
     }
 
-    // Clean up master pool memory
+    // Clean up master pool memory (deleting unchosen weapons, leaving player-owned ones safe)
     for (Weapon* w : availableWeapons) {
-        delete w;
+        if (w != chosenPrimary && w != chosenSecondary) {
+            delete w;
+        }
     }
     availableWeapons.clear();
+}
+
+// Difficulty Selection Menu
+GameDifficulty Game::SelectDifficulty()
+{
+    bool difficultyChosen = false;
+    GameDifficulty chosenDifficulty = GameDifficulty::Normal;
+
+    while (!difficultyChosen)
+    {
+        system("cls");
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("             [ SELECT GAME DIFFICULTY ]           ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge)", ConsoleHelper::Green);
+        ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience)", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience)", ConsoleHelper::White);
+        ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge)", ConsoleHelper::Yellow);
+        ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Wake Up Samurai, We Got A World To Burn)", ConsoleHelper::Red);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("Choice (1-5): ", ConsoleHelper::Cyan, false);
+
+        std::string input;
+        std::getline(std::cin, input);
+        int choice = 0;
+
+        try {
+            choice = std::stoi(input);
+        }
+        catch (...) {
+            choice = 0;
+        }
+
+        if (choice >= 1 && choice <= 5)
+        {
+            chosenDifficulty = static_cast<GameDifficulty>(choice - 1);
+            difficultyChosen = true;
+        }
+        else
+        {
+            ConsoleHelper::print("[!] Invalid selection. Please choose a number between 1 and 5.", ConsoleHelper::Red);
+            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
+        }
+    }
+
+    return chosenDifficulty;
 }

@@ -32,10 +32,14 @@ private:
     int blockStaminaCost;
     int dodgeStaminaCost;
 
+    // Bleed and Burn
+    int bleedBuildUp;
+    int burnBuildUp;
+
 public:
     Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
         float strScale, float agiScale, float intScale, float focScale,
-        int atkSP, int atkMP, int blockSP, int dodgeSP);
+        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal);
 
     // Getters
     std::string GetName() const { return name; }
@@ -51,4 +55,8 @@ public:
     int CalculateDamage(int str, int agi, int intel, int foc) const;
 
     void DisplayWeaponInfo() const;
+
+    // Bleed and Burn
+    int GetBleedBuildUp() const { return bleedBuildUp; }
+    int GetBurnBuildUp() const { return burnBuildUp; }
 };
