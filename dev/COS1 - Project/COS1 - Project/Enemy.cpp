@@ -1,13 +1,42 @@
 #include "Enemy.h"
 #include "Player.h"
+#include "Game.h" 
 #include "ConsoleHelper.h"
 #include <cstdlib> 
 #include <iostream>
 
-Enemy::Enemy(std::string name, int hp, int posture)
-    : name(name), maxHP(hp), currentHP(hp), maxPosture(posture), currentPosture(posture),
-    isStaggered(false), bleedMeter(0), burnMeter(0), frostbiteMeter(0),
-    currentIntent(BossIntent::LightSweep) {
+Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
+    : name(name), maxHP(hp), currentHP(hp), isStaggered(false),
+    bleedMeter(0), burnMeter(0), frostbiteMeter(0),
+    currentIntent(BossIntent::LightSweep)
+{
+    if (difficulty == GameDifficulty::Easy) {
+        maxPosture = posture; // 50
+        maxBleedThreshold = 100;
+        maxBurnThreshold = 100;
+    }
+    else if (difficulty == GameDifficulty::Normal) {
+        maxPosture = static_cast<int>(posture * 1.5); // 75
+        maxBleedThreshold = 120;
+        maxBurnThreshold = 120;
+    }
+    else if (difficulty == GameDifficulty::Hard) {
+        maxPosture = posture * 2; // 100
+        maxBleedThreshold = 150;
+        maxBurnThreshold = 150;
+    }
+    else if (difficulty == GameDifficulty::Insane) {
+        maxPosture = posture * 3; // 150
+        maxBleedThreshold = 200;
+        maxBurnThreshold = 200;
+    }
+    else if (difficulty == GameDifficulty::Impossible) {
+        maxPosture = posture * 5; // 250
+        maxBleedThreshold = 300;
+        maxBurnThreshold = 300;
+    }
+
+    currentPosture = maxPosture;
 }
 
 void Enemy::GenerateIntent()
@@ -105,24 +134,24 @@ void Enemy::ResetTurnState()
 void Enemy::ResolveStatusEffects()
 {
     // Bleed Check 
-    if (bleedMeter >= 100)
+    if (bleedMeter >= maxBleedThreshold)
     {
         int bleedDmg = 75;
         currentHP -= bleedDmg;
         if (currentHP < 0) currentHP = 0;
 
-        ConsoleHelper::print(" [!] BLOOD LOSS! Relic Guardian suffers " + std::to_string(bleedDmg) + " Hemorrhage damage!", ConsoleHelper::Red);
+        ConsoleHelper::print(" [!] BLOOD LOSS! " + name + " suffers " + std::to_string(bleedDmg) + " Hemorrhage damage!", ConsoleHelper::Red);
         bleedMeter = 0; // Reset meter after triggering
     }
 
     // Burn Check 
-    if (burnMeter >= 100)
+    if (burnMeter >= maxBurnThreshold)
     {
         int burnDmg = 40;
         currentHP -= burnDmg;
         if (currentHP < 0) currentHP = 0;
 
-        ConsoleHelper::print(" [!] BLAZING! Relic Guardian burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
+        ConsoleHelper::print(" [!] BLAZING! " + name + " burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
         burnMeter = 0; // Reset meter after triggering
     }
 }

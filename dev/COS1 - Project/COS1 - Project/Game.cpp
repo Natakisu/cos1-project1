@@ -51,16 +51,17 @@ void Game::DisplayWelcomeMenu()
         {
             system("cls"); // Clear the menu before showing instructions
 
-            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
-            ConsoleHelper::print("                 GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
-            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("                  GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
-            ConsoleHelper::print("    from New World Aeternum and Dark Souls        ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Allocate attributes wisely during creation.    ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout. ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks,", ConsoleHelper::White);
+            ConsoleHelper::print("    from New World Aeternum and Dark Souls         ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Allocate attributes wisely during creation.     ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout.  ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Choose a Difficulty you would like to play.     ", ConsoleHelper::White);
+            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks, ", ConsoleHelper::White);
             ConsoleHelper::print("    and Dodges while managing your HP, SP, and MP. ", ConsoleHelper::White);
-            ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
+            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
             ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
@@ -88,7 +89,17 @@ void Game::Initialize()
     system("cls");
     CharacterCreation();
     WeaponSelectionMenu();
-    currentBoss = new Enemy("Relic Guardian", 1000, 50);
+
+    currentDifficulty = SelectDifficulty();
+
+    int bossHP = 5000;
+    if (currentDifficulty == GameDifficulty::Easy) bossHP = 500;
+    else if (currentDifficulty == GameDifficulty::Normal) bossHP = 5000;
+    else if (currentDifficulty == GameDifficulty::Hard) bossHP = 50000;
+    else if (currentDifficulty == GameDifficulty::Insane) bossHP = 500000;
+    else if (currentDifficulty == GameDifficulty::Impossible) bossHP = 5000000;
+
+    currentBoss = new Enemy("Relic Guardian", bossHP, 50, currentDifficulty);
 }
 
 // Character Creation Menu
@@ -181,9 +192,7 @@ void Game::RenderUI() const
         float ratio = static_cast<float>(current) / max;
         if (ratio < 0.0f) ratio = 0.0f;
         if (ratio > 1.0f) ratio = 1.0f;
-
         int filledCount = static_cast<int>(ratio * totalBlocks);
-
         std::cout << "[";
         for (int i = 0; i < totalBlocks; ++i) {
             if (i < filledCount) {
@@ -195,7 +204,6 @@ void Game::RenderUI() const
         }
         std::cout << "] " << current << "/" << max;
         };
-
     ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
     ConsoleHelper::print(" PLAYER: " + player->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(player->GetCurrentHP(), player->GetMaxHP()); std::cout << "\n";
@@ -203,13 +211,20 @@ void Game::RenderUI() const
     std::cout << " MP: "; drawBar(player->GetCurrentMP(), player->GetMaxMP()); std::cout << "\n";
     ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
-    std::cout << " HP: "; drawBar(currentBoss->GetCurrentHP(), 1000); std::cout << " | Posture: " << currentBoss->GetCurrentPosture() << "\n";
-    std::cout << " STATUS BUILDS -> ";
-    std::cout << "Bleed: " << currentBoss->GetBleedMeter() << "/100 | ";
-    std::cout << "Burn: " << currentBoss->GetBurnMeter() << "/100\n";
-    std::cout << " BOSS INTENT: "; ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
-    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 
+    // Boss HP Bar
+    std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
+
+    // Boss Posture Bar
+    std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
+
+    // Status Effect Buildup Bars
+    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
+    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
+
+    ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
+    ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
 // Combat Action Menu
@@ -600,4 +615,52 @@ void Game::WeaponSelectionMenu()
         }
     }
     availableWeapons.clear();
+}
+
+// Difficulty Selection Menu
+GameDifficulty Game::SelectDifficulty()
+{
+    bool difficultyChosen = false;
+    GameDifficulty chosenDifficulty = GameDifficulty::Normal;
+
+    while (!difficultyChosen)
+    {
+        system("cls");
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("             [ SELECT GAME DIFFICULTY ]           ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge)", ConsoleHelper::Green);
+        ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience)", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience)", ConsoleHelper::White);
+        ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge)", ConsoleHelper::Yellow);
+        ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Wake Up Samurai, We Got A World To Burn)", ConsoleHelper::Red);
+        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("Choice (1-5): ", ConsoleHelper::Cyan, false);
+
+        std::string input;
+        std::getline(std::cin, input);
+        int choice = 0;
+
+        try {
+            choice = std::stoi(input);
+        }
+        catch (...) {
+            choice = 0;
+        }
+
+        if (choice >= 1 && choice <= 5)
+        {
+            chosenDifficulty = static_cast<GameDifficulty>(choice - 1);
+            difficultyChosen = true;
+        }
+        else
+        {
+            ConsoleHelper::print("[!] Invalid selection. Please choose a number between 1 and 5.", ConsoleHelper::Red);
+            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
+        }
+    }
+
+    return chosenDifficulty;
 }

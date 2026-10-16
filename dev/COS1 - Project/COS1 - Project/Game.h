@@ -3,6 +3,14 @@
 #include "Enemy.h"
 #include <vector>
 
+enum class GameDifficulty {
+    Easy,
+    Normal,
+    Hard,
+    Insane,
+    Impossible
+};
+
 class Game
 {
 private:
@@ -20,6 +28,8 @@ private:
     int GetValidatedPlayerChoice();
     void ProcessPlayerTurn(int choice);
     void ProcessEnemyTurn();
+
+    GameDifficulty currentDifficulty;
 
 public:
     Game();
@@ -42,4 +52,5 @@ public:
     {
         return isRunning;
     }
+    GameDifficulty SelectDifficulty();
 };
