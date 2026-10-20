@@ -234,3 +234,48 @@ void Player::InspectWeapons() const {
     std::string dummy;
     std::getline(std::cin, dummy);
 }
+
+void Player::GainXP(int amount)
+{
+    currentXP += amount;
+    int xpNeeded = 1000; // Adjust base threshold as needed
+
+    while (currentXP >= xpNeeded)
+    {
+        currentXP -= xpNeeded; // <--- Prevents the infinite loop!
+        level++;
+
+        std::cout << "\n[!] LEVEL UP! You reached Level " << level << "!\n";
+
+        // Scale requirement for next level using standard integer multiplication
+        xpNeeded = (xpNeeded * 3) / 2; // Increases by 50% cleanly without casts
+    }
+}
+
+void Player::LevelUp()
+{
+    level++;
+    xpToNextLevel = (int)(xpToNextLevel * 1.5f); // Scale requirement
+    unspentAttributePoints += 5; // +5 points per level
+
+    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("          [ LEVEL UP! ]                 ", ConsoleHelper::Green);
+    ConsoleHelper::print(" You reached Level " + std::to_string(level) + "!", ConsoleHelper::White);
+    ConsoleHelper::print(" You gained 5 unspent attribute points!", ConsoleHelper::Yellow);
+    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
+}
+
+void Player::AllocateAttribute(int choice, int amount)
+{
+    if (amount > unspentAttributePoints) amount = unspentAttributePoints;
+    if (amount <= 0) return;
+
+    if (choice == 1) constitution += amount;
+    else if (choice == 2) strength += amount;
+    else if (choice == 3) agility += amount;
+    else if (choice == 4) intellect += amount;
+    else if (choice == 5) focus += amount;
+
+    unspentAttributePoints -= amount;
+    UpdateDerivedStats(); 
+}

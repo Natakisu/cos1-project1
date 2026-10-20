@@ -13,7 +13,6 @@ Game::~Game()
     delete currentBoss;
 }
 
-// Main Menu
 void Game::DisplayWelcomeMenu()
 {
     bool inWelcomeMenu = true;
@@ -74,7 +73,6 @@ void Game::DisplayWelcomeMenu()
         else
         {
             ConsoleHelper::print("[!] Invalid choice. Please enter 1, 2, or 3.", ConsoleHelper::Red);
-            // Optional pause here so the player can actually read the error message before the screen clears again!
             ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
@@ -82,9 +80,11 @@ void Game::DisplayWelcomeMenu()
     }
 }
 
-// Initialize the game and Define Boss
+// Main Menu
 void Game::Initialize()
 {
+    isRunning = true; 
+
     DisplayWelcomeMenu();
     system("cls");
     CharacterCreation();
@@ -247,16 +247,29 @@ int Game::GetValidatedPlayerChoice()
 
     while (!isValid)
     {
+        if (std::cin.fail() || std::cin.bad())
+        {
+            std::cin.clear();
+            std::cin.ignore(32767, '\n');
+        }
+
         ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
-        // Grab the entire line of input
-        std::getline(std::cin, inputLine);
+
+        if (!std::getline(std::cin, inputLine))
+        {
+            std::cin.clear();
+            std::cin.ignore(32767, '\n');
+            continue;
+        }
+
+        if (inputLine.empty())
+        {
+            continue;
+        }
 
         try
         {
-            // Attempt to convert string to integer
             choice = std::stoi(inputLine);
-
-            // Check range for the 6 menu items
             if (choice >= 1 && choice <= 6)
             {
                 isValid = true;
@@ -266,15 +279,9 @@ int Game::GetValidatedPlayerChoice()
                 ConsoleHelper::print("[!] Invalid choice. Please enter a number between 1 and 6.", ConsoleHelper::Red);
             }
         }
-        catch (const std::invalid_argument&)
+        catch (...)
         {
-            // Catch if the user types letters or symbols instead of a number
             ConsoleHelper::print("[!] Invalid input. Please enter a valid number.", ConsoleHelper::Red);
-        }
-        catch (const std::out_of_range&)
-        {
-            // Catch if the number is way too large/small 
-            ConsoleHelper::print("[!] Number out of range. Please enter a valid menu number.", ConsoleHelper::Red);
         }
     }
 
@@ -356,9 +363,50 @@ void Game::HandleCombatOutcome() const
 // Combat Updates / Combat Loop
 void Game::RunCombatLoop()
 {
-    while (isRunning && player->IsAlive() && currentBoss->IsAlive())
+    bool rewardClaimed = false;
+
+    while (true)
     {
-        system("cls"); // Clear screen for the current turn's UI
+        // 1. Check if player died
+        if (!player->IsAlive())
+        {
+            break;
+        }
+
+        // 2. Check if boss died
+        if (!currentBoss->IsAlive())
+        {
+            system("cls");
+            HandleCombatOutcome(); // Shows the victory/outcome header
+
+            // Award XP and explicitly print the gained amount to the console
+            if (!rewardClaimed && player->IsAlive())
+            {
+                rewardClaimed = true;
+                int earnedXP = 150;
+                if (currentDifficulty == GameDifficulty::Normal) earnedXP = 300;
+                else if (currentDifficulty == GameDifficulty::Hard) earnedXP = 600;
+                else if (currentDifficulty == GameDifficulty::Insane) earnedXP = 1200;
+                else if (currentDifficulty == GameDifficulty::Impossible) earnedXP = 2400;
+
+                ConsoleHelper::print("\n==================================", ConsoleHelper::Green);
+                ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
+                ConsoleHelper::print("==================================", ConsoleHelper::Green);
+                ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::White);
+
+                player->GainXP(earnedXP); // This will handle your level-up messages internally
+
+                ConsoleHelper::print("==================================", ConsoleHelper::Green);
+            }
+
+            if (std::cin.peek() == '\n') std::cin.ignore();
+            ConsoleHelper::print("\nPress Enter to return to main menu...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
+            break;
+        }
+
+        system("cls");
         currentBoss->GenerateIntent();
         RenderUI();
         DisplayMenu();
@@ -366,47 +414,46 @@ void Game::RunCombatLoop()
         int choice = GetValidatedPlayerChoice();
         HandlePlayerAction(choice);
 
-        // If player inspected weapons, they didn't take a combat turn, so let them read the stats
-        if (choice == 6)
+        // Weapon inspect or swap handled without full combat progression
+        if (choice == 6 || choice == 3)
         {
+            if (std::cin.peek() == '\n') std::cin.ignore();
             ConsoleHelper::print("\nPress Enter to return to combat...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
             continue;
         }
 
-        // If player swapped weapons, pause briefly so they can see the confirmation message
-        if (choice == 3)
-        {
-            ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
-            std::string dummy;
-            std::getline(std::cin, dummy);
-            continue;
-        }
+        // --- COMBAT TURN RESOLUTION ---
+        // Resolve status effects on boss
+        currentBoss->ResolveStatusEffects();
+        if (!currentBoss->IsAlive()) continue; // Re-check at top of loop for clean victory handling
 
-        // For attack, block, or dodge actions, let the damage/healing messages print, 
-        // then pause so the user can read the results before the boss takes their turn or screen clear
-        ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
+        // Execute boss action
+        currentBoss->ExecuteIntent(*player);
+        if (!player->IsAlive()) break;
+
+        // Single consolidated pause per complete turn round
+        if (std::cin.peek() == '\n') std::cin.ignore();
+        ConsoleHelper::print("\n[Turn Complete] Press Enter to continue...", ConsoleHelper::Cyan, false);
         std::string pauseInput;
         std::getline(std::cin, pauseInput);
-        // Check and trigger Burn/Bleed effects right after player turn
-        currentBoss->ResolveStatusEffects();
 
-        // Boss resolves action after player turn
-        if (currentBoss->IsAlive())
-        {
-            currentBoss->ExecuteIntent(*player);
-
-            ConsoleHelper::print("Press Enter to end turn...", ConsoleHelper::White, false);
-            std::getline(std::cin, pauseInput);
-
-            player->RegainResourcesPerTurn();
-            currentBoss->ResetTurnState();
-        }
+        player->RegainResourcesPerTurn();
+        currentBoss->ResetTurnState();
     }
 
-    system("cls");
-    HandleCombatOutcome();
+    // If player lost
+    if (!player->IsAlive())
+    {
+        system("cls");
+        HandleCombatOutcome();
+        if (std::cin.peek() == '\n') std::cin.ignore();
+        ConsoleHelper::print("\nPress Enter to return to main menu...", ConsoleHelper::White, false);
+        std::string dummy;
+        std::getline(std::cin, dummy);
+    }
+
     isRunning = false;
 }
 
@@ -626,15 +673,15 @@ GameDifficulty Game::SelectDifficulty()
     while (!difficultyChosen)
     {
         system("cls");
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("             [ SELECT GAME DIFFICULTY ]           ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge)", ConsoleHelper::Green);
-        ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience)", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience)", ConsoleHelper::White);
-        ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge)", ConsoleHelper::Yellow);
-        ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Wake Up Samurai, We Got A World To Burn)", ConsoleHelper::Red);
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
+        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
+        ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::Cyan);
+        ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::White);
+        ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Yellow);
+        ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
+        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("Choice (1-5): ", ConsoleHelper::Cyan, false);
 
         std::string input;

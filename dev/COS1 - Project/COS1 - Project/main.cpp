@@ -2,8 +2,12 @@
 
 int main() {
     Game game;
-    game.Initialize();
-    game.RunCombatLoop();
-    return 0;
 
+    while (game.IsRunning()) 
+    {
+        game.Initialize();
+        game.RunCombatLoop();
+    }
+
+    return 0;
 }

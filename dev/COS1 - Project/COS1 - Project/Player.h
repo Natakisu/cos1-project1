@@ -30,6 +30,12 @@ private:
     bool isBlocking;
     bool isDodging;
 
+    // XP System
+    int level;
+    int currentXP;
+    int xpToNextLevel;
+    int unspentAttributePoints;
+
 public:
     Player(std::string name);
     ~Player();
@@ -66,4 +72,18 @@ public:
     void DisplayStats() const;
 
     void InspectWeapons() const;
+
+    // XP System
+    void GainXP(int amount);
+    void LevelUp();
+    int GetLevel() const { return level; }
+    int GetUnspentPoints() const { return unspentAttributePoints; }
+    void AllocateAttribute(int choice, int amount);
+
+    void UpdateDerivedStats()
+    {
+        maxHP = 100 + (constitution * 10);
+        maxSP = 100 + (agility * 5);
+        maxMP = 100 + (intellect * 5);
+    }
 };
