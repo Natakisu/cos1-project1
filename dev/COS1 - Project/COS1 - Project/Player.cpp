@@ -238,17 +238,28 @@ void Player::InspectWeapons() const {
 void Player::GainXP(int amount)
 {
     currentXP += amount;
-    int xpNeeded = 1000; // Adjust base threshold as needed
 
-    while (currentXP >= xpNeeded)
+    // Safety guard to prevent any potential infinite loops
+    int safetyCounter = 0;
+    const int maxLevelsPerGrant = 50; // Hard limit just in case
+
+    while (currentXP >= xpToNextLevel && safetyCounter < maxLevelsPerGrant)
     {
-        currentXP -= xpNeeded; // <--- Prevents the infinite loop!
+        currentXP -= xpToNextLevel; // Deduct current threshold
+
         level++;
+        unspentAttributePoints += 5; // Award points
 
-        std::cout << "\n[!] LEVEL UP! You reached Level " << level << "!\n";
+        // Scale requirement for the next level
+        xpToNextLevel = static_cast<int>(xpToNextLevel * 1.5f);
 
-        // Scale requirement for next level using standard integer multiplication
-        xpNeeded = (xpNeeded * 3) / 2; // Increases by 50% cleanly without casts
+        ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("          [ LEVEL UP! ]                 ", ConsoleHelper::Green);
+        ConsoleHelper::print(" You reached Level " + std::to_string(level) + "!", ConsoleHelper::White);
+        ConsoleHelper::print(" You gained 5 unspent attribute points!", ConsoleHelper::Yellow);
+        ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
+
+        safetyCounter++;
     }
 }
 

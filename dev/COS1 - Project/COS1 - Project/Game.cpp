@@ -453,6 +453,20 @@ void Game::RunCombatLoop()
 
                 player->GainXP(earnedXP);
 
+                // If you leveled up and have unspent points, give a moment to read the victory/level-up messages
+                if (player->GetUnspentPoints() > 0)
+                {
+                    if (std::cin.peek() == '\n') std::cin.ignore();
+                    ConsoleHelper::print("\nPress Enter to allocate your attribute points...", ConsoleHelper::White, false);
+                    std::string dummy;
+                    std::getline(std::cin, dummy);
+
+                    while (player->GetUnspentPoints() > 0)
+                    {
+                        AllocateAttributesMenu();
+                    }
+                }
+
                 // --- AUTO-SAVE PROGRESS ---
                 player->SaveToFile("savegame.txt");
 
