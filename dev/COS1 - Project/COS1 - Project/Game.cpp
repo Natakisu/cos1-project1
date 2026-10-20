@@ -249,20 +249,22 @@ void Game::RenderUI() const
         }
         std::cout << "] " << current << "/" << max;
         };
+    // Player Bars
     ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
     ConsoleHelper::print(" PLAYER: " + player->GetName(), ConsoleHelper::White);
     std::cout << " HP: "; drawBar(player->GetCurrentHP(), player->GetMaxHP()); std::cout << "\n";
     std::cout << " SP: "; drawBar(player->GetCurrentSP(), player->GetMaxSP()); std::cout << "\n";
     std::cout << " MP: "; drawBar(player->GetCurrentMP(), player->GetMaxMP()); std::cout << "\n";
+    // ADDED XP BAR
+    std::cout << " XP: "; drawBar(player->GetCurrentXP(), player->GetXPToNextLevel());
+    std::cout << " (Lvl: " << player->GetLevel() << ")\n";
+
+    // Boss Bars
     ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
-
-    // Boss HP Bar
     std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
-
-    // Boss Posture Bar
+    // Posture Bar
     std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
-
     // Status Effect Buildup Bars
     std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
     std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
@@ -281,6 +283,7 @@ void Game::DisplayMenu() const
     ConsoleHelper::print("4. Block", ConsoleHelper::White);
     ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
     ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
+    ConsoleHelper::print("9. [DEBUG] Instant Win / Kill Boss", ConsoleHelper::Yellow); // Added debug option
 }
 
 // Try-Catch
@@ -315,13 +318,13 @@ int Game::GetValidatedPlayerChoice()
         try
         {
             choice = std::stoi(inputLine);
-            if (choice >= 1 && choice <= 6)
+            if ((choice >= 1 && choice <= 6) || choice == 9) // Added || choice == 9
             {
                 isValid = true;
             }
             else
             {
-                ConsoleHelper::print("[!] Invalid choice. Please enter a number between 1 and 6.", ConsoleHelper::Red);
+                ConsoleHelper::print("[!] Invalid choice. Please enter a number between 1 and 6 (or 9).", ConsoleHelper::Red);
             }
         }
         catch (...)
@@ -383,6 +386,16 @@ void Game::HandlePlayerAction(int choice)
     case 6:
         player->InspectWeapons();
         break;
+    case 9:
+    {
+        // DEBUG: Instantly wipe out boss health to test victory/rewards/level-up flow
+        while (currentBoss->GetCurrentHP() > 0)
+        {
+            currentBoss->TakeDamage(99999999, 9999);
+        }
+        ConsoleHelper::print("[DEBUG] Relic Guardian obliterated!", ConsoleHelper::Yellow);
+        break;
+    }
     }
 }
 

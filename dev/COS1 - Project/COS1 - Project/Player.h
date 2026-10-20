@@ -81,6 +81,8 @@ public:
     int GetUnspentPoints() const { return unspentAttributePoints; }
     void AddUnspentPoints(int amount) { unspentAttributePoints += amount; } // Added to grant pool points!
     void AllocateAttribute(int choice, int amount);
+    int GetCurrentXP() const { return currentXP; }
+    int GetXPToNextLevel() const { return xpToNextLevel; }
 
     void UpdateDerivedStats()
     {
