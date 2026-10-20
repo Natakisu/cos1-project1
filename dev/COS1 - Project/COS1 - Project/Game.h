@@ -38,6 +38,7 @@ public:
     void DisplayWelcomeMenu();
     void Initialize();
     void CharacterCreation();
+    void AllocateAttributesMenu();
     void RunCombatLoop();
 
     // Public action and outcome handlers used by the loop

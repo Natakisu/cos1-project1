@@ -3,9 +3,9 @@
 #include "Weapon.h"
 #include <fstream>
 
-class Enemy; // Fix Sytax Error
+class Enemy; // Fix Syntax Error
 
-class Player 
+class Player
 {
 private:
     std::string name;
@@ -79,6 +79,7 @@ public:
     void LevelUp();
     int GetLevel() const { return level; }
     int GetUnspentPoints() const { return unspentAttributePoints; }
+    void AddUnspentPoints(int amount) { unspentAttributePoints += amount; } // Added to grant pool points!
     void AllocateAttribute(int choice, int amount);
 
     void UpdateDerivedStats()

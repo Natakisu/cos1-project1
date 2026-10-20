@@ -285,11 +285,21 @@ void Player::SaveToFile(const std::string& filename) const
     std::ofstream outFile(filename);
     if (outFile.is_open())
     {
+        // Core info
         outFile << name << "\n";
         outFile << level << "\n";
         outFile << currentXP << "\n";
-        outFile << maxHP << "\n";     // Matches Player.h
-        outFile << currentHP << "\n"; // Matches Player.h
+        outFile << maxHP << "\n";
+        outFile << currentHP << "\n";
+
+        // Attributes & Points
+        outFile << constitution << "\n";
+        outFile << strength << "\n";
+        outFile << agility << "\n";
+        outFile << intellect << "\n";
+        outFile << focus << "\n";
+        outFile << unspentAttributePoints << "\n";
+
         outFile.close();
         ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
     }
@@ -304,12 +314,26 @@ void Player::LoadFromFile(const std::string& filename)
     std::ifstream inFile(filename);
     if (inFile.is_open())
     {
+        // Core info
         std::getline(inFile, name);
         inFile >> level;
         inFile >> currentXP;
-        inFile >> maxHP;     // Matches Player.h
-        inFile >> currentHP; // Matches Player.h
+        inFile >> maxHP;
+        inFile >> currentHP;
+
+        // Attributes & Points
+        inFile >> constitution;
+        inFile >> strength;
+        inFile >> agility;
+        inFile >> intellect;
+        inFile >> focus;
+        inFile >> unspentAttributePoints;
+
         inFile.close();
+
+        // Recalculate derived pools (maxHP, maxSP, maxMP) based on loaded attributes!
+        UpdateDerivedStats();
+
         ConsoleHelper::print("[!] Game loaded successfully!", ConsoleHelper::Green);
     }
     else

@@ -92,14 +92,19 @@ void Game::Initialize()
     ConsoleHelper::print("1. New Game", ConsoleHelper::White);
     ConsoleHelper::print("2. Load Saved Game", ConsoleHelper::White);
 
-    int choice = GetValidatedPlayerChoice(); // Or a custom range validator for 1-2
+    int choice = GetValidatedPlayerChoice();
 
     if (choice == 2)
     {
-        // Pass a placeholder name; LoadFromFile will overwrite it instantly with the saved name
         player = new Player("Hero");
         player->LoadFromFile("savegame.txt");
         WeaponSelectionMenu();
+
+        // If they have unspent points saved over, let them allocate them!
+        if (player->GetUnspentPoints() > 0)
+        {
+            AllocateAttributesMenu();
+        }
     }
     else
     {
@@ -129,74 +134,96 @@ void Game::CharacterCreation()
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
     std::getline(std::cin, playerName);
+
+    // 1. Create player
     player = new Player(playerName);
 
-    int totalPoints = 30; // Total points available to spend
-    int con = 10, str = 10, agi = 10, intel = 10, foc = 10; // Base starting stats
+    // 2. Grant them their 30 starting attribute points to spend!
+    // (If your Player class handles this differently, check how it grants points on level up)
+    player->AddUnspentPoints(30); // Or use whatever method your Player class uses to increase unspent points
 
-    // Breif Description of what Stats do
-    ConsoleHelper::print("\n--- Attribute Descriptions ---", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" - Constitution (CON): Increases your Max HP.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Strength     (STR): Increases physical weapon damage.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery", ConsoleHelper::White);
+    // 3. Open the dedicated allocation menu
+    AllocateAttributesMenu();
 
-    ConsoleHelper::print("\n--- Stat Allocation (30 Points Available) ---", ConsoleHelper::Cyan);
-    ConsoleHelper::print("(Base stats start at 10. Enter how many points to [ADD] to each)", ConsoleHelper::White);
-
-    int p = 0;
-
-    // Constitution
-    std::cout << "\n[1/5] Constitution (CON) [Pool Left: " << totalPoints << "]: ";
-    std::cin >> p;
-    if (p > totalPoints) p = totalPoints;
-    con += p;
-    totalPoints -= p;
-
-    // Strength
-    if (totalPoints > 0)
-    {
-        std::cout << "[2/5] Strength (STR) [Pool Left: " << totalPoints << "]: ";
-        std::cin >> p;
-        if (p > totalPoints) p = totalPoints;
-        str += p;
-        totalPoints -= p;
-    }
-
-    // Agility
-    if (totalPoints > 0)
-    {
-        std::cout << "[3/5] Agility (AGI) [Pool Left: " << totalPoints << "]: ";
-        std::cin >> p;
-        if (p > totalPoints) p = totalPoints;
-        agi += p;
-        totalPoints -= p;
-    }
-
-    // Intellect
-    if (totalPoints > 0)
-    {
-        std::cout << "[4/5] Intellect (INT) [Pool Left: " << totalPoints << "]: ";
-        std::cin >> p;
-        if (p > totalPoints) p = totalPoints;
-        intel += p;
-        totalPoints -= p;
-    }
-
-    // Focus (dumps any remaining pool points automatically)
-    foc += totalPoints;
-    std::cout << "[5/5] Focus (FOC): Remaining " << totalPoints << " points automatically allocated.\n";
-
-    // Apply the configured values
-    player->SetAttributes(con, str, agi, intel, foc);
-
-    system("cls"); // Clear allocation text before showing final summary if desired
+    system("cls");
 
     ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
     player->DisplayStats();
+}
+
+// Dedicated Attribute Allocation Menu (Reusable for New Game & Level Ups/Loads)
+void Game::AllocateAttributesMenu()
+{
+    // Brief Description of what Stats do (shown once when entering allocation)
+    system("cls");
+    ConsoleHelper::print("--- Attribute Descriptions ---", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" - Constitution (CON): Increases your Max HP.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Strength     (STR): Increases physical weapon damage.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery.", ConsoleHelper::White);
+    ConsoleHelper::print("\nPress Enter to begin attribute allocation...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
+
+    while (player->GetUnspentPoints() > 0)
+    {
+        system("cls");
+        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("       ALLOCATE ATTRIBUTES        ", ConsoleHelper::Cyan);
+        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("Unspent Points: " + std::to_string(player->GetUnspentPoints()), ConsoleHelper::Green);
+        ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
+        ConsoleHelper::print("1. Constitution (CON)", ConsoleHelper::White);
+        ConsoleHelper::print("2. Strength (STR)", ConsoleHelper::White);
+        ConsoleHelper::print("3. Agility (AGI)", ConsoleHelper::White);
+        ConsoleHelper::print("4. Intellect (INT)", ConsoleHelper::White);
+        ConsoleHelper::print("5. Focus (FOC)", ConsoleHelper::White);
+        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("Select attribute to upgrade (1-5): ", ConsoleHelper::Cyan, false);
+
+        std::string input;
+        std::getline(std::cin, input);
+        int choice = 0;
+        try {
+            choice = std::stoi(input);
+        }
+        catch (...) {
+            choice = 0;
+        }
+
+        if (choice >= 1 && choice <= 5)
+        {
+            ConsoleHelper::print("Enter points to allocate: ", ConsoleHelper::White, false);
+            std::string amtInput;
+            std::getline(std::cin, amtInput);
+            int amount = 0;
+            try {
+                amount = std::stoi(amtInput);
+            }
+            catch (...) {
+                amount = 0;
+            }
+
+            if (amount > 0 && amount <= player->GetUnspentPoints())
+            {
+                player->AllocateAttribute(choice, amount); // Passes choice and amount to your Player class logic
+                player->UpdateDerivedStats(); // Refreshes max HP/SP/MP pools
+            }
+            else
+            {
+                ConsoleHelper::print("[!] Invalid amount. Press Enter to continue...", ConsoleHelper::Red, false);
+                std::string errDummy; std::getline(std::cin, errDummy);
+            }
+        }
+        else
+        {
+            ConsoleHelper::print("[!] Invalid choice. Press Enter to continue...", ConsoleHelper::Red, false);
+            std::string errDummy; std::getline(std::cin, errDummy);
+        }
+    }
 }
 
 // HP, SP, MP Bars
@@ -337,7 +364,7 @@ void Game::HandlePlayerAction(int choice)
             std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
         }
 
-        // ---> Apply status buildup on heavy attack
+        // Apply status buildup on heavy attack
         currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, 0);
         break;
     }
@@ -479,36 +506,24 @@ void Game::RunCombatLoop()
 // Creates Weapons
 void Game::InitializeWeaponPool()
 {
-    // Parameters: (Name, Type, BaseDmg, PostureDmg, StrScale, AgiScale, IntScale, FocScale, AtkSP, AtkMP, BlockSP, DodgeSP, BleedVal, BurnVal)
-
     // [Pure STR Weapons]
-    // Warhammer:
     availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25, 0, 0));
-    // Sword and Shield: Balanced offensive/defensive with high block stability.
     availableWeapons.push_back(new Weapon("Sword and Shield", WeaponType::PureSTR, 15, 10, 0.8f, 0.2f, 0.0f, 0.0f, 12, 5, 15, 18, 0, 0));
 
     // [Pure AGI Weapons]
-    // Daggers: Exclusive Bleed Applier
     availableWeapons.push_back(new Weapon("Daggers", WeaponType::PureAGI, 10, 6, 0.2f, 0.8f, 0.0f, 0.0f, 8, 0, 8, 10, 35, 0));
-    // Bow: Ranged physical damage, quick shots or aimed high damage.
     availableWeapons.push_back(new Weapon("Bow", WeaponType::PureAGI, 14, 8, 0.1f, 0.9f, 0.0f, 0.0f, 10, 0, 10, 12, 0, 0));
 
     // [Pure INT Weapons]
-    // Fire Staff: Exclusive Burn Applier
     availableWeapons.push_back(new Weapon("Fire Staff", WeaponType::PureINT, 20, 5, 0.0f, 0.0f, 1.0f, 0.0f, 10, 15, 5, 15, 0, 40));
-    // Ice Staff: Control and mitigation; reduces enemy stamina regeneration.
     availableWeapons.push_back(new Weapon("Ice Staff", WeaponType::PureINT, 16, 6, 0.0f, 0.0f, 0.9f, 0.1f, 8, 16, 6, 12, 0, 0));
 
     // [Pure FOC Weapons]
-    // Life Staff:
     availableWeapons.push_back(new Weapon("Life Staff", WeaponType::PureFOC, 12, 4, 0.0f, 0.0f, 0.0f, 1.0f, 6, 12, 10, 15, 0, 0));
 
     // [Hybrid Weapons]
-    // Greatsword (STR / AGI):
     availableWeapons.push_back(new Weapon("Greatsword", WeaponType::Hybrid, 22, 14, 0.5f, 0.5f, 0.0f, 0.0f, 20, 0, 15, 20, 0, 0));
-    // Rapier (AGI / INT):
     availableWeapons.push_back(new Weapon("Rapier", WeaponType::Hybrid, 13, 7, 0.2f, 0.4f, 0.4f, 0.0f, 9, 8, 7, 12, 0, 0));
-    // Flail and Shield (STR / FOC):
     availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18, 0, 0));
 }
 
@@ -517,10 +532,8 @@ void Game::WeaponSelectionMenu()
 {
     bool weaponsConfirmed = false;
 
-    // Initialize the master weapon pool once
     InitializeWeaponPool();
 
-    // Track chosen weapon pointers temporarily across category
     Weapon* chosenPrimary = nullptr;
     Weapon* chosenSecondary = nullptr;
 
@@ -567,14 +580,12 @@ void Game::WeaponSelectionMenu()
             categoryChoice = 6;
         }
 
-        // If they chose option 7 to finish
         if (categoryChoice == 7 && chosenPrimary != nullptr && chosenSecondary != nullptr)
         {
             weaponsConfirmed = true;
             break;
         }
 
-        // Filter weapons based on the chosen category
         std::vector<Weapon*> filteredWeapons;
         for (Weapon* w : availableWeapons)
         {
@@ -601,8 +612,6 @@ void Game::WeaponSelectionMenu()
             filteredWeapons[i]->DisplayWeaponInfo();
 
             std::string name = filteredWeapons[i]->GetName();
-            std::cout << "   -> Identity: ";
-
             std::cout << "   -> Identity: ";
             if (name == "Warhammer")
                 ConsoleHelper::print("Slower attack speed, high physical damage, massive posture damage.", ConsoleHelper::White);
@@ -668,13 +677,11 @@ void Game::WeaponSelectionMenu()
         }
     }
 
-    // Equip final selections to player
     if (chosenPrimary && chosenSecondary)
     {
         player->EquipWeapons(chosenPrimary, chosenSecondary);
     }
 
-    // Clean up master pool memory (deleting unchosen weapons, leaving player-owned ones safe)
     for (Weapon* w : availableWeapons) {
         if (w != chosenPrimary && w != chosenSecondary) {
             delete w;
