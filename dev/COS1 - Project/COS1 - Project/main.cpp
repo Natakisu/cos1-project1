@@ -3,10 +3,11 @@
 int main() {
     Game game;
 
-    while (game.IsRunning()) 
-    {
-        game.Initialize();
-        game.RunCombatLoop();
+    // Run the game session loop continuously 
+    while (true) {
+        game.Initialize();      // Displays welcome menu, sets up game
+        game.RunCombatLoop();   // Plays combat until win/loss
+
     }
 
     return 0;
