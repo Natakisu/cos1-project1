@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Weapon.h"
+#include <fstream>
 
 class Enemy; // Fix Sytax Error
 
@@ -86,4 +87,8 @@ public:
         maxSP = 100 + (agility * 5);
         maxMP = 100 + (intellect * 5);
     }
+
+    // Save/Load
+    void SaveToFile(const std::string& filename) const;
+    void LoadFromFile(const std::string& filename);
 };

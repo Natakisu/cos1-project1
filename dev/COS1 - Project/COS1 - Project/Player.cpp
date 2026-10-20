@@ -279,3 +279,41 @@ void Player::AllocateAttribute(int choice, int amount)
     unspentAttributePoints -= amount;
     UpdateDerivedStats(); 
 }
+
+void Player::SaveToFile(const std::string& filename) const
+{
+    std::ofstream outFile(filename);
+    if (outFile.is_open())
+    {
+        outFile << name << "\n";
+        outFile << level << "\n";
+        outFile << currentXP << "\n";
+        outFile << maxHP << "\n";     // Matches Player.h
+        outFile << currentHP << "\n"; // Matches Player.h
+        outFile.close();
+        ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
+    }
+    else
+    {
+        ConsoleHelper::print("[!] Error: Could not open file for saving.", ConsoleHelper::Red);
+    }
+}
+
+void Player::LoadFromFile(const std::string& filename)
+{
+    std::ifstream inFile(filename);
+    if (inFile.is_open())
+    {
+        std::getline(inFile, name);
+        inFile >> level;
+        inFile >> currentXP;
+        inFile >> maxHP;     // Matches Player.h
+        inFile >> currentHP; // Matches Player.h
+        inFile.close();
+        ConsoleHelper::print("[!] Game loaded successfully!", ConsoleHelper::Green);
+    }
+    else
+    {
+        ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
+    }
+}

@@ -83,12 +83,30 @@ void Game::DisplayWelcomeMenu()
 // Main Menu
 void Game::Initialize()
 {
-    isRunning = true; 
+    isRunning = true;
 
-    DisplayWelcomeMenu();
     system("cls");
-    CharacterCreation();
-    WeaponSelectionMenu();
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("        [ RELIC SWITCHER ]        ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("1. New Game", ConsoleHelper::White);
+    ConsoleHelper::print("2. Load Saved Game", ConsoleHelper::White);
+
+    int choice = GetValidatedPlayerChoice(); // Or a custom range validator for 1-2
+
+    if (choice == 2)
+    {
+        // Pass a placeholder name; LoadFromFile will overwrite it instantly with the saved name
+        player = new Player("Hero");
+        player->LoadFromFile("savegame.txt");
+        WeaponSelectionMenu();
+    }
+    else
+    {
+        // Fresh start
+        CharacterCreation();
+        WeaponSelectionMenu();
+    }
 
     currentDifficulty = SelectDifficulty();
 
@@ -377,9 +395,8 @@ void Game::RunCombatLoop()
         if (!currentBoss->IsAlive())
         {
             system("cls");
-            HandleCombatOutcome(); // Shows the victory/outcome header
+            HandleCombatOutcome();
 
-            // Award XP and explicitly print the gained amount to the console
             if (!rewardClaimed && player->IsAlive())
             {
                 rewardClaimed = true;
@@ -394,7 +411,10 @@ void Game::RunCombatLoop()
                 ConsoleHelper::print("==================================", ConsoleHelper::Green);
                 ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::White);
 
-                player->GainXP(earnedXP); // This will handle your level-up messages internally
+                player->GainXP(earnedXP);
+
+                // --- AUTO-SAVE PROGRESS ---
+                player->SaveToFile("savegame.txt");
 
                 ConsoleHelper::print("==================================", ConsoleHelper::Green);
             }
@@ -442,7 +462,6 @@ void Game::RunCombatLoop()
         player->RegainResourcesPerTurn();
         currentBoss->ResetTurnState();
     }
-
     // If player lost
     if (!player->IsAlive())
     {
