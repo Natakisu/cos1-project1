@@ -142,6 +142,8 @@
     <ClCompile Include="ConsoleHelper.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameInput.cpp" />
+    <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="InputValidator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -151,6 +153,8 @@
     <ClInclude Include="ConsoleHelper.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameInput.h" />
+    <ClInclude Include="GameUI.h" />
     <ClInclude Include="InputValidator.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Weapon.h" />

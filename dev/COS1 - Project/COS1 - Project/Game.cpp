@@ -1,8 +1,8 @@
 ﻿#include "Game.h"
+#include "GameUI.h"
+#include "GameInput.h"
 #include "ConsoleHelper.h"
-#include "InputValidator.h"
 #include <iostream>
-#include <string>
 #include <cstdlib>
 
 Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true)
@@ -21,29 +21,8 @@ void Game::DisplayWelcomeMenu()
 
     while (inWelcomeMenu)
     {
-        system("cls"); // Clears the screen at the start of every loop iteration
-
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("               [ RELIC SWITCHER ]                 ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("          A C++ Console RPG Experience            ", ConsoleHelper::White);
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" 1. Start New Game                                ", ConsoleHelper::White);
-        ConsoleHelper::print(" 2. View Instructions                             ", ConsoleHelper::White);
-        ConsoleHelper::print(" 3. Exit Game                                     ", ConsoleHelper::White);
-        ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Choice (1-3): ", ConsoleHelper::Cyan, false);
-
-        std::string input;
-        std::getline(std::cin, input);
-        int choice = 0;
-
-        // Strict numeric validation
-        if (InputValidator::IsValidNumber(input)) {
-            choice = std::stoi(input);
-        }
-        else {
-            choice = 0;
-        }
+        GameUI::DisplayWelcomeMenu();
+        int choice = GameInput::GetValidatedChoice(1, 3);
 
         if (choice == 1)
         {
@@ -51,19 +30,7 @@ void Game::DisplayWelcomeMenu()
         }
         else if (choice == 2)
         {
-            system("cls"); // Clear the menu before showing instructions
-
-            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
-            ConsoleHelper::print("                  GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
-            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
-            ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
-            ConsoleHelper::print("    from New World Aeternum and Dark Souls         ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Allocate attributes wisely during creation.     ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout.  ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Choose a Difficulty you would like to play.     ", ConsoleHelper::White);
-            ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks, ", ConsoleHelper::White);
-            ConsoleHelper::print("    and Dodges while managing your HP, SP, and MP. ", ConsoleHelper::White);
-            ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
+            GameUI::DisplayInstructions();
             ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
@@ -72,13 +39,6 @@ void Game::DisplayWelcomeMenu()
         {
             ConsoleHelper::print("\nExiting game. Thanks for playing!", ConsoleHelper::Green);
             exit(0); // Clean exit
-        }
-        else
-        {
-            ConsoleHelper::print("[!] Invalid choice. Please enter 1, 2, or 3.", ConsoleHelper::Red);
-            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
-            std::string dummy;
-            std::getline(std::cin, dummy);
         }
     }
 }
@@ -95,7 +55,7 @@ void Game::Initialize()
     ConsoleHelper::print("1. New Game", ConsoleHelper::White);
     ConsoleHelper::print("2. Load Saved Game", ConsoleHelper::White);
 
-    int choice = GetValidatedPlayerChoice();
+    int choice = GameInput::GetValidatedChoice(1, 2);
 
     if (choice == 2)
     {
@@ -116,7 +76,7 @@ void Game::Initialize()
         WeaponSelectionMenu();
     }
 
-    currentDifficulty = SelectDifficulty();
+    currentDifficulty = GameUI::SelectDifficulty();
 
     int bossHP = 5000;
     if (currentDifficulty == GameDifficulty::Easy) bossHP = 500;
@@ -158,13 +118,7 @@ void Game::CharacterCreation()
 // Dedicated Attribute Allocation Menu (Reusable for New Game & Level Ups/Loads)
 void Game::AllocateAttributesMenu()
 {
-    system("cls");
-    ConsoleHelper::print("--- Attribute Descriptions ---", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" - Constitution (CON): Increases your Max HP.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Strength     (STR): Increases physical weapon damage.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery.", ConsoleHelper::White);
+    GameUI::DisplayAttributeDescriptions();
     ConsoleHelper::print("\nPress Enter to begin attribute allocation...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
@@ -185,153 +139,29 @@ void Game::AllocateAttributesMenu()
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("Select attribute to upgrade (1-5): ", ConsoleHelper::Cyan, false);
 
-        std::string input;
-        std::getline(std::cin, input);
-        int choice = 0;
+        int choice = GameInput::GetValidatedChoice(1, 5);
 
-        if (InputValidator::IsValidNumber(input)) {
-            choice = std::stoi(input);
-        }
-        else {
-            choice = 0;
-        }
+        ConsoleHelper::print("Enter points to allocate: ", ConsoleHelper::White, false);
+        int amount = GameInput::GetValidatedChoice(1, player->GetUnspentPoints());
 
-        if (choice >= 1 && choice <= 5)
+        if (amount > 0 && amount <= player->GetUnspentPoints())
         {
-            ConsoleHelper::print("Enter points to allocate: ", ConsoleHelper::White, false);
-            std::string amtInput;
-            std::getline(std::cin, amtInput);
-            int amount = 0;
-
-            if (InputValidator::IsValidNumber(amtInput)) {
-                amount = std::stoi(amtInput);
-            }
-            else {
-                amount = 0;
-            }
-
-            if (amount > 0 && amount <= player->GetUnspentPoints())
-            {
-                player->AllocateAttribute(choice, amount);
-                player->UpdateDerivedStats();
-            }
-            else
-            {
-                ConsoleHelper::print("[!] Invalid amount. Press Enter to continue...", ConsoleHelper::Red, false);
-                std::string errDummy; std::getline(std::cin, errDummy);
-            }
+            player->AllocateAttribute(choice, amount);
+            player->UpdateDerivedStats();
         }
         else
         {
-            ConsoleHelper::print("[!] Invalid choice. Press Enter to continue...", ConsoleHelper::Red, false);
-            std::string errDummy; std::getline(std::cin, errDummy);
+            ConsoleHelper::print("[!] Invalid amount. Press Enter to continue...", ConsoleHelper::Red, false);
+            std::string errDummy;
+            std::getline(std::cin, errDummy);
         }
     }
-}
-
-// HP, SP, MP Bars
-void Game::RenderUI() const
-{
-    if (!player || !currentBoss) return;
-
-    auto drawBar = [](int current, int max, int totalBlocks = 10) {
-        if (max <= 0) max = 1;
-        float ratio = static_cast<float>(current) / max;
-        if (ratio < 0.0f) ratio = 0.0f;
-        if (ratio > 1.0f) ratio = 1.0f;
-        int filledCount = static_cast<int>(ratio * totalBlocks);
-        std::cout << "[";
-        for (int i = 0; i < totalBlocks; ++i) {
-            if (i < filledCount) {
-                ConsoleHelper::print("#", ConsoleHelper::Green, false);
-            }
-            else {
-                ConsoleHelper::print("-", ConsoleHelper::Red, false);
-            }
-        }
-        std::cout << "] " << current << "/" << max;
-        };
-
-    ConsoleHelper::print("\n==================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" PLAYER: " + player->GetName(), ConsoleHelper::White);
-    std::cout << " HP: "; drawBar(player->GetCurrentHP(), player->GetMaxHP()); std::cout << "\n";
-    std::cout << " SP: "; drawBar(player->GetCurrentSP(), player->GetMaxSP()); std::cout << "\n";
-    std::cout << " MP: "; drawBar(player->GetCurrentMP(), player->GetMaxMP()); std::cout << "\n";
-    std::cout << " XP: "; drawBar(player->GetCurrentXP(), player->GetXPToNextLevel());
-    std::cout << " (Lvl: " << player->GetLevel() << ")\n";
-
-    ConsoleHelper::print("--------------------------------------------------", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
-    std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
-    std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
-    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
-    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
-
-    ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
-    ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
-    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
 // Combat Action Menu
 void Game::DisplayMenu() const
 {
-    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
-    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
-    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
-    ConsoleHelper::print("4. Block", ConsoleHelper::White);
-    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
-    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
-    ConsoleHelper::print("9. [DEBUG] Instant Win / Kill Boss", ConsoleHelper::Yellow);
-}
-
-// Try-Catch replaced with strict validation check
-int Game::GetValidatedPlayerChoice()
-{
-    int choice = 0;
-    std::string inputLine;
-    bool isValid = false;
-
-    while (!isValid)
-    {
-        if (std::cin.fail() || std::cin.bad())
-        {
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
-        }
-
-        ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
-
-        if (!std::getline(std::cin, inputLine))
-        {
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
-            continue;
-        }
-
-        if (inputLine.empty())
-        {
-            continue;
-        }
-
-        if (InputValidator::IsValidNumber(inputLine))
-        {
-            choice = std::stoi(inputLine);
-            if ((choice >= 1 && choice <= 6) || choice == 9)
-            {
-                isValid = true;
-            }
-            else
-            {
-                ConsoleHelper::print("[!] Invalid choice. Please enter a number between 1 and 6 (or 9).", ConsoleHelper::Red);
-            }
-        }
-        else
-        {
-            ConsoleHelper::print("[!] Invalid input. Please enter a valid number.", ConsoleHelper::Red);
-        }
-    }
-
-    return choice;
+    GameUI::DisplayCombatMenu();
 }
 
 // Weapon Swap and Healing
@@ -472,10 +302,10 @@ void Game::RunCombatLoop()
 
         system("cls");
         currentBoss->GenerateIntent();
-        RenderUI();
+        GameUI::RenderCombatUI(player, currentBoss);
         DisplayMenu();
 
-        int choice = GetValidatedPlayerChoice();
+        int choice = GameInput::GetValidatedChoice(1, 6, 9);
         HandlePlayerAction(choice);
 
         if (choice == 6 || choice == 3)
@@ -569,23 +399,8 @@ void Game::WeaponSelectionMenu()
         }
 
         ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-        std::cout << "Choice (1-" << (chosenPrimary && chosenSecondary ? "7" : "6") << "): ";
-        ConsoleHelper::print("", ConsoleHelper::Cyan, false);
-
-        if (std::cin.peek() == '\n') {
-            std::cin.ignore();
-        }
-
-        std::string catInput;
-        std::getline(std::cin, catInput);
-        int categoryChoice = 0;
-
-        if (InputValidator::IsValidNumber(catInput)) {
-            categoryChoice = std::stoi(catInput);
-        }
-        else {
-            categoryChoice = 6;
-        }
+        int maxOption = (chosenPrimary && chosenSecondary) ? 7 : 6;
+        int categoryChoice = GameInput::GetValidatedChoice(1, maxOption);
 
         if (categoryChoice == 7 && chosenPrimary != nullptr && chosenSecondary != nullptr)
         {
@@ -647,19 +462,7 @@ void Game::WeaponSelectionMenu()
         }
 
         ConsoleHelper::print("Enter 0 to go back to category menu without picking.", ConsoleHelper::White);
-        std::cout << "Select a weapon to assign (1-" << filteredWeapons.size() << ", or 0 to go back): ";
-        ConsoleHelper::print("", ConsoleHelper::Cyan, false);
-
-        std::string wInput;
-        std::getline(std::cin, wInput);
-        int weaponChoice = 0;
-
-        if (InputValidator::IsValidNumber(wInput)) {
-            weaponChoice = std::stoi(wInput);
-        }
-        else {
-            weaponChoice = 0;
-        }
+        int weaponChoice = GameInput::GetValidatedChoice(0, (int)filteredWeapons.size());
 
         if (weaponChoice > 0 && weaponChoice <= (int)filteredWeapons.size())
         {
@@ -668,18 +471,7 @@ void Game::WeaponSelectionMenu()
             std::cout << "\nAssign " << selected->GetName() << " to:\n";
             ConsoleHelper::print("1. Primary Slot", ConsoleHelper::White);
             ConsoleHelper::print("2. Secondary Slot", ConsoleHelper::White);
-            ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
-
-            std::string slotInput;
-            std::getline(std::cin, slotInput);
-            int slotChoice = 0;
-
-            if (InputValidator::IsValidNumber(slotInput)) {
-                slotChoice = std::stoi(slotInput);
-            }
-            else {
-                slotChoice = 1;
-            }
+            int slotChoice = GameInput::GetValidatedChoice(1, 2);
 
             if (slotChoice == 1)
             {
@@ -710,47 +502,5 @@ void Game::WeaponSelectionMenu()
 // Difficulty Selection Menu
 GameDifficulty Game::SelectDifficulty()
 {
-    bool difficultyChosen = false;
-    GameDifficulty chosenDifficulty = GameDifficulty::Normal;
-
-    while (!difficultyChosen)
-    {
-        system("cls");
-        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
-        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
-        ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::White);
-        ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Yellow);
-        ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
-        ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Choice (1-5): ", ConsoleHelper::Cyan, false);
-
-        std::string input;
-        std::getline(std::cin, input);
-        int choice = 0;
-
-        if (InputValidator::IsValidNumber(input)) {
-            choice = std::stoi(input);
-        }
-        else {
-            choice = 0;
-        }
-
-        if (choice >= 1 && choice <= 5)
-        {
-            chosenDifficulty = static_cast<GameDifficulty>(choice - 1);
-            difficultyChosen = true;
-        }
-        else
-        {
-            ConsoleHelper::print("[!] Invalid selection. Please choose a number between 1 and 5.", ConsoleHelper::Red);
-            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
-            std::string dummy;
-            std::getline(std::cin, dummy);
-        }
-    }
-
-    return chosenDifficulty;
+    return GameUI::SelectDifficulty();
 }
