@@ -11,7 +11,7 @@ void GameUI::DisplayWelcomeMenu()
     ConsoleHelper::print("               [ RELIC SWITCHER ]                 ", ConsoleHelper::Cyan);
     ConsoleHelper::print("          A C++ Console RPG Experience            ", ConsoleHelper::White);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" 1. Start New Game                                ", ConsoleHelper::White);
+    ConsoleHelper::print(" 1. Start Game                                    ", ConsoleHelper::White);
     ConsoleHelper::print(" 2. View Instructions                             ", ConsoleHelper::White);
     ConsoleHelper::print(" 3. Exit Game                                     ", ConsoleHelper::White);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
