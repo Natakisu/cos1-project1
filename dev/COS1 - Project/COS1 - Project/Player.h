@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include "Weapon.h"
+#include <fstream>
 
-class Enemy; // Fix Sytax Error
+class Enemy; // Fix Syntax Error
 
-class Player 
+class Player
 {
 private:
     std::string name;
@@ -30,6 +31,12 @@ private:
     bool isBlocking;
     bool isDodging;
 
+    // XP System
+    int level;
+    int currentXP;
+    int xpToNextLevel;
+    int unspentAttributePoints;
+
 public:
     Player(std::string name);
     ~Player();
@@ -37,6 +44,7 @@ public:
     // Setup & Progression
     void AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints);
     void RecalculatePools();
+    void UpdateDerivedStats(); // Moved to Player.cpp
     void EquipWeapons(Weapon* primary, Weapon* secondary);
 
     // Actions
@@ -66,4 +74,18 @@ public:
     void DisplayStats() const;
 
     void InspectWeapons() const;
+
+    // XP System
+    void GainXP(int amount);
+    void LevelUp();
+    int GetLevel() const { return level; }
+    int GetUnspentPoints() const { return unspentAttributePoints; }
+    void AddUnspentPoints(int amount) { unspentAttributePoints += amount; }
+    void AllocateAttribute(int choice, int amount);
+    int GetCurrentXP() const { return currentXP; }
+    int GetXPToNextLevel() const { return xpToNextLevel; }
+
+    // Save/Load
+    void SaveToFile(const std::string& filename) const;
+    void LoadFromFile(const std::string& filename);
 };
