@@ -59,8 +59,37 @@ void Game::Initialize()
 
     if (choice == 2)
     {
-        player = new Player("Hero");
-        player->LoadFromFile("savegame.txt");
+        system("cls");
+        ConsoleHelper::print("Enter your character's name to load: ", ConsoleHelper::Cyan, false);
+
+        std::string charName;
+        std::getline(std::cin, charName);
+
+        if (charName.empty()) {
+            charName = "Hero";
+        }
+
+        std::string saveFileName = charName + "_save.txt";
+
+        player = new Player(charName);
+
+        // Try loading the file. If your Player class returns a bool on LoadFromFile, you can check it here!
+        player->LoadFromFile(saveFileName);
+
+        // If stats are still at default/0 (meaning file didn't exist or failed to load), 
+        // fall back gracefully to character creation instead of breaking!
+        if (player->GetLevel() <= 0 && player->GetMaxHP() <= 100) // Adjust check based on your Player defaults
+        {
+            ConsoleHelper::print("\n[!] Could not find save file: " + saveFileName, ConsoleHelper::Red);
+            ConsoleHelper::print("Starting fresh character creation instead...", ConsoleHelper::Yellow);
+            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+            std::string dummy;
+            std::getline(std::cin, dummy);
+
+            delete player; // Clean up the temp player
+            CharacterCreation(); // Now properly triggers creation!
+        }
+
         WeaponSelectionMenu();
 
         // If they have unspent points saved over, let them allocate them!
@@ -71,7 +100,7 @@ void Game::Initialize()
     }
     else
     {
-        // Fresh start
+        // Fresh start - properly flows through character creation -> attributes -> weapons
         CharacterCreation();
         WeaponSelectionMenu();
     }
@@ -288,7 +317,8 @@ void Game::RunCombatLoop()
                     }
                 }
 
-                player->SaveToFile("savegame.txt");
+                std::string saveFileName = player->GetName() + "_save.txt";
+                player->SaveToFile(saveFileName);
 
                 ConsoleHelper::print("==================================", ConsoleHelper::Green);
             }

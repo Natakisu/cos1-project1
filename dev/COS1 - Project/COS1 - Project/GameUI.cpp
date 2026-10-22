@@ -61,10 +61,15 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
 
     auto drawBar = [](int current, int max, int totalBlocks = 10) {
         if (max <= 0) max = 1;
-        float ratio = static_cast<float>(current) / max;
-        if (ratio < 0.0f) ratio = 0.0f;
-        if (ratio > 1.0f) ratio = 1.0f;
+        if (current < 0) current = 0;
+
+        // Prevent out-of-bounds ratios 
+        double ratio = static_cast<double>(current) / static_cast<double>(max);
+        if (ratio > 1.0) ratio = 1.0;
+        if (ratio < 0.0) ratio = 0.0;
+
         int filledCount = static_cast<int>(ratio * totalBlocks);
+
         std::cout << "[";
         for (int i = 0; i < totalBlocks; ++i) {
             if (i < filledCount) {
