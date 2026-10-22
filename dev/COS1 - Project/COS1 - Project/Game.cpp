@@ -519,11 +519,24 @@ void Game::WeaponSelectionMenu()
         player->EquipWeapons(chosenPrimary, chosenSecondary);
     }
 
-    for (Weapon* w : availableWeapons) {
-        if (w != chosenPrimary && w != chosenSecondary) {
+    // Safe memory cleanup for unselected weapons
+    for (Weapon* w : availableWeapons)
+    {
+        if (w != chosenPrimary && w != chosenSecondary)
+        {
             delete w;
+            w = nullptr;
         }
     }
+
+    // If primary and secondary are the same pointer (safeguard against double-delete), 
+    // only delete it once
+    if (chosenPrimary == chosenSecondary && chosenPrimary != nullptr)
+    {
+        // Keep one reference, clear the other so it doesn't double-delete
+        chosenSecondary = nullptr;
+    }
+
     availableWeapons.clear();
 }
 
