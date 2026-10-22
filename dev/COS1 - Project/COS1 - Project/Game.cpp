@@ -72,13 +72,10 @@ void Game::Initialize()
         std::string saveFileName = charName + "_save.txt";
 
         player = new Player(charName);
-
-        // Try loading the file. If your Player class returns a bool on LoadFromFile, you can check it here!
         player->LoadFromFile(saveFileName);
 
-        // If stats are still at default/0 (meaning file didn't exist or failed to load), 
-        // fall back gracefully to character creation instead of breaking!
-        if (player->GetLevel() <= 0 && player->GetMaxHP() <= 100) // Adjust check based on your Player defaults
+        // Fallback check if file didn't exist
+        if (player->GetLevel() <= 0 && player->GetMaxHP() <= 100)
         {
             ConsoleHelper::print("\n[!] Could not find save file: " + saveFileName, ConsoleHelper::Red);
             ConsoleHelper::print("Starting fresh character creation instead...", ConsoleHelper::Yellow);
@@ -86,13 +83,12 @@ void Game::Initialize()
             std::string dummy;
             std::getline(std::cin, dummy);
 
-            delete player; // Clean up the temp player
-            CharacterCreation(); // Now properly triggers creation!
+            delete player;
+            CharacterCreation();
         }
 
         WeaponSelectionMenu();
 
-        // If they have unspent points saved over, let them allocate them!
         if (player->GetUnspentPoints() > 0)
         {
             AllocateAttributesMenu();
@@ -100,11 +96,11 @@ void Game::Initialize()
     }
     else
     {
-        // Fresh start - properly flows through character creation -> attributes -> weapons
         CharacterCreation();
         WeaponSelectionMenu();
     }
 
+    // --- DIFFICULTY & BOSS INITIALIZATION ---
     currentDifficulty = GameUI::SelectDifficulty();
 
     int bossHP = 5000;
@@ -114,6 +110,8 @@ void Game::Initialize()
     else if (currentDifficulty == GameDifficulty::Insane) bossHP = 500000;
     else if (currentDifficulty == GameDifficulty::Impossible) bossHP = 5000000;
 
+    // Clean up any existing boss pointer just in case
+    delete currentBoss;
     currentBoss = new Enemy("Relic Guardian", bossHP, 50, currentDifficulty);
 }
 

@@ -44,6 +44,7 @@ public:
     // Setup & Progression
     void AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints);
     void RecalculatePools();
+    void UpdateDerivedStats(); // Moved to Player.cpp
     void EquipWeapons(Weapon* primary, Weapon* secondary);
 
     // Actions
@@ -79,17 +80,10 @@ public:
     void LevelUp();
     int GetLevel() const { return level; }
     int GetUnspentPoints() const { return unspentAttributePoints; }
-    void AddUnspentPoints(int amount) { unspentAttributePoints += amount; } // Added to grant pool points!
+    void AddUnspentPoints(int amount) { unspentAttributePoints += amount; }
     void AllocateAttribute(int choice, int amount);
     int GetCurrentXP() const { return currentXP; }
     int GetXPToNextLevel() const { return xpToNextLevel; }
-
-    void UpdateDerivedStats()
-    {
-        maxHP = 100 + (constitution * 10);
-        maxSP = 100 + (agility * 5);
-        maxMP = 100 + (intellect * 5);
-    }
 
     // Save/Load
     void SaveToFile(const std::string& filename) const;
