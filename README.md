@@ -109,18 +109,12 @@ A tactical, turn-based C++ console RPG featuring real-time action combat mechani
 
 ### Week 4
 
-⚙️ Overview - What I worked on this past week:
-
-[]
-
-🌵 Challenges - What problems did I have & how I'm addressing them
-
-[]
-
-🏆 Accomplishments - What is something I "leveled up" on this week
-
-[]
-
-🔮 Next Steps - What I plan to prioritize and do next
-
-[]
+- ⚙️ **Overview** – [This past week, I refactored the codebase into a clean, modular architecture by extracting UI rendering into a dedicated `GameUI` class and input validation logic into a `GameInput` class, keeping `Game.cpp` focused strictly on state management.]
+    
+- 🛠️ **Project Wrap-Up** – [I finished implementing robust string-based input validation, resolved stat-bar scaling so maximum health and resource pools properly track attribute upgrades, and added character-name-based file loading and saving. I also secured memory management by adding safeguards against duplicate weapon pointer deletion.]
+    
+- 🌵 **Challenges** – [One of the trickier issues was implementing the Experience system. I spent hours trying to figure out why the game was rewarding experience in an infinite loop and tried to fix it numerous different ways and loops and everything I could think of and do research on. All to figure out it wasn't the experience loop, it was the Level Up loop the entire time. Another obstacles was ensuring that current health pools scaled correctly alongside maximum health increases when investing points into Constitution, rather than leaving current health stuck at baseline values. I resolved this by updating the pool recalculation and bounds-checking logic inside the player class.]
+    
+- 📚 **Biggest Takeaway** – [Looking back, the most valuable lesson was experiencing firsthand how separating concerns (UI, input, and game loop controllers) makes debugging, scaling, and maintaining a C++ project significantly more manageable. I probably wouldn't have spent hours trying to fix a loop that wasn't broken if I wasn't also drudging through ~750+ lines of code in one File. I've broken it down and separated code and classes into more .h and .cpp files and the Game.cpp is now sitting at a slightly more manageable ~500 lines of code
+    
+- 🔮 **Future Development** – [If I continued this project after the course (which let's be honest I will), I would build out an expanded inventory system, add more diverse enemy AI types with unique status effects, and implement a more robust save-file management screen to handle multiple characters seamlessly.
