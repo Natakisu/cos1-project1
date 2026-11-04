@@ -562,6 +562,7 @@ void Game::WeaponSelectionMenu()
     }
 
     availableWeapons.clear();
+}
 
 // Difficulty Selection Menu
 GameDifficulty Game::SelectDifficulty()
