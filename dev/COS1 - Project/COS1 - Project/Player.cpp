@@ -42,18 +42,16 @@ void Player::RecalculatePools()
     int oldMaxSP = maxSP;
     int oldMaxMP = maxMP;
 
-    // Your stat pool calculations based on attributes
     maxHP = constitution * 10;
     maxSP = agility * 10;
     maxMP = intellect * 10;
 
-    // Scale current pools up by whatever amount the max pool increased by, 
-    // ensuring spending points into stats also scales your current health/stamina/mana up!
+    // Scale current resources up by the exact amount your maximums increased
     currentHP += (maxHP - oldMaxHP);
     currentSP += (maxSP - oldMaxSP);
     currentMP += (maxMP - oldMaxMP);
 
-    // Ensure current values never exceed bounds
+    // Safety bounds
     if (currentHP > maxHP) currentHP = maxHP;
     if (currentSP > maxSP) currentSP = maxSP;
     if (currentMP > maxMP) currentMP = maxMP;
