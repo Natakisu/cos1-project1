@@ -59,48 +59,61 @@ void Game::Initialize()
 
     if (choice == 2)
     {
-        system("cls");
-        ConsoleHelper::print("Enter your character's name to load: ", ConsoleHelper::Cyan, false);
-
-        std::string charName;
-        std::getline(std::cin, charName);
-
-        if (charName.empty()) {
-            charName = "Hero";
-        }
-
-        std::string saveFileName = charName + "_save.txt";
-
-        player = new Player(charName);
-        player->LoadFromFile(saveFileName);
-
-        // Fallback check if file didn't exist
-        if (player->GetLevel() <= 0 && player->GetMaxHP() <= 100)
-        {
-            ConsoleHelper::print("\n[!] Could not find save file: " + saveFileName, ConsoleHelper::Red);
-            ConsoleHelper::print("Starting fresh character creation instead...", ConsoleHelper::Yellow);
-            ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
-            std::string dummy;
-            std::getline(std::cin, dummy);
-
-            delete player;
-            CharacterCreation();
-        }
-
-        WeaponSelectionMenu();
-
-        if (player->GetUnspentPoints() > 0)
-        {
-            AllocateAttributesMenu();
-        }
+        LoadExistingGameSession();
     }
     else
     {
-        CharacterCreation();
-        WeaponSelectionMenu();
+        StartFreshGameSession();
     }
 
-    // --- DIFFICULTY & BOSS INITIALIZATION ---
+    SetupBossDifficulty();
+}
+
+void Game::LoadExistingGameSession()
+{
+    system("cls");
+    ConsoleHelper::print("Enter your character's name to load: ", ConsoleHelper::Cyan, false);
+
+    std::string charName;
+    std::getline(std::cin, charName);
+
+    if (charName.empty()) {
+        charName = "Hero";
+    }
+
+    std::string saveFileName = charName + "_save.txt";
+
+    player = new Player(charName);
+    player->LoadFromFile(saveFileName);
+
+    if (player->GetLevel() <= 0 && player->GetMaxHP() <= 100)
+    {
+        ConsoleHelper::print("\n[!] Could not find save file: " + saveFileName, ConsoleHelper::Red);
+        ConsoleHelper::print("Starting fresh character creation instead...", ConsoleHelper::Yellow);
+        ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+        std::string dummy;
+        std::getline(std::cin, dummy);
+
+        delete player;
+        CharacterCreation();
+    }
+
+    WeaponSelectionMenu();
+
+    if (player->GetUnspentPoints() > 0)
+    {
+        AllocateAttributesMenu();
+    }
+}
+
+void Game::StartFreshGameSession()
+{
+    CharacterCreation();
+    WeaponSelectionMenu();
+}
+
+void Game::SetupBossDifficulty()
+{
     currentDifficulty = GameUI::SelectDifficulty();
 
     int bossHP = 5000;
@@ -110,7 +123,6 @@ void Game::Initialize()
     else if (currentDifficulty == GameDifficulty::Insane) bossHP = 500000;
     else if (currentDifficulty == GameDifficulty::Impossible) bossHP = 5000000;
 
-    // Clean up any existing boss pointer just in case
     delete currentBoss;
     currentBoss = new Enemy("Relic Guardian", bossHP, 50, currentDifficulty);
 }

@@ -31,6 +31,10 @@ private:
 
     GameDifficulty currentDifficulty;
 
+    void LoadExistingGameSession();
+    void StartFreshGameSession();
+    void SetupBossDifficulty();
+
 public:
     Game();
     ~Game();
