@@ -515,13 +515,27 @@ void Game::WeaponSelectionMenu()
 
             if (slotChoice == 1)
             {
-                chosenPrimary = selected;
-                ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Primary!", ConsoleHelper::Green);
+                if (selected == chosenSecondary)
+                {
+                    ConsoleHelper::print("[!] You cannot equip the same weapon in both slots!", ConsoleHelper::Red);
+                }
+                else
+                {
+                    chosenPrimary = selected;
+                    ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Primary!", ConsoleHelper::Green);
+                }
             }
             else
             {
-                chosenSecondary = selected;
-                ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Secondary!", ConsoleHelper::Green);
+                if (selected == chosenPrimary)
+                {
+                    ConsoleHelper::print("[!] You cannot equip the same weapon in both slots!", ConsoleHelper::Red);
+                }
+                else
+                {
+                    chosenSecondary = selected;
+                    ConsoleHelper::print("[+] " + selected->GetName() + " equipped as Secondary!", ConsoleHelper::Green);
+                }
             }
         }
     }
@@ -541,16 +555,13 @@ void Game::WeaponSelectionMenu()
         }
     }
 
-    // If primary and secondary are the same pointer (safeguard against double-delete), 
-    // only delete it once
+    // Safeguard against duplicate pointers
     if (chosenPrimary == chosenSecondary && chosenPrimary != nullptr)
     {
-        // Keep one reference, clear the other so it doesn't double-delete
         chosenSecondary = nullptr;
     }
 
     availableWeapons.clear();
-}
 
 // Difficulty Selection Menu
 GameDifficulty Game::SelectDifficulty()
