@@ -3,6 +3,7 @@
 #include "GameInput.h"
 #include "ConsoleHelper.h"
 #include "WeaponManager.h"
+#include "CharacterManager.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -67,8 +68,10 @@ void Game::DisplayWelcomeMenu()
 // Handle New Game
 void Game::StartFreshGameSession()
 {
-    CharacterCreation();
+    // Uses CharacterManager to create player and run initial point allocation
+    player = CharacterManager::CreateCharacter();
 
+    // Uses WeaponManager to handle loadout selection
     Weapon* primary = nullptr;
     Weapon* secondary = nullptr;
     {
@@ -80,6 +83,7 @@ void Game::StartFreshGameSession()
         player->EquipWeapons(primary, secondary);
     }
 
+    // Temp Debugging Potion
     player->AddItem(new Item("Health Potion", ItemType::HealthPotion, 50, 20));
 }
 
@@ -110,10 +114,10 @@ void Game::LoadExistingGameSession()
         std::getline(std::cin, dummy);
 
         delete player;
-        CharacterCreation();
+        player = CharacterManager::CreateCharacter();
     }
 
-    // Updated to use WeaponManager instead of the deleted WeaponSelectionMenu()
+    // Uses WeaponManager for loadout selection on loaded games
     Weapon* primary = nullptr;
     Weapon* secondary = nullptr;
     {
@@ -127,98 +131,7 @@ void Game::LoadExistingGameSession()
 
     if (player->GetUnspentPoints() > 0)
     {
-        AllocateAttributesMenu();
-    }
-}
-
-// Character Creation Menu
-void Game::CharacterCreation()
-{
-    std::string playerName;
-    bool validName = false;
-
-    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
-    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
-
-    // Keep prompting until a valid, non-empty name is entered
-    while (!validName)
-    {
-        ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
-        std::getline(std::cin, playerName);
-
-        if (playerName.empty() || playerName.find_first_not_of(' ') == std::string::npos)
-        {
-            ConsoleHelper::print("[!] Name cannot be empty. Please enter a valid name.", ConsoleHelper::Yellow);
-        }
-        else
-        {
-            validName = true;
-        }
-    }
-
-    // 1. Create player
-    player = new Player(playerName);
-
-    // 2. Grant them their 30 starting attribute points to spend!
-    player->AddUnspentPoints(30);
-
-    // 3. Open the dedicated allocation menu
-    AllocateAttributesMenu();
-
-    system("cls");
-
-    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
-    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
-    player->DisplayStats();
-
-    // Smooth transition message into weapon selection
-    ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
-}
-
-// Dedicated Attribute Allocation Menu
-void Game::AllocateAttributesMenu()
-{
-    GameUI::DisplayAttributeDescriptions();
-    ConsoleHelper::print("\nPress Enter to begin attribute allocation...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
-
-    while (player->GetUnspentPoints() > 0)
-    {
-        system("cls");
-        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("       ALLOCATE ATTRIBUTES        ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Unspent Points: " + std::to_string(player->GetUnspentPoints()), ConsoleHelper::Green);
-        ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
-        ConsoleHelper::print("1. Constitution (CON)", ConsoleHelper::White);
-        ConsoleHelper::print("2. Strength (STR)", ConsoleHelper::White);
-        ConsoleHelper::print("3. Agility (AGI)", ConsoleHelper::White);
-        ConsoleHelper::print("4. Intellect (INT)", ConsoleHelper::White);
-        ConsoleHelper::print("5. Focus (FOC)", ConsoleHelper::White);
-        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Select attribute to upgrade (1-5): ", ConsoleHelper::Cyan, false);
-
-        int choice = GameInput::GetValidatedChoice(1, 5);
-
-        ConsoleHelper::print("Enter points to allocate: ", ConsoleHelper::White, false);
-        int amount = GameInput::GetValidatedChoice(1, player->GetUnspentPoints());
-
-        if (amount > 0 && amount <= player->GetUnspentPoints())
-        {
-            player->AllocateAttribute(choice, amount);
-            player->UpdateDerivedStats();
-        }
-        else
-        {
-            ConsoleHelper::print("[!] Invalid amount. Press Enter to continue...", ConsoleHelper::Red, false);
-            std::string errDummy;
-            std::getline(std::cin, errDummy);
-        }
+        CharacterManager::RunAttributeAllocationMenu(player);
     }
 }
 
@@ -314,7 +227,7 @@ void Game::RunCombatLoop()
                     }
                 }
             }
-            else // Regular actions (Light Attack, Heavy Attack, Block, Dodge)
+            else // Regular actions (Light Attack, Heavy Attack, Block, Dodge, Debug)
             {
                 HandlePlayerAction(choice);
                 turnConsumed = true; // Action executed -> Turn consumed!
@@ -392,7 +305,7 @@ void Game::RunCombatLoop()
                     {
                         while (player->GetUnspentPoints() > 0)
                         {
-                            AllocateAttributesMenu();
+                            CharacterManager::RunAttributeAllocationMenu(player);
                         }
 
                         std::string saveFileName = player->GetName() + "_save.txt";
@@ -509,7 +422,7 @@ void Game::HandlePlayerAction(int choice)
         player->Dodge();
         ConsoleHelper::print("You prepare to dodge the next attack.", ConsoleHelper::White);
         break;
-    case 9: // Debug Insta-Kill ----------------------------------------------------------------------------------------------------------------------------
+    case 9: // Debug Insta-Kill
     {
         while (currentBoss->GetCurrentHP() > 0)
         {
