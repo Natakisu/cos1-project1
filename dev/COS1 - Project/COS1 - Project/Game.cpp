@@ -68,7 +68,7 @@ void Game::StartFreshGameSession()
 {
     CharacterCreation();
     WeaponSelectionMenu();
-    // Temp Debugging Potion
+    // Temp Debugging Potion -------------------------------------------------------------------------------------------------------
     player->AddItem(new Item("Health Potion", ItemType::HealthPotion, 50, 20));
 }
 
@@ -478,7 +478,15 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7); // (or 1, 7, 9 depending on how your overloaded validation function is set up)
+            int choice = GameInput::GetValidatedChoice(1, 7);
+
+            // [Debug Option - Remove Later]------------------------------------------------------------------------------------------------------------------------------------------
+            if (choice == 9)
+            {
+                HandlePlayerAction(9);
+                turnConsumed = true;
+                break;
+            }
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
@@ -601,7 +609,7 @@ void Game::HandlePlayerAction(int choice)
         player->Dodge();
         ConsoleHelper::print("You prepare to dodge the next attack.", ConsoleHelper::White);
         break;
-    case 9: // Debug Insta-Kill
+    case 9: // Debug Insta-Kill ----------------------------------------------------------------------------------------------------------------------------
     {
         while (currentBoss->GetCurrentHP() > 0)
         {

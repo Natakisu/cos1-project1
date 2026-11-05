@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "ConsoleHelper.h"
 
+// Player Constructor and Destructor
 Player::Player(std::string name)
     : name(name),
     constitution(10), strength(10), agility(10), intellect(10), focus(10),
@@ -18,7 +19,6 @@ Player::Player(std::string name)
     currentSP = maxSP;
     currentMP = maxMP;
 }
-
 Player::~Player()
 {
     delete primaryWeapon;
@@ -27,6 +27,7 @@ Player::~Player()
     secondaryWeapon = nullptr;
 }
 
+// Handle Player Attributes and Stats
 void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
     constitution += conPoints;
     strength += strPoints;
@@ -35,7 +36,46 @@ void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int
     focus += focPoints;
     RecalculatePools();
 }
+void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
+    constitution = con;
+    strength = str;
+    agility = agi;
+    intellect = intel;
+    focus = foc;
+    RecalculatePools();
+    currentHP = maxHP;
+    currentSP = maxSP;
+    currentMP = maxMP;
+}
+void Player::AllocateAttribute(int choice, int amount)
+{
+    if (amount > unspentAttributePoints) amount = unspentAttributePoints;
+    if (amount <= 0) return;
 
+    if (choice == 1) constitution += amount;
+    else if (choice == 2) strength += amount;
+    else if (choice == 3) agility += amount;
+    else if (choice == 4) intellect += amount;
+    else if (choice == 5) focus += amount;
+
+    unspentAttributePoints -= amount;
+    UpdateDerivedStats();
+}
+void Player::DisplayStats() const {
+    system("cls");
+
+    ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
+    std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
+    std::cout << "Strength     (STR): " << strength << "\n";
+    std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
+    std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
+    std::cout << "Focus        (FOC): " << focus << "\n";
+    ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
+
+    ConsoleHelper::print("Press Enter to continue to weapon selection...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
+}
 void Player::RecalculatePools()
 {
     int oldMaxHP = maxHP;
@@ -59,18 +99,35 @@ void Player::RecalculatePools()
     if (currentSP < 0) currentSP = 0;
     if (currentMP < 0) currentMP = 0;
 }
-
 void Player::UpdateDerivedStats()
 {
     RecalculatePools();
 }
 
+// Handles Player Weapons
 void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
 {
     primaryWeapon = primary;
     secondaryWeapon = secondary;
 }
+void Player::InspectWeapons() const {
+    system("cls");
 
+    ConsoleHelper::print("=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
+    if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+    else std::cout << "[STOWED] ";
+    if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
+
+    std::cout << "\n";
+    if (!isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+    else std::cout << "[STOWED] ";
+    if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
+    ConsoleHelper::print("========================", ConsoleHelper::Cyan);
+
+    ConsoleHelper::print("\nPress Enter to return to the main menu...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
+}
 bool Player::SwapWeapon()
 {
     if (currentSP < 10) return false;
@@ -80,6 +137,39 @@ bool Player::SwapWeapon()
     return true;
 }
 
+// Handles Player Inventory
+void Player::AddItem(Item* item)
+{
+    inventory.push_back(item);
+}
+const std::vector<Item*>& Player::GetInventory() const
+{
+    return inventory;
+}
+void Player::UseItem(size_t index)
+{
+    if (index >= inventory.size()) return;
+
+    Item* item = inventory[index];
+    if (item->GetType() == ItemType::HealthPotion)
+    {
+        currentHP += item->GetPotency();
+        if (currentHP > maxHP) currentHP = maxHP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " HP.\n";
+    }
+    else if (item->GetType() == ItemType::StaminaPotion)
+    {
+        currentSP += item->GetPotency();
+        if (currentSP > maxSP) currentSP = maxSP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " Stamina.\n";
+    }
+
+    // Remove consumed item from inventory
+    delete item;
+    inventory.erase(inventory.begin() + index);
+}
+
+// Handles Player Combat Actions
 int Player::PerformLightAttack(Enemy& target)
 {
     Weapon* activeWeapon = GetActiveWeapon();
@@ -126,7 +216,6 @@ int Player::PerformLightAttack(Enemy& target)
 
     return damage;
 }
-
 int Player::PerformHeavyAttack(Enemy& target) {
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon) return 0;
@@ -172,17 +261,14 @@ int Player::PerformHeavyAttack(Enemy& target) {
 
     return damage;
 }
-
 void Player::Block()
 {
     isBlocking = true;
 }
-
 void Player::Dodge()
 {
     isDodging = true;
 }
-
 void Player::RegainResourcesPerTurn()
 {
     currentSP = std::min(maxSP, currentSP + 20);
@@ -190,7 +276,6 @@ void Player::RegainResourcesPerTurn()
     isBlocking = false;
     isDodging = false;
 }
-
 void Player::TakeDamage(int damage)
 {
     if (isDodging) return;
@@ -204,53 +289,7 @@ void Player::TakeDamage(int damage)
     if (currentHP < 0) currentHP = 0;
 }
 
-void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
-    constitution = con;
-    strength = str;
-    agility = agi;
-    intellect = intel;
-    focus = foc;
-    RecalculatePools();
-    currentHP = maxHP;
-    currentSP = maxSP;
-    currentMP = maxMP;
-}
-
-void Player::DisplayStats() const {
-    system("cls");
-
-    ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
-    std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
-    std::cout << "Strength     (STR): " << strength << "\n";
-    std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
-    std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
-    std::cout << "Focus        (FOC): " << focus << "\n";
-    ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
-
-    ConsoleHelper::print("Press Enter to continue to weapon selection...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
-}
-
-void Player::InspectWeapons() const {
-    system("cls");
-
-    ConsoleHelper::print("=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
-    if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
-
-    std::cout << "\n";
-    if (!isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
-    ConsoleHelper::print("========================", ConsoleHelper::Cyan);
-
-    ConsoleHelper::print("\nPress Enter to return to the main menu...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
-}
-
+// Handles Player Combat Rewards
 void Player::GainXP(int amount)
 {
     currentXP += amount;
@@ -276,7 +315,6 @@ void Player::GainXP(int amount)
         safetyCounter++;
     }
 }
-
 void Player::LevelUp()
 {
     level++;
@@ -290,21 +328,7 @@ void Player::LevelUp()
     ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
 }
 
-void Player::AllocateAttribute(int choice, int amount)
-{
-    if (amount > unspentAttributePoints) amount = unspentAttributePoints;
-    if (amount <= 0) return;
-
-    if (choice == 1) constitution += amount;
-    else if (choice == 2) strength += amount;
-    else if (choice == 3) agility += amount;
-    else if (choice == 4) intellect += amount;
-    else if (choice == 5) focus += amount;
-
-    unspentAttributePoints -= amount;
-    UpdateDerivedStats();
-}
-
+// Handles Player Save/Load
 void Player::SaveToFile(const std::string& filename) const
 {
     std::ofstream outFile(filename);
@@ -331,7 +355,6 @@ void Player::SaveToFile(const std::string& filename) const
         ConsoleHelper::print("[!] Error: Could not open file for saving.", ConsoleHelper::Red);
     }
 }
-
 void Player::LoadFromFile(const std::string& filename)
 {
     std::ifstream inFile(filename);
@@ -360,37 +383,4 @@ void Player::LoadFromFile(const std::string& filename)
     {
         ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
     }
-}
-
-void Player::AddItem(Item* item) 
-{
-    inventory.push_back(item);
-}
-
-const std::vector<Item*>& Player::GetInventory() const 
-{
-    return inventory;
-}
-
-void Player::UseItem(size_t index) 
-{
-    if (index >= inventory.size()) return;
-
-    Item* item = inventory[index];
-    if (item->GetType() == ItemType::HealthPotion) 
-    {
-        currentHP += item->GetPotency();
-        if (currentHP > maxHP) currentHP = maxHP;
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " HP.\n";
-    }
-    else if (item->GetType() == ItemType::StaminaPotion) 
-    {
-        currentSP += item->GetPotency();
-        if (currentSP > maxSP) currentSP = maxSP;
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " Stamina.\n";
-    }
-
-    // Remove consumed item from inventory
-    delete item;
-    inventory.erase(inventory.begin() + index);
 }
