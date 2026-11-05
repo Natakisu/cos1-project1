@@ -150,6 +150,7 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PreparationMenu.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponManager.cpp" />
   </ItemGroup>
@@ -164,6 +165,7 @@
     <ClInclude Include="InventoryScreen.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PreparationMenu.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponManager.h" />
   </ItemGroup>

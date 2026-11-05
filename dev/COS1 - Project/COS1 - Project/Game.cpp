@@ -4,6 +4,7 @@
 #include "ConsoleHelper.h"
 #include "WeaponManager.h"
 #include "CharacterManager.h"
+#include "PreparationMenu.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -85,6 +86,9 @@ void Game::StartFreshGameSession()
 
     // Temp Debugging Potion
     player->AddItem(new Item("Health Potion", ItemType::HealthPotion, 50, 20));
+
+    // Open Preparation Hub before moving to boss difficulty
+    PreparationMenu::Open(player);
 }
 
 // Handle Load Game
@@ -133,8 +137,10 @@ void Game::LoadExistingGameSession()
     {
         CharacterManager::RunAttributeAllocationMenu(player);
     }
-}
 
+    // Open Preparation Hub before moving to boss difficulty
+    PreparationMenu::Open(player);
+}
 // Set Boss Stats
 void Game::SetupBossDifficulty()
 {
