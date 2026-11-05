@@ -100,8 +100,10 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
     std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
     std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
-    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
-    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
+
+    // Updated to use dynamic difficulty thresholds instead of hardcoded 100
+    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), currentBoss->GetMaxBleedThreshold()); std::cout << "\n";
+    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), currentBoss->GetMaxBurnThreshold()); std::cout << "\n";
 
     ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
     ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
@@ -120,7 +122,7 @@ void GameUI::DisplayCombatMenu()
     ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
     ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
     ConsoleHelper::print("7. Open Inventory", ConsoleHelper::White);
-    ConsoleHelper::print("9. [DEBUG - Instant Kill", ConsoleHelper::Yellow);
+    ConsoleHelper::print("9. [DEBUG - Instant Kill]", ConsoleHelper::Yellow); // Added closing bracket
     ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("Choose your action: ", ConsoleHelper::Cyan, false);
 }

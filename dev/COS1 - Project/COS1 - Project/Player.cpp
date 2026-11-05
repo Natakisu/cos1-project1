@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <fstream>
 #include "Player.h"
 #include "Enemy.h"
 #include "ConsoleHelper.h"
@@ -19,6 +20,7 @@ Player::Player(std::string name)
     currentSP = maxSP;
     currentMP = maxMP;
 }
+
 Player::~Player()
 {
     delete primaryWeapon;
@@ -36,6 +38,7 @@ void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int
     focus += focPoints;
     RecalculatePools();
 }
+
 void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
     constitution = con;
     strength = str;
@@ -47,6 +50,7 @@ void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
     currentSP = maxSP;
     currentMP = maxMP;
 }
+
 void Player::AllocateAttribute(int choice, int amount)
 {
     if (amount > unspentAttributePoints) amount = unspentAttributePoints;
@@ -61,6 +65,7 @@ void Player::AllocateAttribute(int choice, int amount)
     unspentAttributePoints -= amount;
     UpdateDerivedStats();
 }
+
 void Player::DisplayStats() const {
     system("cls");
 
@@ -76,6 +81,7 @@ void Player::DisplayStats() const {
     std::string dummy;
     std::getline(std::cin, dummy);
 }
+
 void Player::RecalculatePools()
 {
     int oldMaxHP = maxHP;
@@ -99,6 +105,7 @@ void Player::RecalculatePools()
     if (currentSP < 0) currentSP = 0;
     if (currentMP < 0) currentMP = 0;
 }
+
 void Player::UpdateDerivedStats()
 {
     RecalculatePools();
@@ -110,6 +117,7 @@ void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
     primaryWeapon = primary;
     secondaryWeapon = secondary;
 }
+
 void Player::InspectWeapons() const {
     system("cls");
 
@@ -128,6 +136,7 @@ void Player::InspectWeapons() const {
     std::string dummy;
     std::getline(std::cin, dummy);
 }
+
 bool Player::SwapWeapon()
 {
     if (currentSP < 10) return false;
@@ -142,10 +151,12 @@ void Player::AddItem(Item* item)
 {
     inventory.push_back(item);
 }
+
 const std::vector<Item*>& Player::GetInventory() const
 {
     return inventory;
 }
+
 void Player::UseItem(size_t index)
 {
     if (index >= inventory.size()) return;
@@ -216,6 +227,7 @@ int Player::PerformLightAttack(Enemy& target)
 
     return damage;
 }
+
 int Player::PerformHeavyAttack(Enemy& target) {
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon) return 0;
@@ -261,14 +273,17 @@ int Player::PerformHeavyAttack(Enemy& target) {
 
     return damage;
 }
+
 void Player::Block()
 {
     isBlocking = true;
 }
+
 void Player::Dodge()
 {
     isDodging = true;
 }
+
 void Player::RegainResourcesPerTurn()
 {
     currentSP = std::min(maxSP, currentSP + 20);
@@ -276,6 +291,7 @@ void Player::RegainResourcesPerTurn()
     isBlocking = false;
     isDodging = false;
 }
+
 void Player::TakeDamage(int damage)
 {
     if (isDodging) return;
@@ -315,6 +331,7 @@ void Player::GainXP(int amount)
         safetyCounter++;
     }
 }
+
 void Player::LevelUp()
 {
     level++;
@@ -337,6 +354,7 @@ void Player::SaveToFile(const std::string& filename) const
         outFile << name << "\n";
         outFile << level << "\n";
         outFile << currentXP << "\n";
+        outFile << xpToNextLevel << "\n"; // <--- Added so level-up curve persists
         outFile << maxHP << "\n";
         outFile << currentHP << "\n";
 
@@ -355,6 +373,7 @@ void Player::SaveToFile(const std::string& filename) const
         ConsoleHelper::print("[!] Error: Could not open file for saving.", ConsoleHelper::Red);
     }
 }
+
 void Player::LoadFromFile(const std::string& filename)
 {
     std::ifstream inFile(filename);
@@ -363,6 +382,7 @@ void Player::LoadFromFile(const std::string& filename)
         std::getline(inFile, name);
         inFile >> level;
         inFile >> currentXP;
+        inFile >> xpToNextLevel; // <--- Added to match save file order
         inFile >> maxHP;
         inFile >> currentHP;
 

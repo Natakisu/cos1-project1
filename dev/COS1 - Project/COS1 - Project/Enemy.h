@@ -26,6 +26,7 @@ private:
 
     int maxBleedThreshold;
     int maxBurnThreshold;
+    int maxFrostbiteThreshold;
 
     BossIntent currentIntent;
 
@@ -45,12 +46,15 @@ public:
     // Getters
     int GetBleedMeter() const { return bleedMeter; }
     int GetBurnMeter() const { return burnMeter; }
+    int GetFrostbiteMeter() const { return frostbiteMeter; }
     std::string GetName() const { return name; }
     int GetCurrentHP() const { return currentHP; }
     int GetCurrentPosture() const { return currentPosture; }
     bool IsAlive() const { return currentHP > 0; }
     int GetMaxHP() const { return maxHP; }
     int GetMaxPosture() const { return maxPosture; }
+
     int GetMaxBleedThreshold() const { return maxBleedThreshold; }
     int GetMaxBurnThreshold() const { return maxBurnThreshold; }
+    int GetMaxFrostbiteThreshold() const { return maxFrostbiteThreshold; }
 };

@@ -5,12 +5,12 @@
 
 Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     float strScale, float agiScale, float intScale, float focScale,
-    int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal) 
+    int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal)
     : name(name), type(type), baseDamage(baseDmg), postureDamage(postureDmg),
     strScaling(strScale), agiScaling(agiScale), intScaling(intScale), focScaling(focScale),
     attackStaminaCost(atkSP), attackManaCost(atkMP),
     blockStaminaCost(blockSP), dodgeStaminaCost(dodgeSP),
-    bleedBuildUp(bleedVal), burnBuildUp(burnVal)
+    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal) // <--- Added frostbite initialization
 {
 }
 

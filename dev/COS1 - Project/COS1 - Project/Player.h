@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "Weapon.h"
 #include "Item.h"
-#include <fstream>
-#include <vector>
 
 class Enemy;
 
@@ -49,7 +48,7 @@ public:
     // Setup & Progression
     void AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints);
     void RecalculatePools();
-    void UpdateDerivedStats(); // Moved to Player.cpp
+    void UpdateDerivedStats();
     void EquipWeapons(Weapon* primary, Weapon* secondary);
 
     // Actions
@@ -82,7 +81,6 @@ public:
 
     // XP System
     void GainXP(int amount);
-    void LevelUp();
     int GetLevel() const { return level; }
     int GetUnspentPoints() const { return unspentAttributePoints; }
     void AddUnspentPoints(int amount) { unspentAttributePoints += amount; }
@@ -98,5 +96,4 @@ public:
     void AddItem(Item* item);
     void UseItem(size_t index);
     const std::vector<Item*>& GetInventory() const;
-
 };

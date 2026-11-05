@@ -153,7 +153,7 @@ void Game::CharacterCreation()
     player->DisplayStats();
 
     // Smooth transition message into weapon selection
-    ConsoleHelper::print("\nPress Enter to continue to weapon selection...", ConsoleHelper::White, false);
+    ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
 }
@@ -421,53 +421,6 @@ void Game::RunCombatLoop()
             break;
         }
 
-        if (!currentBoss->IsAlive())
-        {
-            system("cls");
-            HandleCombatOutcome();
-
-            if (!rewardClaimed && player->IsAlive())
-            {
-                rewardClaimed = true;
-                int earnedXP = 150;
-                if (currentDifficulty == GameDifficulty::Normal) earnedXP = 300;
-                else if (currentDifficulty == GameDifficulty::Hard) earnedXP = 600;
-                else if (currentDifficulty == GameDifficulty::Insane) earnedXP = 1200;
-                else if (currentDifficulty == GameDifficulty::Impossible) earnedXP = 2400;
-
-                ConsoleHelper::print("\n==================================", ConsoleHelper::Green);
-                ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
-                ConsoleHelper::print("==================================", ConsoleHelper::Green);
-                ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::White);
-
-                player->GainXP(earnedXP);
-
-                if (player->GetUnspentPoints() > 0)
-                {
-                    if (std::cin.peek() == '\n') std::cin.ignore();
-                    ConsoleHelper::print("\nPress Enter to allocate your attribute points...", ConsoleHelper::White, false);
-                    std::string dummy;
-                    std::getline(std::cin, dummy);
-
-                    while (player->GetUnspentPoints() > 0)
-                    {
-                        AllocateAttributesMenu();
-                    }
-                }
-
-                std::string saveFileName = player->GetName() + "_save.txt";
-                player->SaveToFile(saveFileName);
-
-                ConsoleHelper::print("==================================", ConsoleHelper::Green);
-            }
-
-            if (std::cin.peek() == '\n') std::cin.ignore();
-            ConsoleHelper::print("\nPress Enter to return to main menu...", ConsoleHelper::White, false);
-            std::string dummy;
-            std::getline(std::cin, dummy);
-            break;
-        }
-
         system("cls");
         currentBoss->GenerateIntent();
         GameUI::RenderCombatUI(player, currentBoss);
@@ -478,19 +431,25 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7, 9);
+            int choice = GameInput::GetValidatedChoice(1, 7);
+
+            // Quick check for debug instant kill (if allowed)
+            if (choice == 9)
+            {
+                HandlePlayerAction(9);
+                turnConsumed = true;
+                break;
+            }
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
             {
                 player->SwapWeapon();
                 ConsoleHelper::print("Swapped weapons!", ConsoleHelper::Green);
-                // turnConsumed remains false, loop repeats to show combat menu again
             }
             else if (choice == 6) // Inspect Weapons (FREE)
             {
                 player->InspectWeapons();
-                // turnConsumed remains false, loop repeats
             }
             else if (choice == 7) // Inventory Menu
             {
@@ -499,7 +458,6 @@ void Game::RunCombatLoop()
                 {
                     ConsoleHelper::print("\n[!] Your inventory is completely empty!", ConsoleHelper::Yellow);
                     ConsoleHelper::print("Returning to action selection...", ConsoleHelper::White);
-                    // Free check, turn not consumed
                 }
                 else
                 {
@@ -523,15 +481,132 @@ void Game::RunCombatLoop()
                     }
                 }
             }
-            else // Regular actions (Light Attack, Heavy Attack, Block, Dodge, Debug Kill)
+            else // Regular actions (Light Attack, Heavy Attack, Block, Dodge)
             {
                 HandlePlayerAction(choice);
                 turnConsumed = true; // Action executed -> Turn consumed!
             }
         }
 
-        if (!currentBoss->IsAlive()) continue;
+        // --- CHECK IF BOSS DIED FROM PLAYER TURN ---
+        if (!currentBoss->IsAlive())
+        {
+            system("cls");
+            HandleCombatOutcome();
 
+            if (!rewardClaimed && player->IsAlive())
+            {
+                rewardClaimed = true;
+                int earnedXP = 150;
+                if (currentDifficulty == GameDifficulty::Normal) earnedXP = 300;
+                else if (currentDifficulty == GameDifficulty::Hard) earnedXP = 600;
+                else if (currentDifficulty == GameDifficulty::Insane) earnedXP = 1200;
+                else if (currentDifficulty == GameDifficulty::Impossible) earnedXP = 2400;
+
+                ConsoleHelper::print("\n==================================", ConsoleHelper::Green);
+                ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
+                ConsoleHelper::print("==================================", ConsoleHelper::Green);
+                ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::White);
+
+                player->GainXP(earnedXP);
+
+                std::string saveFileName = player->GetName() + "_save.txt";
+                player->SaveToFile(saveFileName);
+
+                ConsoleHelper::print("==================================", ConsoleHelper::Green);
+            }
+
+            // --- VICTORY MENU ---
+            bool inVictoryMenu = true;
+            while (inVictoryMenu)
+            {
+                ConsoleHelper::print("\n==================================", ConsoleHelper::Cyan);
+                ConsoleHelper::print("        [ VICTORY OPTIONS ]       ", ConsoleHelper::Cyan);
+                ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+                ConsoleHelper::print("1. Review Current Stats & Attributes", ConsoleHelper::White);
+
+                if (player->GetUnspentPoints() > 0)
+                {
+                    ConsoleHelper::print("2. Allocate Remaining Points (" + std::to_string(player->GetUnspentPoints()) + " left)", ConsoleHelper::Green);
+                }
+                else
+                {
+                    ConsoleHelper::print("2. Allocate Remaining Points [No Points Available]", ConsoleHelper::White);
+                }
+
+                ConsoleHelper::print("3. New Game", ConsoleHelper::White);
+                ConsoleHelper::print("4. Main Menu (Select to Load Character and Play Again with Current Stats)", ConsoleHelper::White);
+                ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+                ConsoleHelper::print("Select an option (1-4): ", ConsoleHelper::Cyan, false);
+
+                int victoryChoice = GameInput::GetValidatedChoice(1, 4);
+
+                if (victoryChoice == 1) // Review Stats
+                {
+                    system("cls");
+                    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("        [ CHARACTER STATS ]       ", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+                    player->DisplayStats();
+                    ConsoleHelper::print("\nPress Enter to return to victory menu...", ConsoleHelper::White, false);
+                    std::string dummy;
+                    std::getline(std::cin, dummy);
+                    system("cls");
+                }
+                else if (victoryChoice == 2) // Allocate Points
+                {
+                    if (player->GetUnspentPoints() > 0)
+                    {
+                        while (player->GetUnspentPoints() > 0)
+                        {
+                            AllocateAttributesMenu();
+                        }
+
+                        std::string saveFileName = player->GetName() + "_save.txt";
+                        player->SaveToFile(saveFileName);
+                        ConsoleHelper::print("[+] Attributes updated and saved!", ConsoleHelper::Green);
+                    }
+                    else
+                    {
+                        ConsoleHelper::print("\n[!] You have no unspent attribute points remaining!", ConsoleHelper::Yellow);
+                    }
+
+                    ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+                    std::string dummy;
+                    std::getline(std::cin, dummy);
+                    system("cls");
+                }
+                else if (victoryChoice == 3) // Play Again (Fresh Run)
+                {
+                    delete player;
+                    player = nullptr;
+                    delete currentBoss;
+                    currentBoss = nullptr;
+
+                    system("cls");
+                    StartFreshGameSession();
+                    SetupBossDifficulty();
+                    RunCombatLoop();
+                    return;
+                }
+                else if (victoryChoice == 4) // Exit to Main Menu
+                {
+                    delete player;
+                    player = nullptr;
+                    delete currentBoss;
+                    currentBoss = nullptr;
+
+                    system("cls");
+                    DisplayWelcomeMenu();
+                    Initialize();
+                    RunCombatLoop();
+                    return;
+                }
+            }
+            break;
+        }
+
+        // --- BOSS TURN ---
         currentBoss->ResolveStatusEffects();
         if (!currentBoss->IsAlive()) continue;
 
@@ -577,7 +652,7 @@ void Game::HandlePlayerAction(int choice)
             std::cout << " > You dealt " << damageDealt << " damage to " << currentBoss->GetName() << "!\n";
         }
 
-        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp(), activeWeapon->GetBurnBuildUp(), 0);
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp(), activeWeapon->GetBurnBuildUp(), activeWeapon->GetFrostbiteBuildUp());
         break;
     }
     case 2: // Heavy Attack
@@ -590,7 +665,7 @@ void Game::HandlePlayerAction(int choice)
             std::cout << " > You landed a Heavy Attack for " << damageDealt << " damage!\n";
         }
 
-        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, 0);
+        currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, activeWeapon->GetFrostbiteBuildUp() * 2);
         break;
     }
     case 4: // Block

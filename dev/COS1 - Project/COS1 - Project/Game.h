@@ -3,7 +3,8 @@
 #include "Enemy.h"
 #include <vector>
 
-enum class GameDifficulty {
+enum class GameDifficulty 
+{
     Easy,
     Normal,
     Hard,
@@ -23,11 +24,6 @@ private:
 
     void InitializeWeaponPool();
     void WeaponSelectionMenu();
-
-    // Helper Methods (Cleaned up duplicates and typos)
-    int GetValidatedPlayerChoice();
-    void ProcessPlayerTurn(int choice);
-    void ProcessEnemyTurn();
 
     GameDifficulty currentDifficulty;
 
@@ -50,7 +46,6 @@ public:
     void HandleCombatOutcome() const;
 
     // UI rendering helpers
-    void RenderUI() const;
     void DisplayMenu() const;
 
     bool IsRunning() const

@@ -32,14 +32,15 @@ private:
     int blockStaminaCost;
     int dodgeStaminaCost;
 
-    // Bleed and Burn
+    // Status Buildups (Bleed, Burn, Frostbite)
     int bleedBuildUp;
     int burnBuildUp;
+    int frostbiteBuildUp; // Added missing frostbite buildup metric
 
 public:
     Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
         float strScale, float agiScale, float intScale, float focScale,
-        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal);
+        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal = 0); // Added default param for backward compatibility
 
     // Getters
     std::string GetName() const { return name; }
@@ -56,7 +57,8 @@ public:
 
     void DisplayWeaponInfo() const;
 
-    // Bleed and Burn
+    // Status Buildup Getters
     int GetBleedBuildUp() const { return bleedBuildUp; }
     int GetBurnBuildUp() const { return burnBuildUp; }
+    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; } // Added missing getter
 };
