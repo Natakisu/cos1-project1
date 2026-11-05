@@ -19,12 +19,6 @@ private:
     Enemy* currentBoss;
     bool isRunning;
 
-    // Vector and Helper Methods for weapon selection
-    std::vector<Weapon*> availableWeapons;
-
-    void InitializeWeaponPool();
-    void WeaponSelectionMenu();
-
     GameDifficulty currentDifficulty;
 
     void LoadExistingGameSession();
