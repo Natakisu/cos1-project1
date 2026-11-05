@@ -41,6 +41,9 @@ private:
     // Item System
     std::vector<Item*> inventory;
 
+    // Currency
+    int relicShards;
+
 public:
     Player(std::string name);
     ~Player();
@@ -96,4 +99,10 @@ public:
     void AddItem(Item* item);
     void UseItem(size_t index);
     const std::vector<Item*>& GetInventory() const;
+
+    // Currency
+    int GetRelicShards() const { return relicShards; }
+    void AddRelicShards(int amount) { relicShards += amount; }
+    void SpendRelicShards(int amount) { if (relicShards >= amount) relicShards -= amount; }
+
 };
