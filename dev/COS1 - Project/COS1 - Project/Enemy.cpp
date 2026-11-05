@@ -122,15 +122,6 @@ void Enemy::CheckPostureBreak()
     }
 }
 
-void Enemy::ResetTurnState()
-{
-    if (isStaggered)
-    {
-        isStaggered = false;
-        currentPosture = maxPosture;
-    }
-}
-
 void Enemy::ResolveStatusEffects()
 {
     // Bleed Check 
@@ -153,5 +144,14 @@ void Enemy::ResolveStatusEffects()
 
         ConsoleHelper::print(" [!] BLAZING! " + name + " burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
         burnMeter = 0; // Reset meter after triggering
+    }
+}
+
+void Enemy::ResetTurnState()
+{
+    if (isStaggered)
+    {
+        isStaggered = false;
+        currentPosture = maxPosture;
     }
 }

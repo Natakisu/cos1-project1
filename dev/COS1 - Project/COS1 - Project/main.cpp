@@ -4,8 +4,8 @@ int main()
 {
     Game game;
 
-    game.DisplayWelcomeMenu(); // <-- This shows the welcome / instructions screen first
-    game.Initialize();         // <-- Then goes into New Game / Load Game
+    game.DisplayWelcomeMenu();
+    game.Initialize();
     game.RunCombatLoop();
 
     return 0;

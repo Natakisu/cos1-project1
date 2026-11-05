@@ -9,6 +9,32 @@ Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true)
 {
 }
 
+// Main Menu
+void Game::Initialize()
+{
+    isRunning = true;
+
+    system("cls");
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("        [ RELIC SWITCHER ]        ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("1. New Game", ConsoleHelper::White);
+    ConsoleHelper::print("2. Load Saved Game", ConsoleHelper::White);
+
+    int choice = GameInput::GetValidatedChoice(1, 2);
+
+    if (choice == 2)
+    {
+        LoadExistingGameSession();
+    }
+    else
+    {
+        StartFreshGameSession();
+    }
+
+    SetupBossDifficulty();
+}
+
 void Game::DisplayWelcomeMenu()
 {
     bool inWelcomeMenu = true;
@@ -35,32 +61,6 @@ void Game::DisplayWelcomeMenu()
             exit(0); // Clean exit
         }
     }
-}
-
-// Main Menu
-void Game::Initialize()
-{
-    isRunning = true;
-
-    system("cls");
-    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("        [ RELIC SWITCHER ]        ", ConsoleHelper::Cyan);
-    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("1. New Game", ConsoleHelper::White);
-    ConsoleHelper::print("2. Load Saved Game", ConsoleHelper::White);
-
-    int choice = GameInput::GetValidatedChoice(1, 2);
-
-    if (choice == 2)
-    {
-        LoadExistingGameSession();
-    }
-    else
-    {
-        StartFreshGameSession();
-    }
-
-    SetupBossDifficulty();
 }
 
 // Handle New Game
@@ -478,15 +478,7 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7);
-
-            // [Debug Option - Remove Later]------------------------------------------------------------------------------------------------------------------------------------------
-            if (choice == 9)
-            {
-                HandlePlayerAction(9);
-                turnConsumed = true;
-                break;
-            }
+            int choice = GameInput::GetValidatedChoice(1, 7, 9);
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
