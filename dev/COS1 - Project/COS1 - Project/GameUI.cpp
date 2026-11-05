@@ -33,17 +33,6 @@ void GameUI::DisplayInstructions()
     ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
 }
 
-void GameUI::DisplayCombatMenu()
-{
-    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
-    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
-    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
-    ConsoleHelper::print("4. Block", ConsoleHelper::White);
-    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
-    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
-    ConsoleHelper::print("9. [DEBUG] Instant Win / Kill Boss", ConsoleHelper::Yellow);
-}
-
 void GameUI::DisplayAttributeDescriptions()
 {
     system("cls");
@@ -53,6 +42,23 @@ void GameUI::DisplayAttributeDescriptions()
     ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
     ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
     ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery.", ConsoleHelper::White);
+}
+
+GameDifficulty GameUI::SelectDifficulty()
+{
+    system("cls");
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
+    ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::White);
+    ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Yellow);
+    ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+
+    int choice = GameInput::GetValidatedChoice(1, 5);
+    return static_cast<GameDifficulty>(choice - 1);
 }
 
 void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
@@ -102,19 +108,19 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
-GameDifficulty GameUI::SelectDifficulty()
+void GameUI::DisplayCombatMenu()
 {
-    system("cls");
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
-    ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::White);
-    ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Yellow);
-    ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-
-    int choice = GameInput::GetValidatedChoice(1, 5);
-    return static_cast<GameDifficulty>(choice - 1);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("         [ COMBAT MENU ]          ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
+    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
+    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
+    ConsoleHelper::print("4. Block", ConsoleHelper::White);
+    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
+    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
+    ConsoleHelper::print("7. Open Inventory", ConsoleHelper::White);
+    ConsoleHelper::print("9. [DEBUG - Instant Kill", ConsoleHelper::Yellow);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("Choose your action: ", ConsoleHelper::Cyan, false);
 }

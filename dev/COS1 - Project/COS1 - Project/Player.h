@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 #include "Weapon.h"
+#include "Item.h"
 #include <fstream>
+#include <vector>
 
-class Enemy; // Fix Syntax Error
+class Enemy;
 
 class Player
 {
@@ -36,6 +38,9 @@ private:
     int currentXP;
     int xpToNextLevel;
     int unspentAttributePoints;
+
+    // Item System
+    std::vector<Item*> inventory;
 
 public:
     Player(std::string name);
@@ -88,4 +93,10 @@ public:
     // Save/Load
     void SaveToFile(const std::string& filename) const;
     void LoadFromFile(const std::string& filename);
+
+    // Item System
+    void AddItem(Item* item);
+    void UseItem(size_t index);
+    const std::vector<Item*>& GetInventory() const;
+
 };

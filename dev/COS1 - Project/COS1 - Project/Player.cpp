@@ -227,7 +227,7 @@ void Player::DisplayStats() const {
     std::cout << "Focus        (FOC): " << focus << "\n";
     ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
 
-    ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
+    ConsoleHelper::print("Press Enter to continue to weapon selection...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
 }
@@ -360,4 +360,37 @@ void Player::LoadFromFile(const std::string& filename)
     {
         ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
     }
+}
+
+void Player::AddItem(Item* item) 
+{
+    inventory.push_back(item);
+}
+
+const std::vector<Item*>& Player::GetInventory() const 
+{
+    return inventory;
+}
+
+void Player::UseItem(size_t index) 
+{
+    if (index >= inventory.size()) return;
+
+    Item* item = inventory[index];
+    if (item->GetType() == ItemType::HealthPotion) 
+    {
+        currentHP += item->GetPotency();
+        if (currentHP > maxHP) currentHP = maxHP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " HP.\n";
+    }
+    else if (item->GetType() == ItemType::StaminaPotion) 
+    {
+        currentSP += item->GetPotency();
+        if (currentSP > maxSP) currentSP = maxSP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " Stamina.\n";
+    }
+
+    // Remove consumed item from inventory
+    delete item;
+    inventory.erase(inventory.begin() + index);
 }

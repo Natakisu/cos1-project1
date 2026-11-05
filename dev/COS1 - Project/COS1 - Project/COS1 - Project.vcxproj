@@ -145,6 +145,7 @@
     <ClCompile Include="GameInput.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="InputValidator.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="GameInput.h" />
     <ClInclude Include="GameUI.h" />
     <ClInclude Include="InputValidator.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
