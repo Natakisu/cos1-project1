@@ -9,11 +9,27 @@
 // Player Constructor and Destructor
 Player::Player(std::string name)
     : name(name),
-    constitution(10), strength(10), agility(10), intellect(10), focus(10),
-    maxHP(100), currentHP(100), maxSP(100), currentSP(100), maxMP(100), currentMP(100),
-    primaryWeapon(nullptr), secondaryWeapon(nullptr), isPrimaryActive(true),
-    isBlocking(false), isDodging(false),
-    level(1), currentXP(0), xpToNextLevel(100), unspentAttributePoints(0)
+    constitution(10),
+    strength(10),
+    agility(10),
+    intellect(10),
+    focus(10),
+    maxHP(100),
+    currentHP(100),
+    maxSP(100),
+    currentSP(100),
+    maxMP(100),
+    currentMP(100),
+    primaryWeapon(nullptr),
+    secondaryWeapon(nullptr),
+    isPrimaryActive(true),
+    isBlocking(false),
+    isDodging(false),
+    level(1),
+    currentXP(0),
+    xpToNextLevel(100),
+    unspentAttributePoints(0),
+    relicShards(100)
 {
     RecalculatePools();
     currentHP = maxHP;
@@ -344,13 +360,13 @@ void Player::SaveToFile(const std::string& filename) const
         outFile << xpToNextLevel << "\n"; // <--- Added so level-up curve persists
         outFile << maxHP << "\n";
         outFile << currentHP << "\n";
-
         outFile << constitution << "\n";
         outFile << strength << "\n";
         outFile << agility << "\n";
         outFile << intellect << "\n";
         outFile << focus << "\n";
         outFile << unspentAttributePoints << "\n";
+        outFile << relicShards << "\n";
 
         outFile.close();
         ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
@@ -372,13 +388,13 @@ void Player::LoadFromFile(const std::string& filename)
         inFile >> xpToNextLevel; // <--- Added to match save file order
         inFile >> maxHP;
         inFile >> currentHP;
-
         inFile >> constitution;
         inFile >> strength;
         inFile >> agility;
         inFile >> intellect;
         inFile >> focus;
         inFile >> unspentAttributePoints;
+        inFile >> relicShards;
 
         inFile.close();
 

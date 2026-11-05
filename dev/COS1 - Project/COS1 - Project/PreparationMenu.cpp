@@ -17,7 +17,7 @@ void PreparationMenu::Open(Player* player)
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("     [ PREPARATION & RELIC HUB ]  ", ConsoleHelper::Cyan);
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print(" Character: " + player->GetName() + " | Level: " + std::to_string(player->GetLevel()), ConsoleHelper::White);
+        ConsoleHelper::print(" Character: " + player->GetName() + " | Level: " + std::to_string(player->GetLevel()) + " | Shards: " + std::to_string(player->GetRelicShards()) + "rs", ConsoleHelper::White);
         ConsoleHelper::print(" HP: " + std::to_string(player->GetCurrentHP()) + "/" + std::to_string(player->GetMaxHP()), ConsoleHelper::White);
         ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
         ConsoleHelper::print("1. Review Full Character Stats", ConsoleHelper::White);
