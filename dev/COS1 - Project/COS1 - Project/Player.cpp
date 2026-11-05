@@ -332,19 +332,6 @@ void Player::GainXP(int amount)
     }
 }
 
-void Player::LevelUp()
-{
-    level++;
-    xpToNextLevel = (int)(xpToNextLevel * 1.5f);
-    unspentAttributePoints += 5;
-
-    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("          [ LEVEL UP! ]                 ", ConsoleHelper::Green);
-    ConsoleHelper::print(" You reached Level " + std::to_string(level) + "!", ConsoleHelper::White);
-    ConsoleHelper::print(" You gained 5 unspent attribute points!", ConsoleHelper::Yellow);
-    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
-}
-
 // Handles Player Save/Load
 void Player::SaveToFile(const std::string& filename) const
 {
