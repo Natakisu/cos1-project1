@@ -173,27 +173,72 @@ const std::vector<Item*>& Player::GetInventory() const
     return inventory;
 }
 
-void Player::UseItem(size_t index)
+// Consumables
+void Player::UseItem(int index)
 {
-    if (index >= inventory.size()) return;
+    if (index < 0 || index >= inventory.size()) return;
 
     Item* item = inventory[index];
+    if (!item) return;
+
     if (item->GetType() == ItemType::HealthPotion)
     {
-        currentHP += item->GetPotency();
+        currentHP += item->GetEffectValue();
         if (currentHP > maxHP) currentHP = maxHP;
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " HP.\n";
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " HP.\n";
     }
     else if (item->GetType() == ItemType::StaminaPotion)
     {
-        currentSP += item->GetPotency();
+        currentSP += item->GetEffectValue();
         if (currentSP > maxSP) currentSP = maxSP;
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetPotency() << " Stamina.\n";
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Stamina.\n";
+    }
+    else if (item->GetType() == ItemType::ManaPotion)
+    {
+        currentMP += item->GetEffectValue();
+        if (currentMP > maxMP) currentMP = maxMP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Mana.\n";
+    }
+}
+
+// LoZ: OoT Remake Themed Items
+void Player::CastMagicBlessing(Item* item, Enemy* target)
+{
+    if (!item || !target) return;
+
+    int manaCost = 100;
+
+    if (currentMP < manaCost)
+    {
+        std::cout << " > Not enough Mana to cast " << item->GetName() << "! (Requires 100 MP)\n";
+        return;
     }
 
-    // Remove consumed item from inventory
-    delete item;
-    inventory.erase(inventory.begin() + index);
+    // Deduct Mana cost
+    currentMP -= manaCost;
+
+    // Apply effects based on which blessing is cast
+    if (item->GetType() == ItemType::DinsFire)
+    {
+        int fireDmg = 45;
+        target->TakeDamage(fireDmg, 15);
+        target->ApplyStatusBuildup(0, 75, 0); // Heavy burn buildup
+        std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
+    }
+    else if (item->GetType() == ItemType::FaroresWind)
+    {
+        int windDmg = 35;
+        target->TakeDamage(windDmg, 20);
+        target->ApplyStatusBuildup(75, 0, 0); // Heavy bleed buildup
+        std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
+    }
+    else if (item->GetType() == ItemType::NayrusLove)
+    {
+        int frostDmg = 35;
+        target->TakeDamage(frostDmg, 25);
+        target->ApplyStatusBuildup(0, 0, 75); // Heavy frostbite buildup
+        std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
+    }
 }
 
 // Handles Player Combat Actions

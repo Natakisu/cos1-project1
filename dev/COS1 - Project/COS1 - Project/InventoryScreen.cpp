@@ -28,7 +28,7 @@ void InventoryScreen::Open(Player* player)
             for (size_t i = 0; i < inv.size(); ++i)
             {
                 std::cout << i + 1 << ". ";
-                inv[i]->DisplayItemInfo();
+                inv[i]->DisplayInfo();
             }
         }
 

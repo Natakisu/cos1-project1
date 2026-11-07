@@ -56,6 +56,7 @@ public:
 
     // Actions
     bool SwapWeapon();
+    void UseItem(int index);
     int PerformLightAttack(Enemy& target);
     int PerformHeavyAttack(Enemy& target);
     void Block();
@@ -98,6 +99,8 @@ public:
     // Item System
     void AddItem(Item* item);
     void UseItem(size_t index);
+    void CastMagicBlessing(Item* item, Enemy* target);
+    void UseItem(Item* item);
     const std::vector<Item*>& GetInventory() const;
 
     // Currency

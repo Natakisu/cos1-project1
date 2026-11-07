@@ -219,7 +219,7 @@ void Game::RunCombatLoop()
                     for (size_t i = 0; i < inv.size(); ++i)
                     {
                         std::cout << i + 1 << ". ";
-                        inv[i]->DisplayItemInfo();
+                        inv[i]->DisplayInfo();
                     }
                     ConsoleHelper::print("0. Back to Combat", ConsoleHelper::White);
                     ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
@@ -255,12 +255,20 @@ void Game::RunCombatLoop()
                 else if (currentDifficulty == GameDifficulty::Insane) earnedXP = 1200;
                 else if (currentDifficulty == GameDifficulty::Impossible) earnedXP = 2400;
 
+                int earnedShards = 100;
+                if (currentDifficulty == GameDifficulty::Normal) earnedShards = 200;
+                else if (currentDifficulty == GameDifficulty::Hard) earnedShards = 300;
+                else if (currentDifficulty == GameDifficulty::Insane) earnedShards = 400;
+                else if (currentDifficulty == GameDifficulty::Impossible) earnedShards = 500;
+
                 ConsoleHelper::print("\n==================================", ConsoleHelper::Green);
                 ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
                 ConsoleHelper::print("==================================", ConsoleHelper::Green);
-                ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::White);
+                ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::Cyan);
+                ConsoleHelper::print(" Relic Shards Earned: +" + std::to_string(earnedShards) + "rs", ConsoleHelper::Cyan);
 
                 player->GainXP(earnedXP);
+                player->AddRelicShards(earnedShards);
 
                 std::string saveFileName = player->GetName() + "_save.txt";
                 player->SaveToFile(saveFileName);

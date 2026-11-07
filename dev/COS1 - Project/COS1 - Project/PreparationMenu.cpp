@@ -1,5 +1,6 @@
 #include "PreparationMenu.h"
 #include "InventoryScreen.h"
+#include "ItemShop.h"
 #include "ConsoleHelper.h"
 #include "GameInput.h"
 #include <iostream>
@@ -23,8 +24,7 @@ void PreparationMenu::Open(Player* player)
         ConsoleHelper::print("1. Review Full Character Stats", ConsoleHelper::White);
         ConsoleHelper::print("2. Open Inventory & Consumables", ConsoleHelper::White);
         ConsoleHelper::print("3. Inspect Equipped Weapons", ConsoleHelper::White);
-        // Placeholder for future Item Shop:
-        ConsoleHelper::print("4. Visit In-Game Item Shop [Coming Soon]", ConsoleHelper::White);
+        ConsoleHelper::print("4. Visit In-Game Item Shop", ConsoleHelper::White);
         ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
         ConsoleHelper::print("5. Proceed to Boss Difficulty", ConsoleHelper::Green);
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
@@ -45,7 +45,6 @@ void PreparationMenu::Open(Player* player)
         }
         else if (choice == 2)
         {
-            // Open the inventory management screen
             InventoryScreen::Open(player);
         }
         else if (choice == 3)
@@ -58,6 +57,11 @@ void PreparationMenu::Open(Player* player)
             ConsoleHelper::print("\nPress Enter to return...", ConsoleHelper::White, false);
             std::string dummy;
             std::getline(std::cin, dummy);
+        }
+        else if (choice == 4)
+        {
+            // Open the Item Shop!
+            ItemShop::Open(player);
         }
         else if (choice == 5)
         {
