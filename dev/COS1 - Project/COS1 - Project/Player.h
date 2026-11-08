@@ -5,6 +5,7 @@
 #include "Item.h"
 
 class Enemy;
+class WeaponSkillManager;
 
 class Player
 {
@@ -58,6 +59,7 @@ public:
 
     // Actions
     bool SwapWeapon();
+    void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
     void UseItem(int index);
     int PerformLightAttack(Enemy& target);
     int PerformHeavyAttack(Enemy& target);
@@ -110,6 +112,12 @@ public:
     int GetRelicShards() const { return relicShards; }
     void AddRelicShards(int amount) { relicShards += amount; }
     void SpendRelicShards(int amount) { if (relicShards >= amount) relicShards -= amount; }
+
+    // Weapon Skills Getters
+    int GetStrength() const { return strength; }
+    int GetAgility() const { return agility; }
+    int GetIntellect() const { return intellect; }
+    int GetFocus() const { return focus; }
 
     void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
 };

@@ -158,6 +158,12 @@ void Game::RunCombatLoop()
         system("cls");
         currentBoss->GenerateIntent();
 
+        // Tick down active weapon cooldowns at the start of the turn
+        if (player->GetActiveWeapon())
+        {
+            player->GetActiveWeapon()->UpdateCooldowns();
+        }
+
         GameUI::RenderCombatUI(player, currentBoss);
 
         // --- TURN-BASED ACTION LOOP ---
@@ -165,8 +171,8 @@ void Game::RunCombatLoop()
 
         while (!turnConsumed)
         {
-            DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 8, 9); // Option 8 for Weapon Skills, 9 for Debug
+            DisplayMenu(); // Displays Combat Menu (make sure option 8 is listed here!)
+            int choice = GameInput::GetValidatedChoice(1, 8, 9); // Updated to accept option 8 (and 9 for debug)
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)

@@ -228,6 +228,11 @@ bool Player::SwapWeapon()
     return true;
 }
 
+void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+{
+    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
+}
+
 // Handles Player Inventory
 void Player::AddItem(Item* item)
 {
