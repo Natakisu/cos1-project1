@@ -154,6 +154,7 @@
     <ClCompile Include="PreparationMenu.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponManager.cpp" />
+    <ClCompile Include="WeaponSkills.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CharacterManager.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="PreparationMenu.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponManager.h" />
+    <ClInclude Include="WeaponSkills.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
