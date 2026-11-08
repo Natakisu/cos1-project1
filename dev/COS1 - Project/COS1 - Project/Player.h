@@ -62,6 +62,7 @@ public:
     void Block();
     void Dodge();
     void RegainResourcesPerTurn();
+    void ConsumeMP(int amount) { currentMP -= amount; if (currentMP < 0) currentMP = 0; }
 
     // Damage & Status Handlers
     void TakeDamage(int damage);

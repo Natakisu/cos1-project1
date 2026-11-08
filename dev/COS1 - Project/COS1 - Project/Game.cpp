@@ -141,6 +141,7 @@ void Game::LoadExistingGameSession()
     // Open Preparation Hub before moving to boss difficulty
     PreparationMenu::Open(player);
 }
+
 // Set Boss Stats
 void Game::SetupBossDifficulty()
 {
@@ -183,6 +184,10 @@ void Game::RunCombatLoop()
 
         system("cls");
         currentBoss->GenerateIntent();
+
+        system("cls");
+        currentBoss->GenerateIntent();
+
         GameUI::RenderCombatUI(player, currentBoss);
 
         // --- TURN-BASED ACTION LOOP ---
@@ -203,7 +208,7 @@ void Game::RunCombatLoop()
             {
                 player->InspectWeapons();
             }
-            else if (choice == 7) // Inventory Menu
+            else if (choice == 7) // Inventory Menu / Magic Spells
             {
                 const auto& inv = player->GetInventory();
                 if (inv.empty())
@@ -223,13 +228,53 @@ void Game::RunCombatLoop()
                     }
                     ConsoleHelper::print("0. Back to Combat", ConsoleHelper::White);
                     ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-                    ConsoleHelper::print("Select item to use (0 to cancel): ", ConsoleHelper::Cyan, false);
+                    ConsoleHelper::print("Select item/spell to use (0 to cancel): ", ConsoleHelper::Cyan, false);
 
                     int itemChoice = GameInput::GetValidatedChoice(0, (int)inv.size());
                     if (itemChoice > 0)
                     {
-                        player->UseItem(itemChoice - 1);
-                        turnConsumed = true; // Item used -> Turn consumed!
+                        Item* chosenItem = inv[itemChoice - 1];
+                        ItemType type = chosenItem->GetType();
+
+                        // Handle LoZ Magic Blessings (Mana Cost, Permanent Keep)
+                        if (type == ItemType::DinsFire || type == ItemType::FaroresWind || type == ItemType::NayrusLove)
+                        {
+                            int manaCost = 100;
+                            if (player->GetCurrentMP() < manaCost)
+                            {
+                                ConsoleHelper::print("\n[!] Not enough Mana to cast " + chosenItem->GetName() + "! (Requires 100 MP)", ConsoleHelper::Red);
+                            }
+                            else
+                            {
+                                player->ConsumeMP(manaCost);
+
+                                if (type == ItemType::DinsFire)
+                                {
+                                    currentBoss->TakeDamage(45, 15);
+                                    currentBoss->ApplyStatusBuildup(0, 75, 0);
+                                    ConsoleHelper::print("\n > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.", ConsoleHelper::Red);
+                                }
+                                else if (type == ItemType::FaroresWind)
+                                {
+                                    currentBoss->TakeDamage(35, 20);
+                                    currentBoss->ApplyStatusBuildup(75, 0, 0);
+                                    ConsoleHelper::print("\n > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.", ConsoleHelper::Green);
+                                }
+                                else if (type == ItemType::NayrusLove)
+                                {
+                                    currentBoss->TakeDamage(35, 25);
+                                    currentBoss->ApplyStatusBuildup(0, 0, 75);
+                                    ConsoleHelper::print("\n > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.", ConsoleHelper::Cyan);
+                                }
+                                turnConsumed = true; // Spell cast -> Turn consumed!
+                            }
+                        }
+                        else
+                        {
+                            // Standard consumable items (potions)
+                            player->UseItem(itemChoice - 1);
+                            turnConsumed = true; // Item used -> Turn consumed!
+                        }
                     }
                 }
             }
@@ -382,14 +427,39 @@ void Game::RunCombatLoop()
         currentBoss->ResetTurnState();
     }
 
+    // --- GAME OVER / DEATH MENU (Prevents auto-closing) ---
     if (!player->IsAlive())
     {
         system("cls");
         HandleCombatOutcome();
-        if (std::cin.peek() == '\n') std::cin.ignore();
-        ConsoleHelper::print("\nPress Enter to return to main menu...", ConsoleHelper::White, false);
-        std::string dummy;
-        std::getline(std::cin, dummy);
+        ConsoleHelper::print("\n==================================", ConsoleHelper::Red);
+        ConsoleHelper::print("1. Load Last Save", ConsoleHelper::White);
+        ConsoleHelper::print("2. Return to Main Menu", ConsoleHelper::White);
+        ConsoleHelper::print("==================================", ConsoleHelper::Red);
+        ConsoleHelper::print("Select an option (1-2): ", ConsoleHelper::Cyan, false);
+
+        int deathChoice = GameInput::GetValidatedChoice(1, 2);
+        if (deathChoice == 1)
+        {
+            std::string saveFileName = player->GetName() + "_save.txt";
+            player->LoadFromFile(saveFileName);
+            SetupBossDifficulty();
+            RunCombatLoop();
+            return;
+        }
+        else
+        {
+            delete player;
+            player = nullptr;
+            delete currentBoss;
+            currentBoss = nullptr;
+
+            system("cls");
+            DisplayWelcomeMenu();
+            Initialize();
+            RunCombatLoop();
+            return;
+        }
     }
 
     isRunning = false;

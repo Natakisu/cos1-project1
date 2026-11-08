@@ -1,13 +1,30 @@
 Test
 7
-326
+476
 1135
 100
-100
+45
 10
 70
 10
 10
 10
 0
-600
+100
+4
+4
+Farore's Wind
+30
+20
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
+20
+1
+SP Potion
+30
+20

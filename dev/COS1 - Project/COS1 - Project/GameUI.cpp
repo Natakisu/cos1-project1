@@ -117,8 +117,7 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
     // Updated to use dynamic difficulty thresholds instead of hardcoded 100
     std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), currentBoss->GetMaxBleedThreshold()); std::cout << "\n";
     std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), currentBoss->GetMaxBurnThreshold()); std::cout << "\n";
-    std::cout << " Frostbite: " << currentBoss->GetFrostbiteMeter() << " / " << currentBoss->GetMaxFrostbiteThreshold() << "\n";
-
+    std::cout << " Frostbite: "; drawBar(currentBoss->GetFrostbiteMeter(), currentBoss->GetMaxFrostbiteThreshold()); std::cout << "\n";
     ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
     ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);

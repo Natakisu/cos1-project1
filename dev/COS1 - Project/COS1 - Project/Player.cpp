@@ -201,7 +201,7 @@ void Player::UseItem(int index)
     }
 }
 
-// LoZ: OoT Remake Themed Items
+// LoZ: OoT Themed Items
 void Player::CastMagicBlessing(Item* item, Enemy* target)
 {
     if (!item || !target) return;
@@ -221,22 +221,22 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
     if (item->GetType() == ItemType::DinsFire)
     {
         int fireDmg = 45;
-        target->TakeDamage(fireDmg, 50);
-        target->ApplyStatusBuildup(0, 150, 0); // Heavy burn buildup
+        target->TakeDamage(fireDmg, 15);
+        target->ApplyStatusBuildup(0, 50, 0); // Heavy burn buildup
         std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
     }
     else if (item->GetType() == ItemType::FaroresWind)
     {
         int windDmg = 35;
-        target->TakeDamage(windDmg, 50);
-        target->ApplyStatusBuildup(150, 0, 0); // Heavy bleed buildup
+        target->TakeDamage(windDmg, 15);
+        target->ApplyStatusBuildup(50, 0, 0); // Heavy bleed buildup
         std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
     }
     else if (item->GetType() == ItemType::NayrusLove)
     {
         int frostDmg = 35;
-        target->TakeDamage(frostDmg, 50);
-        target->ApplyStatusBuildup(0, 0, 150); // Heavy frostbite buildup
+        target->TakeDamage(frostDmg, 15);
+        target->ApplyStatusBuildup(0, 0, 50); // Heavy frostbite buildup
         std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
     }
 }
@@ -413,6 +413,18 @@ void Player::SaveToFile(const std::string& filename) const
         outFile << unspentAttributePoints << "\n";
         outFile << relicShards << "\n";
 
+        outFile << inventory.size() << "\n";
+        for (const Item* item : inventory)
+        {
+            if (item)
+            {
+                outFile << static_cast<int>(item->GetType()) << "\n";
+                outFile << item->GetName() << "\n";
+                outFile << item->GetEffectValue() << "\n";
+                outFile << item->GetCost() << "\n";
+            }
+        }
+        
         outFile.close();
         ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
     }
@@ -440,6 +452,36 @@ void Player::LoadFromFile(const std::string& filename)
         inFile >> focus;
         inFile >> unspentAttributePoints;
         inFile >> relicShards;
+
+        for (Item* item : inventory)
+        {
+            delete item;
+        }
+        inventory.clear();
+
+        // Load inventory
+        size_t inventorySize = 0;
+        inFile >> inventorySize;
+        inFile.ignore();
+
+        for (size_t i = 0; i < inventorySize; ++i)
+        {
+            int typeInt = 0;
+            std::string itemName;
+            int effectVal = 0;
+            int itemCost = 0;
+
+            inFile >> typeInt;
+            inFile.ignore();
+            std::getline(inFile, itemName);
+            inFile >> effectVal >> itemCost;
+            inFile.ignore();
+
+            ItemType type = static_cast<ItemType>(typeInt);
+
+            // Recreate and add the item to the player's inventory
+            inventory.push_back(new Item(itemName, type, effectVal, itemCost));
+        }
 
         inFile.close();
 
