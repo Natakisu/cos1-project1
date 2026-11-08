@@ -72,22 +72,12 @@ void Game::StartFreshGameSession()
     // Uses CharacterManager to create player and run initial point allocation
     player = CharacterManager::CreateCharacter();
 
-    // Uses WeaponManager to handle loadout selection
-    Weapon* primary = nullptr;
-    Weapon* secondary = nullptr;
-    {
-        WeaponManager manager;
-        manager.SelectPlayerLoadout(primary, secondary);
-    }
-    if (primary && secondary)
-    {
-        player->EquipWeapons(primary, secondary);
-    }
+ 
 
     // Temp Debugging Potion
     player->AddItem(new Item("Health Potion", ItemType::HealthPotion, 50, 20));
 
-    // Open Preparation Hub before moving to boss difficulty
+    // Open Preparation Hub directly after setup
     PreparationMenu::Open(player);
 }
 
@@ -121,24 +111,7 @@ void Game::LoadExistingGameSession()
         player = CharacterManager::CreateCharacter();
     }
 
-    // Uses WeaponManager for loadout selection on loaded games
-    Weapon* primary = nullptr;
-    Weapon* secondary = nullptr;
-    {
-        WeaponManager manager;
-        manager.SelectPlayerLoadout(primary, secondary);
-    }
-    if (primary && secondary)
-    {
-        player->EquipWeapons(primary, secondary);
-    }
-
-    if (player->GetUnspentPoints() > 0)
-    {
-        CharacterManager::RunAttributeAllocationMenu(player);
-    }
-
-    // Open Preparation Hub before moving to boss difficulty
+    // Drop straight into the Prep Hub (loaded weapons and stats are preserved from file)
     PreparationMenu::Open(player);
 }
 
@@ -196,7 +169,7 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7, 9);   // DEBUG options. Change later
+            int choice = GameInput::GetValidatedChoice(1, 8, 9); // Option 8 for Weapon Skills, 9 for Debug
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
@@ -278,6 +251,125 @@ void Game::RunCombatLoop()
                     }
                 }
             }
+            else if (choice == 8) // Weapon Skills Menu
+            {
+                Weapon* activeWeapon = player->GetActiveWeapon();
+                if (!activeWeapon)
+                {
+                    ConsoleHelper::print("\n[!] No active weapon equipped!", ConsoleHelper::Red);
+                }
+                else
+                {
+                    system("cls");
+                    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("             [ WEAPON SKILLS: " + activeWeapon->GetName() + " ]       ", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+
+                    int shortCD = activeWeapon->GetShortCooldownRemaining();
+                    int longCD = activeWeapon->GetLongCooldownRemaining();
+
+                    std::string wName = activeWeapon->GetName();
+                    std::string shortName = "Short Skill";
+                    std::string shortDesc = "Quick tactical maneuver.";
+                    std::string longName = "Long Skill";
+                    std::string longDesc = "Devastating signature technique.";
+
+                    if (wName == "Warhammer") {
+                        shortName = "Crushing Blow"; shortDesc = "Deals heavy STR damage and moderate posture damage. (2 Turn CD)";
+                        longName = "Earthshatter"; longDesc = "Slams the ground for massive damage and heavy disruption. (4 Turn CD)";
+                    }
+                    else if (wName == "Sword & Shield") {
+                        shortName = "Shield Bash"; shortDesc = "Strikes the foe and guards posture. (2 Turn CD)";
+                        longName = "Fortress Wall"; longDesc = "Raises an absolute defense aura for the turn. (3 Turn CD)";
+                    }
+                    else if (wName == "Daggers") {
+                        shortName = "Flurry Strike"; shortDesc = "Delivers 3 rapid stabs with moderate Bleed buildup. (2 Turn CD)";
+                        longName = "Shadow Step"; longDesc = "Vanish into shadows to auto-dodge and inflict high Bleed. (4 Turn CD)";
+                    }
+                    else if (wName == "Bow") {
+                        shortName = "Quick Shot"; shortDesc = "Fires a swift arrow and prepares an evasive dodge. (1 Turn CD)";
+                        longName = "Rain of Arrows"; longDesc = "Unleashes a multi-turn barrage of steady pressure. (4 Turn CD)";
+                    }
+                    else if (wName == "Fire Staff") {
+                        shortName = "Fireball"; shortDesc = "Hurls a blazing sphere with moderate Burn buildup. (2 Turn CD)";
+                        longName = "Combustion"; longDesc = "Detonates current target heat for massive scaling damage. (4 Turn CD)";
+                    }
+                    else if (wName == "Ice Staff") {
+                        shortName = "Ice Spike"; shortDesc = "Hurls piercing ice with moderate Frostbite buildup. (1 Turn CD)";
+                        longName = "Entomb"; longDesc = "Encases you in crystal ice for safety and MP recovery. (4 Turn CD)";
+                    }
+                    else if (wName == "Life Staff") {
+                        shortName = "Divine Plea"; shortDesc = "Offers a brief prayer to restore moderate HP. (2 Turn CD)";
+                        longName = "Sacred Ground"; longDesc = "Consecrates the earth for sustained healing and protection. (4 Turn CD)";
+                    }
+                    else if (wName == "Greatsword") {
+                        shortName = "Relentless Onslaught"; shortDesc = "Unleashes multi-hits scaling off your Agility. (2 Turn CD)";
+                        longName = "Execute"; longDesc = "A devastating finisher scaling heavily off Strength. (4 Turn CD)";
+                    }
+                    else if (wName == "Rapier") {
+                        shortName = "Evade Stance"; shortDesc = "Strikes scaling off target Bleed while dodging. (2 Turn CD)";
+                        longName = "Detonate Stance"; longDesc = "Explodes target Burn buildup while regenerating MP. (2 Turn CD)";
+                    }
+                    else if (wName == "Flail & Shield") {
+                        shortName = "Blessed Aegis"; shortDesc = "Blocks incoming attacks and restores HP based on Focus. (2 Turn CD)";
+                        longName = "Divine Smite"; longDesc = "Smites the foe with heavy damage and a health pulse. (4 Turn CD)";
+                    }
+
+                    std::cout << "1. " << shortName;
+                    if (shortCD == 0) ConsoleHelper::print(" [READY]", ConsoleHelper::Green);
+                    else std::cout << " [CD: " << shortCD << " turns]\n";
+                    std::cout << "   -> " << shortDesc << "\n\n";
+
+                    std::cout << "2. " << longName;
+                    if (longCD == 0) ConsoleHelper::print(" [READY]", ConsoleHelper::Green);
+                    else std::cout << " [CD: " << longCD << " turns]\n";
+                    std::cout << "   -> " << longDesc << "\n\n";
+
+                    ConsoleHelper::print("0. Back to Combat Action Menu", ConsoleHelper::White);
+                    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("Select skill to execute (0-2): ", ConsoleHelper::Cyan, false);
+
+                    int skillChoice = GameInput::GetValidatedChoice(0, 2);
+                    if (skillChoice == 1)
+                    {
+                        if (activeWeapon->CanUseShortSkill())
+                        {
+                            player->ExecuteWeaponSkill(false, *currentBoss);
+                            turnConsumed = true;
+
+                            if (std::cin.peek() == '\n') std::cin.ignore();
+                            ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::Cyan, false);
+                            std::string dummy;
+                            std::getline(std::cin, dummy);
+                        }
+                        else
+                        {
+                            ConsoleHelper::print("\n[!] That skill is still on cooldown!", ConsoleHelper::Yellow);
+                            if (std::cin.peek() == '\n') std::cin.ignore();
+                            ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::Cyan, false);
+                            std::string dummy;
+                            std::getline(std::cin, dummy);
+                        }
+                    }
+                    else if (skillChoice == 2)
+                    {
+                        if (activeWeapon->CanUseLongSkill())
+                        {
+                            player->ExecuteWeaponSkill(true, *currentBoss);
+                            turnConsumed = true;
+
+                            if (std::cin.peek() == '\n') std::cin.ignore();
+                            ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::Cyan, false);
+                            std::string dummy;
+                            std::getline(std::cin, dummy);
+                        }
+                        else
+                        {
+                            ConsoleHelper::print("\n[!] That skill is still on cooldown!", ConsoleHelper::Yellow);
+                        }
+                    }
+                }
+            }
             else // Regular actions (Light Attack, Heavy Attack, Block, Dodge, Debug)
             {
                 HandlePlayerAction(choice);
@@ -328,23 +420,24 @@ void Game::RunCombatLoop()
                 ConsoleHelper::print("\n==================================", ConsoleHelper::Cyan);
                 ConsoleHelper::print("        [ VICTORY OPTIONS ]       ", ConsoleHelper::Cyan);
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-                ConsoleHelper::print("1. Review Current Stats & Attributes", ConsoleHelper::White);
+                ConsoleHelper::print("1. Review Stats", ConsoleHelper::White);
 
                 if (player->GetUnspentPoints() > 0)
                 {
-                    ConsoleHelper::print("2. Allocate Remaining Points (" + std::to_string(player->GetUnspentPoints()) + " left)", ConsoleHelper::Green);
+                    ConsoleHelper::print("2. Allocate Points (" + std::to_string(player->GetUnspentPoints()) + " left)", ConsoleHelper::Green);
                 }
                 else
                 {
-                    ConsoleHelper::print("2. Allocate Remaining Points [No Points Available]", ConsoleHelper::White);
+                    ConsoleHelper::print("2. Allocate Points [No Points Available]", ConsoleHelper::White);
                 }
 
-                ConsoleHelper::print("3. New Game", ConsoleHelper::White);
-                ConsoleHelper::print("4. Main Menu (Select to Load Character and Play Again with Current Stats)", ConsoleHelper::White);
+                ConsoleHelper::print("3. Return to Prep Hub", ConsoleHelper::White);
+                ConsoleHelper::print("4. Main Menu", ConsoleHelper::White);
+                ConsoleHelper::print("5. Exit Game", ConsoleHelper::White);
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-                ConsoleHelper::print("Select an option (1-4): ", ConsoleHelper::Cyan, false);
+                ConsoleHelper::print("Select an option (1-5): ", ConsoleHelper::Cyan, false);
 
-                int victoryChoice = GameInput::GetValidatedChoice(1, 4);
+                int victoryChoice = GameInput::GetValidatedChoice(1, 5);
 
                 if (victoryChoice == 1) // Review Stats
                 {
@@ -381,21 +474,22 @@ void Game::RunCombatLoop()
                     std::getline(std::cin, dummy);
                     system("cls");
                 }
-                else if (victoryChoice == 3) // Play Again (Fresh Run)
+                else if (victoryChoice == 3) // Return to Prep Hub
                 {
-                    delete player;
-                    player = nullptr;
-                    delete currentBoss;
-                    currentBoss = nullptr;
+                    std::string saveFileName = player->GetName() + "_save.txt";
+                    player->SaveToFile(saveFileName);
 
                     system("cls");
-                    StartFreshGameSession();
+                    PreparationMenu::Open(player);
+
                     SetupBossDifficulty();
-                    RunCombatLoop();
                     return;
                 }
-                else if (victoryChoice == 4) // Exit to Main Menu
+                else if (victoryChoice == 4) // Main Menu
                 {
+                    std::string saveFileName = player->GetName() + "_save.txt";
+                    player->SaveToFile(saveFileName);
+
                     delete player;
                     player = nullptr;
                     delete currentBoss;
@@ -405,6 +499,19 @@ void Game::RunCombatLoop()
                     DisplayWelcomeMenu();
                     Initialize();
                     RunCombatLoop();
+                    return;
+                }
+                else if (victoryChoice == 5) // Exit Game
+                {
+                    std::string saveFileName = player->GetName() + "_save.txt";
+                    player->SaveToFile(saveFileName);
+
+                    delete player;
+                    player = nullptr;
+                    delete currentBoss;
+                    currentBoss = nullptr;
+
+                    isRunning = false;
                     return;
                 }
             }
@@ -427,7 +534,7 @@ void Game::RunCombatLoop()
         currentBoss->ResetTurnState();
     }
 
-    // --- GAME OVER / DEATH MENU (Prevents auto-closing) ---
+    // --- GAME OVER / DEATH MENU ---
     if (!player->IsAlive())
     {
         system("cls");

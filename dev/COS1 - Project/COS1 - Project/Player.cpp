@@ -93,7 +93,7 @@ void Player::DisplayStats() const {
     std::cout << "Focus        (FOC): " << focus << "\n";
     ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
 
-    ConsoleHelper::print("Press Enter to continue to weapon selection...", ConsoleHelper::White, false);
+    ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
 }
@@ -137,18 +137,83 @@ void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
 void Player::InspectWeapons() const {
     system("cls");
 
-    ConsoleHelper::print("=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
-    if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("               [ LOADOUT & WEAPON SKILLS ]        ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 
-    std::cout << "\n";
-    if (!isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
-    ConsoleHelper::print("========================", ConsoleHelper::Cyan);
+    // Lambda helper to print weapon info + skills
+    auto printWeaponDetails = [](Weapon* weapon, bool isActive) {
+        if (!weapon) return;
 
-    ConsoleHelper::print("\nPress Enter to return to the main menu...", ConsoleHelper::White, false);
+        if (isActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+        else std::cout << "[STOWED] ";
+
+        std::cout << weapon->GetName() << "\n";
+
+        std::string wName = weapon->GetName();
+        std::string shortName = "Short Skill";
+        std::string shortDesc = "Quick tactical strike.";
+        std::string longName = "Long Skill";
+        std::string longDesc = "Devastating signature technique.";
+
+        // Assign specific names/descriptions per weapon blueprint
+        if (wName == "Warhammer") {
+            shortName = "Crushing Blow"; shortDesc = "Deals heavy STR damage and moderate posture damage (2 Turn CD)";
+            longName = "Earthshatter"; longDesc = "Slams the ground for massive damage and heavy disruption (4 Turn CD)";
+        }
+        else if (wName == "Sword & Shield") {
+            shortName = "Shield Bash"; shortDesc = "Strikes the foe and guards posture (2 Turn CD)";
+            longName = "Fortress Wall"; longDesc = "Raises an absolute defense aura for the turn (3 Turn CD)";
+        }
+        else if (wName == "Daggers") {
+            shortName = "Flurry Strike"; shortDesc = "Delivers 3 rapid stabs with moderate Bleed buildup (2 Turn CD)";
+            longName = "Shadow Step"; longDesc = "Vanish into shadows to auto-dodge and inflict high Bleed (4 Turn CD)";
+        }
+        else if (wName == "Bow") {
+            shortName = "Quick Shot"; shortDesc = "Fires a swift arrow and prepares an evasive dodge (1 Turn CD)";
+            longName = "Rain of Arrows"; longDesc = "Unleashes a multi-turn barrage of steady pressure (4 Turn CD)";
+        }
+        else if (wName == "Fire Staff") {
+            shortName = "Fireball"; shortDesc = "Hurls a blazing sphere with moderate Burn buildup (2 Turn CD)";
+            longName = "Combustion"; longDesc = "Detonates current target heat for massive scaling damage (4 Turn CD)";
+        }
+        else if (wName == "Ice Staff") {
+            shortName = "Ice Spike"; shortDesc = "Hurls piercing ice with moderate Frostbite buildup (1 Turn CD)";
+            longName = "Entomb"; longDesc = "Encases you in crystal ice for safety and MP recovery (4 Turn CD)";
+        }
+        else if (wName == "Life Staff") {
+            shortName = "Divine Plea"; shortDesc = "Offers a brief prayer to restore moderate HP (2 Turn CD)";
+            longName = "Sacred Ground"; longDesc = "Consecrates the earth for sustained healing and protection (4 Turn CD)";
+        }
+        else if (wName == "Greatsword") {
+            shortName = "Relentless Onslaught"; shortDesc = "Unleashes multi-hits scaling off your Agility (2 Turn CD)";
+            longName = "Execute"; longDesc = "A devastating finisher scaling heavily off Strength (4 Turn CD)";
+        }
+        else if (wName == "Rapier") {
+            shortName = "Evade Stance"; shortDesc = "Strikes scaling off target Bleed while dodging (2 Turn CD)";
+            longName = "Detonate Stance"; shortDesc = "Explodes target Burn buildup while regenerating MP (2 Turn CD)";
+        }
+        else if (wName == "Flail & Shield") {
+            shortName = "Blessed Aegis"; shortDesc = "Blocks incoming attacks and restores HP based on Focus (2 Turn CD)";
+            longName = "Divine Smite"; longDesc = "Smites the foe with heavy damage and a health pulse (4 Turn CD)";
+        }
+
+        std::cout << "   -> Short: " << shortName << " (" << shortDesc << ")\n";
+        std::cout << "   -> Long:  " << longName << " (" << longDesc << ")\n\n";
+        };
+
+    if (primaryWeapon)
+    {
+        printWeaponDetails(primaryWeapon, isPrimaryActive);
+    }
+
+    if (secondaryWeapon)
+    {
+        printWeaponDetails(secondaryWeapon, !isPrimaryActive);
+    }
+
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
 }

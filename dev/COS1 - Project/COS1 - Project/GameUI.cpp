@@ -125,7 +125,6 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
 
 void GameUI::DisplayCombatMenu()
 {
-    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("         [ COMBAT MENU ]          ", ConsoleHelper::Cyan);
     ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
