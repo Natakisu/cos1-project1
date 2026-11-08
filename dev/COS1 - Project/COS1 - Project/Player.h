@@ -8,6 +8,8 @@ class Enemy;
 
 class Player
 {
+    friend class WeaponSkillManager;
+
 private:
     std::string name;
 
@@ -109,4 +111,5 @@ public:
     void AddRelicShards(int amount) { relicShards += amount; }
     void SpendRelicShards(int amount) { if (relicShards >= amount) relicShards -= amount; }
 
+    void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
 };

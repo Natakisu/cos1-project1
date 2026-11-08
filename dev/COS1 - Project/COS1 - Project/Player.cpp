@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "ConsoleHelper.h"
+#include "WeaponSkills.h"
 
 // Player Constructor and Destructor
 Player::Player(std::string name)
@@ -558,4 +559,9 @@ void Player::LoadFromFile(const std::string& filename)
     {
         ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
     }
+}
+
+void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+{
+    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }

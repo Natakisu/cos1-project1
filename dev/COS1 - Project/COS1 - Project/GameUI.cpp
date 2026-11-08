@@ -133,8 +133,7 @@ void GameUI::DisplayCombatMenu()
     ConsoleHelper::print("4. Block", ConsoleHelper::White);
     ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
     ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
-    ConsoleHelper::print("7. Open Inventory", ConsoleHelper::White);
-    ConsoleHelper::print("9. [DEBUG - Instant Kill]", ConsoleHelper::Yellow); // Added closing bracket
-    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("Choose your action: ", ConsoleHelper::Cyan, false);
+    ConsoleHelper::print("7. Inventory & Consumables", ConsoleHelper::White);
+    ConsoleHelper::print("8. Weapon Skills", ConsoleHelper::Cyan);
+    ConsoleHelper::print("9. Debug Insta-Kill", ConsoleHelper::Yellow);
 }

@@ -158,9 +158,6 @@ void Game::RunCombatLoop()
         system("cls");
         currentBoss->GenerateIntent();
 
-        system("cls");
-        currentBoss->GenerateIntent();
-
         GameUI::RenderCombatUI(player, currentBoss);
 
         // --- TURN-BASED ACTION LOOP ---
