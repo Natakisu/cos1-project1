@@ -35,7 +35,13 @@ private:
     // Status Buildups (Bleed, Burn, Frostbite)
     int bleedBuildUp;
     int burnBuildUp;
-    int frostbiteBuildUp; // Added missing frostbite buildup metric
+    int frostbiteBuildUp;
+
+    // Cooldown System
+    int shortCooldownRemaining;
+    int longCooldownRemaining;
+    int shortCooldownCurrent = 0;
+    int longCooldownCurrent = 0;
 
 public:
     Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
@@ -60,5 +66,20 @@ public:
     // Status Buildup Getters
     int GetBleedBuildUp() const { return bleedBuildUp; }
     int GetBurnBuildUp() const { return burnBuildUp; }
-    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; } // Added missing getter
+    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; }
+
+    // Cooldown Tracker
+    void UpdateCooldowns() {
+        if (shortCooldownCurrent > 0) shortCooldownCurrent--;
+        if (longCooldownCurrent > 0) longCooldownCurrent--;
+    }
+
+    bool CanUseShortSkill() const { return shortCooldownCurrent == 0; }
+    bool CanUseLongSkill() const { return longCooldownCurrent == 0; }
+
+    void TriggerShortSkill(int duration) { shortCooldownCurrent = duration; }
+    void TriggerLongSkill(int duration) { longCooldownCurrent = duration; }
+
+    int GetShortCooldownRemaining() const { return shortCooldownCurrent; }
+    int GetLongCooldownRemaining() const { return longCooldownCurrent; }
 };

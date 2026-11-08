@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "ConsoleHelper.h"
+#include "WeaponSkills.h"
 
 // Player Constructor and Destructor
 Player::Player(std::string name)
@@ -160,6 +161,11 @@ bool Player::SwapWeapon()
     isPrimaryActive = !isPrimaryActive;
     currentSP -= 10;
     return true;
+}
+
+void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+{
+    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }
 
 // Handles Player Inventory
