@@ -198,8 +198,8 @@ void Game::RunCombatLoop()
 
         while (!turnConsumed)
         {
-            DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7, 9);
+            DisplayMenu(); // Displays Combat Menu (make sure option 8 is listed here!)
+            int choice = GameInput::GetValidatedChoice(1, 8, 9); // Updated to accept option 8 (and 9 for debug)
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
@@ -249,9 +249,7 @@ void Game::RunCombatLoop()
                             }
                             else
                             {
-                                // Directly check/deduct mana since SetCurrentMP isn't in Player class
-                                // (Alternatively, you can add ConsumeMP or SetCurrentMP to Player.h)
-                                player->ConsumeMP(manaCost); // Make sure to add ConsumeMP to Player.h if using this, or use: player = ...
+                                player->ConsumeMP(manaCost);
 
                                 if (type == ItemType::DinsFire)
                                 {
@@ -279,6 +277,66 @@ void Game::RunCombatLoop()
                             // Standard consumable items (potions)
                             player->UseItem(itemChoice - 1);
                             turnConsumed = true; // Item used -> Turn consumed!
+                        }
+                    }
+                }
+            }
+            else if (choice == 8) // Weapon Skills Menu
+            {
+                Weapon* activeWeapon = player->GetActiveWeapon();
+                if (!activeWeapon)
+                {
+                    ConsoleHelper::print("\n[!] No active weapon equipped!", ConsoleHelper::Red);
+                }
+                else
+                {
+                    ConsoleHelper::print("\n==================================", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("         [ WEAPON SKILLS ]        ", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+
+                    std::string wName = activeWeapon->GetName();
+                    int shortCD = activeWeapon->GetShortCooldownRemaining();
+                    int longCD = activeWeapon->GetLongCooldownRemaining();
+
+                    std::cout << "Equipped: " << wName << "\n";
+
+                    if (shortCD == 0)
+                        ConsoleHelper::print("1. Short Skill [Ready]", ConsoleHelper::Green);
+                    else
+                        ConsoleHelper::print("1. Short Skill [Cooldown: " + std::to_string(shortCD) + " turns]", ConsoleHelper::Yellow);
+
+                    if (longCD == 0)
+                        ConsoleHelper::print("2. Long Skill [Ready]", ConsoleHelper::Green);
+                    else
+                        ConsoleHelper::print("2. Long Skill [Cooldown: " + std::to_string(longCD) + " turns]", ConsoleHelper::Yellow);
+
+                    ConsoleHelper::print("0. Back to Combat", ConsoleHelper::White);
+                    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+                    ConsoleHelper::print("Select skill to use (0-2): ", ConsoleHelper::Cyan, false);
+
+                    int skillChoice = GameInput::GetValidatedChoice(0, 2);
+                    if (skillChoice == 1)
+                    {
+                        if (activeWeapon->CanUseShortSkill())
+                        {
+                            player->ExecuteWeaponSkill(false, *currentBoss);
+                            turnConsumed = true; // Skill used -> Turn consumed!
+                        }
+                        else
+                        {
+                            ConsoleHelper::print("\n[!] That skill is still on cooldown!", ConsoleHelper::Yellow);
+                        }
+                    }
+                    else if (skillChoice == 2)
+                    {
+                        if (activeWeapon->CanUseLongSkill())
+                        {
+                            player->ExecuteWeaponSkill(true, *currentBoss);
+                            turnConsumed = true; // Skill used -> Turn consumed!
+                        }
+                        else
+                        {
+                            ConsoleHelper::print("\n[!] That skill is still on cooldown!", ConsoleHelper::Yellow);
                         }
                     }
                 }
