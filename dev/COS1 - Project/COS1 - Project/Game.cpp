@@ -185,8 +185,11 @@ void Game::RunCombatLoop()
         system("cls");
         currentBoss->GenerateIntent();
 
-        system("cls");
-        currentBoss->GenerateIntent();
+        // Tick down active weapon cooldowns at the start of the turn
+        if (player->GetActiveWeapon())
+        {
+            player->GetActiveWeapon()->UpdateCooldowns();
+        }
 
         GameUI::RenderCombatUI(player, currentBoss);
 
@@ -196,7 +199,7 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7, 9);   // DEBUG options. Change later
+            int choice = GameInput::GetValidatedChoice(1, 7, 9);
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
@@ -246,7 +249,9 @@ void Game::RunCombatLoop()
                             }
                             else
                             {
-                                player->ConsumeMP(manaCost);
+                                // Directly check/deduct mana since SetCurrentMP isn't in Player class
+                                // (Alternatively, you can add ConsumeMP or SetCurrentMP to Player.h)
+                                player->ConsumeMP(manaCost); // Make sure to add ConsumeMP to Player.h if using this, or use: player = ...
 
                                 if (type == ItemType::DinsFire)
                                 {
