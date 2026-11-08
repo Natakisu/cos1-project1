@@ -221,22 +221,22 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
     if (item->GetType() == ItemType::DinsFire)
     {
         int fireDmg = 45;
-        target->TakeDamage(fireDmg, 15);
-        target->ApplyStatusBuildup(0, 75, 0); // Heavy burn buildup
+        target->TakeDamage(fireDmg, 50);
+        target->ApplyStatusBuildup(0, 150, 0); // Heavy burn buildup
         std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
     }
     else if (item->GetType() == ItemType::FaroresWind)
     {
         int windDmg = 35;
-        target->TakeDamage(windDmg, 20);
-        target->ApplyStatusBuildup(75, 0, 0); // Heavy bleed buildup
+        target->TakeDamage(windDmg, 50);
+        target->ApplyStatusBuildup(150, 0, 0); // Heavy bleed buildup
         std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
     }
     else if (item->GetType() == ItemType::NayrusLove)
     {
         int frostDmg = 35;
-        target->TakeDamage(frostDmg, 25);
-        target->ApplyStatusBuildup(0, 0, 75); // Heavy frostbite buildup
+        target->TakeDamage(frostDmg, 50);
+        target->ApplyStatusBuildup(0, 0, 150); // Heavy frostbite buildup
         std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
     }
 }

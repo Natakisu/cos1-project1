@@ -265,7 +265,7 @@ void Game::RunCombatLoop()
                 ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
                 ConsoleHelper::print("==================================", ConsoleHelper::Green);
                 ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::Cyan);
-                ConsoleHelper::print(" Relic Shards Earned: +" + std::to_string(earnedShards) + "rs", ConsoleHelper::Cyan);
+                ConsoleHelper::print(" Relic Shards Earned: +" + std::to_string(earnedShards) + "rs", ConsoleHelper::Purple);
 
                 player->GainXP(earnedXP);
                 player->AddRelicShards(earnedShards);
