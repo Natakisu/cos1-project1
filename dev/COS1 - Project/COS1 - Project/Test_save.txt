@@ -1,17 +1,17 @@
 Test
-7
-476
-1135
-100
-45
 10
+2486
+3829
+250
+195
+25
 70
 10
 10
 10
 0
-100
-4
+29425
+11
 4
 Farore's Wind
 30
@@ -27,4 +27,32 @@ Health Potion
 1
 SP Potion
 30
+20
+4
+Farore's Wind
+30
+20
+5
+Nayru's Love
+30
+20
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
 20

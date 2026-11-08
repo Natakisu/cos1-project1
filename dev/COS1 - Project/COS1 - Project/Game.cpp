@@ -196,7 +196,7 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             DisplayMenu(); // Displays Combat Menu
-            int choice = GameInput::GetValidatedChoice(1, 7, 9);
+            int choice = GameInput::GetValidatedChoice(1, 7, 9);   // DEBUG options. Change later
 
             // Handle free actions vs turn-consuming actions
             if (choice == 3) // Swap Weapon (FREE)
@@ -485,6 +485,7 @@ void Game::HandlePlayerAction(int choice)
         currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp(), activeWeapon->GetBurnBuildUp(), activeWeapon->GetFrostbiteBuildUp());
         break;
     }
+
     case 2: // Heavy Attack
     {
         std::string weaponName = activeWeapon->GetName();
@@ -498,14 +499,17 @@ void Game::HandlePlayerAction(int choice)
         currentBoss->ApplyStatusBuildup(activeWeapon->GetBleedBuildUp() * 2, activeWeapon->GetBurnBuildUp() * 2, activeWeapon->GetFrostbiteBuildUp() * 2);
         break;
     }
+
     case 4: // Block
         player->Block();
         ConsoleHelper::print("You raise your guard to block incoming damage.", ConsoleHelper::White);
         break;
+
     case 5: // Dodge
         player->Dodge();
         ConsoleHelper::print("You prepare to dodge the next attack.", ConsoleHelper::White);
         break;
+
     case 9: // Debug Insta-Kill
     {
         while (currentBoss->GetCurrentHP() > 0)
