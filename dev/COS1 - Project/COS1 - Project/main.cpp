@@ -1,9 +1,12 @@
 #include "Game.h"
 
-int main() {
+int main()
+{
     Game game;
+
+    game.DisplayWelcomeMenu();
     game.Initialize();
     game.RunCombatLoop();
-    return 0;
 
+    return 0;
 }

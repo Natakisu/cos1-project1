@@ -1,0 +1,11 @@
+I wasn't going to get this all to fit into a Discord comment, and I'm not paying for Nitro
+
+- **Overview** – [This past week, I finished the experience system, and the save/load file. I worked out numerous bugs in both systems, and fixed bugs these systems started causing in other systems. I also address the feedback from milestone 3 and implemented fixes to that. I finished up the week constantly playtesting the game, and making minor tweaks to the UI and layout of the game, and feel like it is at a comfortable, enjoyable, and understandable state.
+    
+- **Project Wrap-Up** – [I am going to keep polishing up and tweaking all the minor details in the UI until the game is as smooth and clean as I can get it, and keep playtesting and breaking anything I can.]
+    
+- **Challenges** – [One of the trickier issues was implementing the Experience system. I spent hours trying to figure out why the game was rewarding experience in an infinite loop and tried to fix it numerous different ways and loops and everything I could think of and do research on. All to figure out it wasn't the experience loop, it was the Level Up loop the entire time. Another obstacles was ensuring that current health pools scaled correctly alongside maximum health increases when investing points into Constitution, rather than leaving current health stuck at baseline values. I resolved this by updating the pool recalculation and bounds-checking logic inside the player class.]
+    
+- **Biggest Takeaway** – [Looking back, the most valuable lesson was experiencing firsthand how separating concerns (UI, input, and game loop controllers) makes debugging, scaling, and maintaining a C++ project significantly more manageable. I probably wouldn't have spent hours trying to fix a loop that wasn't broken if I wasn't also drudging through ~750+ lines of code in one File. I've broken it down and separated code and classes into more .h and .cpp files and the Game.cpp is now sitting at a slightly more manageable ~500 lines of code
+    
+- **Future Development** – [If I continued this project after the course (which, let's be honest I will), I would build out an expanded inventory system, add more diverse enemy AI types with unique status effects, and implement a more robust save-file management screen to handle multiple characters seamlessly.

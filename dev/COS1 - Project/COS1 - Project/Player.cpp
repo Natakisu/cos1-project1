@@ -1,15 +1,36 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <fstream>
 #include "Player.h"
 #include "Enemy.h"
 #include "ConsoleHelper.h"
+#include "WeaponSkills.h"
 
+// Player Constructor and Destructor
 Player::Player(std::string name)
     : name(name),
-    constitution(10), strength(10), agility(10), intellect(10), focus(10),
-    maxHP(100), currentHP(100), maxSP(100), currentSP(100), maxMP(100), currentMP(100),
-    primaryWeapon(nullptr), secondaryWeapon(nullptr), isPrimaryActive(true),
-    isBlocking(false), isDodging(false)
+    constitution(10),
+    strength(10),
+    agility(10),
+    intellect(10),
+    focus(10),
+    maxHP(100),
+    currentHP(100),
+    maxSP(100),
+    currentSP(100),
+    maxMP(100),
+    currentMP(100),
+    primaryWeapon(nullptr),
+    secondaryWeapon(nullptr),
+    isPrimaryActive(true),
+    isBlocking(false),
+    isDodging(false),
+    level(1),
+    currentXP(0),
+    xpToNextLevel(100),
+    unspentAttributePoints(0),
+    relicShards(100)
 {
     RecalculatePools();
     currentHP = maxHP;
@@ -19,13 +40,13 @@ Player::Player(std::string name)
 
 Player::~Player()
 {
-    // Memory Cleanup Addressed
     delete primaryWeapon;
     delete secondaryWeapon;
     primaryWeapon = nullptr;
     secondaryWeapon = nullptr;
 }
 
+// Handle Player Attributes and Stats
 void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
     constitution += conPoints;
     strength += strPoints;
@@ -35,28 +56,263 @@ void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int
     RecalculatePools();
 }
 
+void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
+    constitution = con;
+    strength = str;
+    agility = agi;
+    intellect = intel;
+    focus = foc;
+    RecalculatePools();
+    currentHP = maxHP;
+    currentSP = maxSP;
+    currentMP = maxMP;
+}
+
+void Player::AllocateAttribute(int choice, int amount)
+{
+    if (amount > unspentAttributePoints) amount = unspentAttributePoints;
+    if (amount <= 0) return;
+
+    if (choice == 1) constitution += amount;
+    else if (choice == 2) strength += amount;
+    else if (choice == 3) agility += amount;
+    else if (choice == 4) intellect += amount;
+    else if (choice == 5) focus += amount;
+
+    unspentAttributePoints -= amount;
+    UpdateDerivedStats();
+}
+
+void Player::DisplayStats() const {
+    system("cls");
+
+    ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
+    std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
+    std::cout << "Strength     (STR): " << strength << "\n";
+    std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
+    std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
+    std::cout << "Focus        (FOC): " << focus << "\n";
+    ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
+
+    ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
+}
+
 void Player::RecalculatePools()
 {
+    int oldMaxHP = maxHP;
+    int oldMaxSP = maxSP;
+    int oldMaxMP = maxMP;
+
     maxHP = constitution * 10;
     maxSP = agility * 10;
     maxMP = intellect * 10;
+
+    // Scale current resources up by the exact amount your maximums increased
+    currentHP += (maxHP - oldMaxHP);
+    currentSP += (maxSP - oldMaxSP);
+    currentMP += (maxMP - oldMaxMP);
+
+    // Safety bounds
+    if (currentHP > maxHP) currentHP = maxHP;
+    if (currentSP > maxSP) currentSP = maxSP;
+    if (currentMP > maxMP) currentMP = maxMP;
+    if (currentHP < 0) currentHP = 0;
+    if (currentSP < 0) currentSP = 0;
+    if (currentMP < 0) currentMP = 0;
 }
 
+void Player::UpdateDerivedStats()
+{
+    RecalculatePools();
+}
+
+// Handles Player Weapons
 void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
 {
     primaryWeapon = primary;
     secondaryWeapon = secondary;
 }
 
+void Player::InspectWeapons() const {
+    system("cls");
+
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("               [ LOADOUT & WEAPON SKILLS ]        ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+
+    // Lambda helper to print weapon info + skills
+    auto printWeaponDetails = [](Weapon* weapon, bool isActive) {
+        if (!weapon) return;
+
+        if (isActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
+        else std::cout << "[STOWED] ";
+
+        std::cout << weapon->GetName() << "\n";
+
+        std::string wName = weapon->GetName();
+        std::string shortName = "Short Skill";
+        std::string shortDesc = "Quick tactical strike.";
+        std::string longName = "Long Skill";
+        std::string longDesc = "Devastating signature technique.";
+
+        // Assign specific names/descriptions per weapon blueprint
+        if (wName == "Warhammer") {
+            shortName = "Crushing Blow"; shortDesc = "Deals heavy STR damage and moderate posture damage (2 Turn CD)";
+            longName = "Earthshatter"; longDesc = "Slams the ground for massive damage and heavy disruption (4 Turn CD)";
+        }
+        else if (wName == "Sword & Shield") {
+            shortName = "Shield Bash"; shortDesc = "Strikes the foe and guards posture (2 Turn CD)";
+            longName = "Fortress Wall"; longDesc = "Raises an absolute defense aura for the turn (3 Turn CD)";
+        }
+        else if (wName == "Daggers") {
+            shortName = "Flurry Strike"; shortDesc = "Delivers 3 rapid stabs with moderate Bleed buildup (2 Turn CD)";
+            longName = "Shadow Step"; longDesc = "Vanish into shadows to auto-dodge and inflict high Bleed (4 Turn CD)";
+        }
+        else if (wName == "Bow") {
+            shortName = "Quick Shot"; shortDesc = "Fires a swift arrow and prepares an evasive dodge (1 Turn CD)";
+            longName = "Rain of Arrows"; longDesc = "Unleashes a multi-turn barrage of steady pressure (4 Turn CD)";
+        }
+        else if (wName == "Fire Staff") {
+            shortName = "Fireball"; shortDesc = "Hurls a blazing sphere with moderate Burn buildup (2 Turn CD)";
+            longName = "Combustion"; longDesc = "Detonates current target heat for massive scaling damage (4 Turn CD)";
+        }
+        else if (wName == "Ice Staff") {
+            shortName = "Ice Spike"; shortDesc = "Hurls piercing ice with moderate Frostbite buildup (1 Turn CD)";
+            longName = "Entomb"; longDesc = "Encases you in crystal ice for safety and MP recovery (4 Turn CD)";
+        }
+        else if (wName == "Life Staff") {
+            shortName = "Divine Plea"; shortDesc = "Offers a brief prayer to restore moderate HP (2 Turn CD)";
+            longName = "Sacred Ground"; longDesc = "Consecrates the earth for sustained healing and protection (4 Turn CD)";
+        }
+        else if (wName == "Greatsword") {
+            shortName = "Relentless Onslaught"; shortDesc = "Unleashes multi-hits scaling off your Agility (2 Turn CD)";
+            longName = "Execute"; longDesc = "A devastating finisher scaling heavily off Strength (4 Turn CD)";
+        }
+        else if (wName == "Rapier") {
+            shortName = "Evade Stance"; shortDesc = "Strikes scaling off target Bleed while dodging (2 Turn CD)";
+            longName = "Detonate Stance"; shortDesc = "Explodes target Burn buildup while regenerating MP (2 Turn CD)";
+        }
+        else if (wName == "Flail & Shield") {
+            shortName = "Blessed Aegis"; shortDesc = "Blocks incoming attacks and restores HP based on Focus (2 Turn CD)";
+            longName = "Divine Smite"; longDesc = "Smites the foe with heavy damage and a health pulse (4 Turn CD)";
+        }
+
+        std::cout << "   -> Short: " << shortName << " (" << shortDesc << ")\n";
+        std::cout << "   -> Long:  " << longName << " (" << longDesc << ")\n\n";
+        };
+
+    if (primaryWeapon)
+    {
+        printWeaponDetails(primaryWeapon, isPrimaryActive);
+    }
+
+    if (secondaryWeapon)
+    {
+        printWeaponDetails(secondaryWeapon, !isPrimaryActive);
+    }
+
+    ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
+}
+
 bool Player::SwapWeapon()
 {
-    if (currentSP < 10) return false; // Stamina cost for swapping
+    if (currentSP < 10) return false;
 
     isPrimaryActive = !isPrimaryActive;
     currentSP -= 10;
     return true;
 }
 
+void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+{
+    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
+}
+
+// Handles Player Inventory
+void Player::AddItem(Item* item)
+{
+    inventory.push_back(item);
+}
+
+const std::vector<Item*>& Player::GetInventory() const
+{
+    return inventory;
+}
+
+// Consumables
+void Player::UseItem(int index)
+{
+    if (index < 0 || index >= inventory.size()) return;
+
+    Item* item = inventory[index];
+    if (!item) return;
+
+    if (item->GetType() == ItemType::HealthPotion)
+    {
+        currentHP += item->GetEffectValue();
+        if (currentHP > maxHP) currentHP = maxHP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " HP.\n";
+    }
+    else if (item->GetType() == ItemType::StaminaPotion)
+    {
+        currentSP += item->GetEffectValue();
+        if (currentSP > maxSP) currentSP = maxSP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Stamina.\n";
+    }
+    else if (item->GetType() == ItemType::ManaPotion)
+    {
+        currentMP += item->GetEffectValue();
+        if (currentMP > maxMP) currentMP = maxMP;
+        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Mana.\n";
+    }
+}
+
+// LoZ: OoT Themed Items
+void Player::CastMagicBlessing(Item* item, Enemy* target)
+{
+    if (!item || !target) return;
+
+    int manaCost = 100;
+
+    if (currentMP < manaCost)
+    {
+        std::cout << " > Not enough Mana to cast " << item->GetName() << "! (Requires 100 MP)\n";
+        return;
+    }
+
+    // Deduct Mana cost
+    currentMP -= manaCost;
+
+    // Apply effects based on which blessing is cast
+    if (item->GetType() == ItemType::DinsFire)
+    {
+        int fireDmg = 45;
+        target->TakeDamage(fireDmg, 15);
+        target->ApplyStatusBuildup(0, 50, 0); // Heavy burn buildup
+        std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
+    }
+    else if (item->GetType() == ItemType::FaroresWind)
+    {
+        int windDmg = 35;
+        target->TakeDamage(windDmg, 15);
+        target->ApplyStatusBuildup(50, 0, 0); // Heavy bleed buildup
+        std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
+    }
+    else if (item->GetType() == ItemType::NayrusLove)
+    {
+        int frostDmg = 35;
+        target->TakeDamage(frostDmg, 15);
+        target->ApplyStatusBuildup(0, 0, 50); // Heavy frostbite buildup
+        std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
+    }
+}
+
+// Handles Player Combat Actions
 int Player::PerformLightAttack(Enemy& target)
 {
     Weapon* activeWeapon = GetActiveWeapon();
@@ -66,7 +322,6 @@ int Player::PerformLightAttack(Enemy& target)
 
     std::string weaponName = activeWeapon->GetName();
 
-    // 1. Life Staff Heals the player instead of dealing damage
     if (weaponName == "Life Staff")
     {
         int healingAmount = 25 + (focus * 2);
@@ -74,10 +329,9 @@ int Player::PerformLightAttack(Enemy& target)
         if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
 
         ConsoleHelper::print(" > " + name + " channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
-        return 0; // Skips dealing damage to the boss
+        return 0;
     }
 
-    // Check stamina cost for standard weapons
     if (currentSP < activeWeapon->GetAttackStaminaCost()) {
         ConsoleHelper::print("[!] Not enough stamina for light attack!", ConsoleHelper::Red);
         return 0;
@@ -88,7 +342,6 @@ int Player::PerformLightAttack(Enemy& target)
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage());
 
-    // 2. Flail and Shield heal on attack if Focus >= 12
     if (weaponName == "Flail and Shield")
     {
         if (focus >= 12)
@@ -113,7 +366,6 @@ int Player::PerformHeavyAttack(Enemy& target) {
 
     std::string weaponName = activeWeapon->GetName();
 
-    // Life Staff doesn't do heavy physical attacks, but a stronger heal
     if (weaponName == "Life Staff")
     {
         int healingAmount = 50 + (focus * 4);
@@ -136,7 +388,6 @@ int Player::PerformHeavyAttack(Enemy& target) {
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage() * 2);
 
-    // Flail and shield heavy attack drain check
     if (weaponName == "Flail and Shield")
     {
         if (focus >= 12)
@@ -175,62 +426,147 @@ void Player::RegainResourcesPerTurn()
 
 void Player::TakeDamage(int damage)
 {
-    if (isDodging) return; // Negate damage on dodge
+    if (isDodging) return;
 
     if (isBlocking)
     {
-        damage /= 2; // Reduce damage when blocking
+        damage /= 2;
     }
 
     currentHP -= damage;
     if (currentHP < 0) currentHP = 0;
 }
 
-void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
-    constitution = con;
-    strength = str;
-    agility = agi;
-    intellect = intel;
-    focus = foc;
-    RecalculatePools();
-    currentHP = maxHP;
-    currentSP = maxSP;
-    currentMP = maxMP;
+// Handles Player Combat Rewards
+void Player::GainXP(int amount)
+{
+    currentXP += amount;
+
+    int safetyCounter = 0;
+    const int maxLevelsPerGrant = 50;
+
+    while (currentXP >= xpToNextLevel && safetyCounter < maxLevelsPerGrant)
+    {
+        currentXP -= xpToNextLevel;
+
+        level++;
+        unspentAttributePoints += 5;
+
+        xpToNextLevel = static_cast<int>(xpToNextLevel * 1.5f);
+
+        ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
+        ConsoleHelper::print("          [ LEVEL UP! ]                 ", ConsoleHelper::Green);
+        ConsoleHelper::print(" You reached Level " + std::to_string(level) + "!", ConsoleHelper::White);
+        ConsoleHelper::print(" You gained 5 unspent attribute points!", ConsoleHelper::Yellow);
+        ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
+
+        safetyCounter++;
+    }
 }
 
-void Player::DisplayStats() const {
-    system("cls"); // Clear the main menu away
+// Handles Player Save/Load
+void Player::SaveToFile(const std::string& filename) const
+{
+    std::ofstream outFile(filename);
+    if (outFile.is_open())
+    {
+        outFile << name << "\n";
+        outFile << level << "\n";
+        outFile << currentXP << "\n";
+        outFile << xpToNextLevel << "\n"; // <--- Added so level-up curve persists
+        outFile << maxHP << "\n";
+        outFile << currentHP << "\n";
+        outFile << constitution << "\n";
+        outFile << strength << "\n";
+        outFile << agility << "\n";
+        outFile << intellect << "\n";
+        outFile << focus << "\n";
+        outFile << unspentAttributePoints << "\n";
+        outFile << relicShards << "\n";
 
-    ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
-    std::cout << "Constitution (CON): " << constitution << " (Max HP: " << maxHP << ")\n";
-    std::cout << "Strength     (STR): " << strength << "\n";
-    std::cout << "Agility      (AGI): " << agility << " (Max SP: " << maxSP << ")\n";
-    std::cout << "Intellect    (INT): " << intellect << " (Max MP: " << maxMP << ")\n";
-    std::cout << "Focus        (FOC): " << focus << "\n";
-    ConsoleHelper::print("---------------------------\n", ConsoleHelper::Cyan);
-
-    // Pause so the player can read their stats before returning to the main menu
-    ConsoleHelper::print("Press Enter to return to the main menu...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
+        outFile << inventory.size() << "\n";
+        for (const Item* item : inventory)
+        {
+            if (item)
+            {
+                outFile << static_cast<int>(item->GetType()) << "\n";
+                outFile << item->GetName() << "\n";
+                outFile << item->GetEffectValue() << "\n";
+                outFile << item->GetCost() << "\n";
+            }
+        }
+        
+        outFile.close();
+        ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
+    }
+    else
+    {
+        ConsoleHelper::print("[!] Error: Could not open file for saving.", ConsoleHelper::Red);
+    }
 }
 
-void Player::InspectWeapons() const {
-    system("cls"); // Clear previous screen
+void Player::LoadFromFile(const std::string& filename)
+{
+    std::ifstream inFile(filename);
+    if (inFile.is_open())
+    {
+        std::getline(inFile, name);
+        inFile >> level;
+        inFile >> currentXP;
+        inFile >> xpToNextLevel; // <--- Added to match save file order
+        inFile >> maxHP;
+        inFile >> currentHP;
+        inFile >> constitution;
+        inFile >> strength;
+        inFile >> agility;
+        inFile >> intellect;
+        inFile >> focus;
+        inFile >> unspentAttributePoints;
+        inFile >> relicShards;
 
-    ConsoleHelper::print("=== EQUIPPED WEAPONS ===", ConsoleHelper::Cyan);
-    if (isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (primaryWeapon) primaryWeapon->DisplayWeaponInfo();
+        for (Item* item : inventory)
+        {
+            delete item;
+        }
+        inventory.clear();
 
-    std::cout << "\n";
-    if (!isPrimaryActive) ConsoleHelper::print("[ACTIVE] ", ConsoleHelper::Green, false);
-    else std::cout << "[STOWED] ";
-    if (secondaryWeapon) secondaryWeapon->DisplayWeaponInfo();
-    ConsoleHelper::print("========================", ConsoleHelper::Cyan);
+        // Load inventory
+        size_t inventorySize = 0;
+        inFile >> inventorySize;
+        inFile.ignore();
 
-    // Pause so they can look over both weapons
-    ConsoleHelper::print("\nPress Enter to return to the main menu...", ConsoleHelper::White, false);
-    std::string dummy;
-    std::getline(std::cin, dummy);
+        for (size_t i = 0; i < inventorySize; ++i)
+        {
+            int typeInt = 0;
+            std::string itemName;
+            int effectVal = 0;
+            int itemCost = 0;
+
+            inFile >> typeInt;
+            inFile.ignore();
+            std::getline(inFile, itemName);
+            inFile >> effectVal >> itemCost;
+            inFile.ignore();
+
+            ItemType type = static_cast<ItemType>(typeInt);
+
+            // Recreate and add the item to the player's inventory
+            inventory.push_back(new Item(itemName, type, effectVal, itemCost));
+        }
+
+        inFile.close();
+
+        UpdateDerivedStats();
+
+        ConsoleHelper::print("[!] Game loaded successfully!", ConsoleHelper::Green);
+    }
+    else
+    {
+        ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
+    }
+}
+
+void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+{
+    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }
