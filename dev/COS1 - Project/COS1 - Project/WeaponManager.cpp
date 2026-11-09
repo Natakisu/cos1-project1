@@ -172,17 +172,13 @@ void WeaponManager::SelectPlayerLoadout(Weapon*& outPrimary, Weapon*& outSeconda
         }
     }
 
-    // Safeguard against duplicate pointers
     if (chosenPrimary == chosenSecondary && chosenPrimary != nullptr)
     {
         chosenSecondary = nullptr;
     }
 
-    // Pass the finalized choices back out to the caller
     outPrimary = chosenPrimary;
     outSecondary = chosenSecondary;
 
-    // Clear vector pointers from local list tracking so they don't get deleted when WeaponManager goes out of scope 
-    // (since they are now owned by the Player object)
     availableWeapons.clear();
 }

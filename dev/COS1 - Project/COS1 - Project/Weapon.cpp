@@ -31,3 +31,39 @@ void Weapon::DisplayWeaponInfo() const {
     std::cout << "Scaling Ratios -> STR: " << (strScaling * 100) << "% | AGI: " << (agiScaling * 100)
         << "% | INT: " << (intScaling * 100) << "% | FOC: " << (focScaling * 100) << "%\n";
 }
+
+int Weapon::GetShortCooldownRemaining() const
+{
+    return shortCooldownRemaining; // Or whatever your internal short cooldown variable is named
+}
+
+int Weapon::GetLongCooldownRemaining() const
+{
+    return longCooldownRemaining; // Or whatever your internal long cooldown variable is named
+}
+
+bool Weapon::CanUseShortSkill() const
+{
+    return shortCooldownRemaining <= 0;
+}
+
+bool Weapon::CanUseLongSkill() const
+{
+    return longCooldownRemaining <= 0;
+}
+
+void Weapon::TriggerShortSkill(int cooldownTurns)
+{
+    shortCooldownRemaining = cooldownTurns;
+}
+
+void Weapon::TriggerLongSkill(int cooldownTurns)
+{
+    longCooldownRemaining = cooldownTurns;
+}
+
+void Weapon::UpdateCooldowns()
+{
+    if (shortCooldownRemaining > 0) shortCooldownRemaining--;
+    if (longCooldownRemaining > 0) longCooldownRemaining--;
+}

@@ -119,4 +119,5 @@ public:
     int GetIntellect() const { return intellect; }
     int GetFocus() const { return focus; }
 
+    void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
 };

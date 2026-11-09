@@ -39,7 +39,7 @@ void WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& t
     }
 
     // SWORD & SHIELD [STR]
-    else if (wName == "Sword & Shield")
+    else if (wName == "Sword & Shield" || wName == "Sword and Shield" || wName == "Sword &amp; Shield")
     {
         if (!isLongSkill) // Short: Shield Bash (2 Turns)
         {
@@ -206,7 +206,7 @@ void WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& t
     }
 
     // FLAIL & SHIELD [STR / FOC]
-    else if (wName == "Flail & Shield")
+    else if (wName == "Flail & Shield" || wName == "Flail and Shield" || wName == "Flail &amp; Shield")
     {
         if (!isLongSkill) // Short: Blessed Aegis (2 Turns)
         {
