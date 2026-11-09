@@ -2,7 +2,9 @@
 #include <string>
 #include "Player.h"
 #include "Enemy.h"
-#include "Game.h"
+
+// Forward declaration instead of #include "Game.h" to avoid circular dependencies
+enum class GameDifficulty;
 
 class GameUI
 {

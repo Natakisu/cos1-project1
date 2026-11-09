@@ -139,25 +139,39 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterManager.cpp" />
     <ClCompile Include="ConsoleHelper.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInput.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="InputValidator.cpp" />
+    <ClCompile Include="InventoryScreen.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemShop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PreparationMenu.cpp" />
     <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="WeaponManager.cpp" />
+    <ClCompile Include="WeaponSkills.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CharacterManager.h" />
     <ClInclude Include="ConsoleHelper.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameInput.h" />
     <ClInclude Include="GameUI.h" />
     <ClInclude Include="InputValidator.h" />
+    <ClInclude Include="InventoryScreen.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemShop.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PreparationMenu.h" />
     <ClInclude Include="Weapon.h" />
+    <ClInclude Include="WeaponManager.h" />
+    <ClInclude Include="WeaponSkills.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

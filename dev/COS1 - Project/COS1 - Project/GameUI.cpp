@@ -23,36 +23,55 @@ void GameUI::DisplayInstructions()
     ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
     ConsoleHelper::print("                  GAME INSTRUCTIONS                ", ConsoleHelper::Cyan);
     ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::White);
-    ConsoleHelper::print("    from New World Aeternum and Dark Souls         ", ConsoleHelper::White);
-    ConsoleHelper::print(" - Allocate attributes wisely during creation.     ", ConsoleHelper::White);
-    ConsoleHelper::print(" - Choose a Primary and Secondary weapon loadout.  ", ConsoleHelper::White);
-    ConsoleHelper::print(" - Choose a Difficulty you would like to play.     ", ConsoleHelper::White);
-    ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Blocks, ", ConsoleHelper::White);
-    ConsoleHelper::print("    and Dodges while managing your HP, SP, and MP. ", ConsoleHelper::White);
+    ConsoleHelper::print(" - Relic Switcher is a Turn-Based RPG with elements", ConsoleHelper::Red);
+    ConsoleHelper::print("    from New World Aeternum and Dark Souls         ", ConsoleHelper::Red);
+    ConsoleHelper::print(" - Allocate attributes wisely during creation.     ", ConsoleHelper::Orange);
+    ConsoleHelper::print(" - Choose a Primary and Secondary Weapon.          ", ConsoleHelper::Yellow);
+    ConsoleHelper::print(" - Choose a Difficulty you would like to play.     ", ConsoleHelper::Green);
+    ConsoleHelper::print("    Higher Difficulties reward more Experience, and", ConsoleHelper::Green);
+    ConsoleHelper::print("     Relic Shards.                                 ", ConsoleHelper::Green);
+    ConsoleHelper::print(" - Fight the Relic Guardian using Attacks, Block,  ", ConsoleHelper::Blue);
+    ConsoleHelper::print("    Dodge, and Items while managing your HP, SP,   ", ConsoleHelper::Blue);
+    ConsoleHelper::print("    and MP.                                        ", ConsoleHelper::Blue);
+    ConsoleHelper::print(" - Upon completion of the game your Characters     ", ConsoleHelper::Purple);
+    ConsoleHelper::print("    Attributes, Level, and Relic Shards will be    ", ConsoleHelper::Purple);
+    ConsoleHelper::print("    saved. In order to load your character select  ", ConsoleHelper::Purple);
+    ConsoleHelper::print("    > Start Game                                   ", ConsoleHelper::White);
+    ConsoleHelper::print("    > Load Game                                    ", ConsoleHelper::White);
+    ConsoleHelper::print("    > Eneter Character Name EXACTLY as typed when  ", ConsoleHelper::White);
+    ConsoleHelper::print("       you created the character.                  ", ConsoleHelper::White);
+    ConsoleHelper::print("(Plan to update the Save/Load System in the future)", ConsoleHelper::DarkGray);
     ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
-}
-
-void GameUI::DisplayCombatMenu()
-{
-    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
-    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
-    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
-    ConsoleHelper::print("4. Block", ConsoleHelper::White);
-    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
-    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
-    ConsoleHelper::print("9. [DEBUG] Instant Win / Kill Boss", ConsoleHelper::Yellow);
 }
 
 void GameUI::DisplayAttributeDescriptions()
 {
     system("cls");
-    ConsoleHelper::print("--- Attribute Descriptions ---", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" - Constitution (CON): Increases your Max HP.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Strength     (STR): Increases physical weapon damage.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Agility      (AGI): Increases Stamina (SP) and dodging/speed.", ConsoleHelper::White);
-    ConsoleHelper::print(" - Intellect    (INT): Increases Mana (MP) and magical effectiveness.", ConsoleHelper::White);
+    ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
+    ConsoleHelper::print("                Attribute Description              ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" - Constitution (CON): Increases your Max (HP).", ConsoleHelper::White);
+    ConsoleHelper::print(" - Strength     (STR): Increases STR weapon damage.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Agility      (AGI): Increases your Max (SP) and AGI weapon damage.", ConsoleHelper::White);
+    ConsoleHelper::print(" - Intellect    (INT): Increases your Max (MP) and INT weapon damage.", ConsoleHelper::White);
     ConsoleHelper::print(" - Focus        (FOC): Increases your healing potency and recovery.", ConsoleHelper::White);
+}
+
+GameDifficulty GameUI::SelectDifficulty()
+{
+    system("cls");
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
+    ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::White);
+    ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::Yellow);
+    ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Orange);
+    ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
+    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
+
+    int choice = GameInput::GetValidatedChoice(1, 5);
+    return static_cast<GameDifficulty>(choice - 1);
 }
 
 void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
@@ -94,27 +113,29 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
     ConsoleHelper::print(" BOSS:   " + currentBoss->GetName(), ConsoleHelper::White);
     std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
     std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
-    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), 100); std::cout << "\n";
-    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), 100); std::cout << "\n";
 
+    // Updated to use dynamic difficulty thresholds instead of hardcoded 100
+    std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), currentBoss->GetMaxBleedThreshold()); std::cout << "\n";
+    std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), currentBoss->GetMaxBurnThreshold()); std::cout << "\n";
+    std::cout << " Frostbite: "; drawBar(currentBoss->GetFrostbiteMeter(), currentBoss->GetMaxFrostbiteThreshold()); std::cout << "\n";
     ConsoleHelper::print(" BOSS INTENT: ", ConsoleHelper::White, false);
     ConsoleHelper::print(currentBoss->GetIntentDescription(), ConsoleHelper::Yellow);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 }
 
-GameDifficulty GameUI::SelectDifficulty()
+void GameUI::DisplayCombatMenu()
 {
-    system("cls");
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("                    [ SELECT GAME DIFFICULTY ]                    |", ConsoleHelper::Cyan);
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" 1. Easy       (Boss HP: 500     | Barely A Challenge  | XP:  150)|", ConsoleHelper::Green);
-    ConsoleHelper::print(" 2. Normal     (Boss HP: 5000    | Standard Experience | XP:  300)|", ConsoleHelper::Cyan);
-    ConsoleHelper::print(" 3. Hard       (Boss HP: 50000   | Harder Experience   | XP:  600)|", ConsoleHelper::White);
-    ConsoleHelper::print(" 4. Insane     (Boss HP: 500000  | Soulslike Challenge | XP: 1200)|", ConsoleHelper::Yellow);
-    ConsoleHelper::print(" 5. Impossible (Boss HP: 5000000 | Why? Why Do This?   | XP: 2400)|", ConsoleHelper::Red);
-    ConsoleHelper::print("===================================================================", ConsoleHelper::Cyan);
-
-    int choice = GameInput::GetValidatedChoice(1, 5);
-    return static_cast<GameDifficulty>(choice - 1);
+    ConsoleHelper::print("         [ COMBAT MENU ]          ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("1. Light Attack", ConsoleHelper::White);
+    ConsoleHelper::print("2. Heavy Attack", ConsoleHelper::White);
+    ConsoleHelper::print("3. Swap Weapon", ConsoleHelper::White);
+    ConsoleHelper::print("4. Block", ConsoleHelper::White);
+    ConsoleHelper::print("5. Dodge", ConsoleHelper::White);
+    ConsoleHelper::print("6. Inspect Weapons", ConsoleHelper::White);
+    ConsoleHelper::print("7. Open Inventory", ConsoleHelper::White);
+    ConsoleHelper::print("8. Weapon Skills", ConsoleHelper::Cyan);
+    ConsoleHelper::print("9. [DEBUG - Instant Kill]", ConsoleHelper::Yellow);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("Choose your action: ", ConsoleHelper::Cyan, false);
 }

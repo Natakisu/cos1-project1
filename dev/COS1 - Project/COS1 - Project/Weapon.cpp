@@ -5,12 +5,12 @@
 
 Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     float strScale, float agiScale, float intScale, float focScale,
-    int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal) 
+    int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal)
     : name(name), type(type), baseDamage(baseDmg), postureDamage(postureDmg),
     strScaling(strScale), agiScaling(agiScale), intScaling(intScale), focScaling(focScale),
     attackStaminaCost(atkSP), attackManaCost(atkMP),
     blockStaminaCost(blockSP), dodgeStaminaCost(dodgeSP),
-    bleedBuildUp(bleedVal), burnBuildUp(burnVal)
+    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal) // <--- Added frostbite initialization
 {
 }
 
@@ -30,4 +30,40 @@ void Weapon::DisplayWeaponInfo() const {
     std::cout << "Stamina Cost: " << attackStaminaCost << " | Mana Cost: " << attackManaCost << "\n";
     std::cout << "Scaling Ratios -> STR: " << (strScaling * 100) << "% | AGI: " << (agiScaling * 100)
         << "% | INT: " << (intScaling * 100) << "% | FOC: " << (focScaling * 100) << "%\n";
+}
+
+int Weapon::GetShortCooldownRemaining() const
+{
+    return shortCooldownRemaining; // Or whatever your internal short cooldown variable is named
+}
+
+int Weapon::GetLongCooldownRemaining() const
+{
+    return longCooldownRemaining; // Or whatever your internal long cooldown variable is named
+}
+
+bool Weapon::CanUseShortSkill() const
+{
+    return shortCooldownRemaining <= 0;
+}
+
+bool Weapon::CanUseLongSkill() const
+{
+    return longCooldownRemaining <= 0;
+}
+
+void Weapon::TriggerShortSkill(int cooldownTurns)
+{
+    shortCooldownRemaining = cooldownTurns;
+}
+
+void Weapon::TriggerLongSkill(int cooldownTurns)
+{
+    longCooldownRemaining = cooldownTurns;
+}
+
+void Weapon::UpdateCooldowns()
+{
+    if (shortCooldownRemaining > 0) shortCooldownRemaining--;
+    if (longCooldownRemaining > 0) longCooldownRemaining--;
 }

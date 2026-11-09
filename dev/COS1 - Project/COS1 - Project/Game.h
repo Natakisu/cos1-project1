@@ -3,7 +3,8 @@
 #include "Enemy.h"
 #include <vector>
 
-enum class GameDifficulty {
+enum class GameDifficulty 
+{
     Easy,
     Normal,
     Hard,
@@ -18,18 +19,11 @@ private:
     Enemy* currentBoss;
     bool isRunning;
 
-    // Vector and Helper Methods for weapon selection
-    std::vector<Weapon*> availableWeapons;
-
-    void InitializeWeaponPool();
-    void WeaponSelectionMenu();
-
-    // Helper Methods (Cleaned up duplicates and typos)
-    int GetValidatedPlayerChoice();
-    void ProcessPlayerTurn(int choice);
-    void ProcessEnemyTurn();
-
     GameDifficulty currentDifficulty;
+
+    void LoadExistingGameSession();
+    void StartFreshGameSession();
+    void SetupBossDifficulty();
 
 public:
     Game();
@@ -37,8 +31,6 @@ public:
 
     void DisplayWelcomeMenu();
     void Initialize();
-    void CharacterCreation();
-    void AllocateAttributesMenu();
     void RunCombatLoop();
 
     // Public action and outcome handlers used by the loop
@@ -46,7 +38,6 @@ public:
     void HandleCombatOutcome() const;
 
     // UI rendering helpers
-    void RenderUI() const;
     void DisplayMenu() const;
 
     bool IsRunning() const

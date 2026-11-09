@@ -32,14 +32,21 @@ private:
     int blockStaminaCost;
     int dodgeStaminaCost;
 
-    // Bleed and Burn
+    // Status Buildups (Bleed, Burn, Frostbite)
     int bleedBuildUp;
     int burnBuildUp;
+    int frostbiteBuildUp;
+
+    // Cooldown System
+    int shortCooldownRemaining;
+    int longCooldownRemaining;
+    int shortCooldownCurrent = 0;
+    int longCooldownCurrent = 0;
 
 public:
     Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
         float strScale, float agiScale, float intScale, float focScale,
-        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal);
+        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal = 0); // Added default param for backward compatibility
 
     // Getters
     std::string GetName() const { return name; }
@@ -56,7 +63,23 @@ public:
 
     void DisplayWeaponInfo() const;
 
-    // Bleed and Burn
+    // Status Buildup Getters
     int GetBleedBuildUp() const { return bleedBuildUp; }
     int GetBurnBuildUp() const { return burnBuildUp; }
+    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; }
+
+    // Cooldown Tracker
+    void UpdateCooldowns() {
+        if (shortCooldownCurrent > 0) shortCooldownCurrent--;
+        if (longCooldownCurrent > 0) longCooldownCurrent--;
+    }
+
+    bool CanUseShortSkill() const { return shortCooldownCurrent == 0; }
+    bool CanUseLongSkill() const { return longCooldownCurrent == 0; }
+
+    void TriggerShortSkill(int duration) { shortCooldownCurrent = duration; }
+    void TriggerLongSkill(int duration) { longCooldownCurrent = duration; }
+
+    int GetShortCooldownRemaining() const { return shortCooldownCurrent; }
+    int GetLongCooldownRemaining() const { return longCooldownCurrent; }
 };

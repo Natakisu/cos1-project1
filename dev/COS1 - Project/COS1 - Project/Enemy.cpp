@@ -11,29 +11,34 @@ Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
     currentIntent(BossIntent::LightSweep)
 {
     if (difficulty == GameDifficulty::Easy) {
-        maxPosture = posture; // 50
+        maxPosture = posture;
         maxBleedThreshold = 100;
         maxBurnThreshold = 100;
+        maxFrostbiteThreshold = 100; 
     }
     else if (difficulty == GameDifficulty::Normal) {
-        maxPosture = static_cast<int>(posture * 1.5); // 75
+        maxPosture = static_cast<int>(posture * 1.5);
         maxBleedThreshold = 120;
         maxBurnThreshold = 120;
+        maxFrostbiteThreshold = 120;
     }
     else if (difficulty == GameDifficulty::Hard) {
-        maxPosture = posture * 2; // 100
+        maxPosture = posture * 2;
         maxBleedThreshold = 150;
         maxBurnThreshold = 150;
+        maxFrostbiteThreshold = 150;
     }
     else if (difficulty == GameDifficulty::Insane) {
-        maxPosture = posture * 3; // 150
+        maxPosture = posture * 3;
         maxBleedThreshold = 200;
         maxBurnThreshold = 200;
+        maxFrostbiteThreshold = 200;
     }
     else if (difficulty == GameDifficulty::Impossible) {
-        maxPosture = posture * 5; // 250
+        maxPosture = posture * 5;
         maxBleedThreshold = 300;
         maxBurnThreshold = 300;
+        maxFrostbiteThreshold = 300;
     }
 
     currentPosture = maxPosture;
@@ -122,15 +127,6 @@ void Enemy::CheckPostureBreak()
     }
 }
 
-void Enemy::ResetTurnState()
-{
-    if (isStaggered)
-    {
-        isStaggered = false;
-        currentPosture = maxPosture;
-    }
-}
-
 void Enemy::ResolveStatusEffects()
 {
     // Bleed Check 
@@ -153,5 +149,14 @@ void Enemy::ResolveStatusEffects()
 
         ConsoleHelper::print(" [!] BLAZING! " + name + " burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
         burnMeter = 0; // Reset meter after triggering
+    }
+}
+
+void Enemy::ResetTurnState()
+{
+    if (isStaggered)
+    {
+        isStaggered = false;
+        currentPosture = maxPosture;
     }
 }
