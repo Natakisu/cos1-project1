@@ -117,6 +117,7 @@ void Player::RecalculatePools()
     currentSP += (maxSP - oldMaxSP);
     currentMP += (maxMP - oldMaxMP);
 
+    // Clamps to ensure values remain within bounds
     if (currentHP > maxHP) currentHP = maxHP;
     if (currentSP > maxSP) currentSP = maxSP;
     if (currentMP > maxMP) currentMP = maxMP;
@@ -251,6 +252,7 @@ int Player::PerformLightAttack(Enemy& target)
 
     currentSP -= activeWeapon->GetAttackStaminaCost();
     int damage = activeWeapon->CalculateDamage(strength, agility, intellect, focus);
+    if (damage < 0) damage = 0;
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage());
 
@@ -295,7 +297,10 @@ int Player::PerformHeavyAttack(Enemy& target)
 
     currentSP -= staminaCost;
 
-    int damage = (activeWeapon->CalculateDamage(strength, agility, intellect, focus) * 3) / 2;
+    int rawDmg = activeWeapon->CalculateDamage(strength, agility, intellect, focus);
+    int damage = (rawDmg * 3) / 2;
+    if (damage < 0) damage = 0; // Prevent overflow/underflow wrapping
+
     target.TakeDamage(damage, activeWeapon->GetPostureDamage() * 2);
 
     if (weaponName == "Flail and Shield" || weaponName == "Flail & Shield")
@@ -337,6 +342,7 @@ void Player::RegainResourcesPerTurn()
 void Player::TakeDamage(int damage)
 {
     if (isDodging || isFullBlocking) return;
+    if (damage < 0) damage = 0;
 
     if (isBlocking)
     {
@@ -345,6 +351,25 @@ void Player::TakeDamage(int damage)
 
     currentHP -= damage;
     if (currentHP < 0) currentHP = 0;
+    if (currentHP > maxHP) currentHP = maxHP;
+}
+
+void Player::RestoreHP(int amount)
+{
+    if (amount < 0) amount = 0;
+    currentHP = std::min(maxHP, currentHP + amount);
+}
+
+void Player::RestoreMP(int amount)
+{
+    if (amount < 0) amount = 0;
+    currentMP = std::min(maxMP, currentMP + amount);
+}
+
+void Player::RestoreSP(int amount)
+{
+    if (amount < 0) amount = 0;
+    currentSP = std::min(maxSP, currentSP + amount);
 }
 
 // --- PROGRESSION & REWARDS ---

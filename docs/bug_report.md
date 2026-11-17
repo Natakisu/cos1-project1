@@ -39,3 +39,18 @@
 - **Cause:** The skill implementation stubs only called cooldown triggers and resource deductions without invoking player state methods.
     
 - **Fix:** Updated `WeaponSkillManager::ExecuteSwordAndShield`, `ExecuteIceStaff`, and `ExecuteLifeStaff` to explicitly invoke `player->FullBlock()`, `player->RestoreMP()`, and `player->Heal()` alongside resource consumption.
+
+
+### [Bug 4: Integer Overflow and Health Wrap-Around on Heavy Attacks]
+
+- **Description:**
+    
+    - **What happened:** Executing a heavy attack caused damage to display as a massive negative number (something like`-136725`), wrapping the boss's current health bar up into millions (something like `498714/100 HP`) before instantly killing them on the next hit due to underflow.
+        
+    - **Expected behavior:** Damage and health values should remain bounded within valid positive limits and prevent integer underflow/overflow.
+        
+    - **Steps to Reproduce:** Enter combat, trigger a heavy attack or high-scaling staff ability against a boss when stats scale exceptionally high.
+        
+    - **Cause:** Unchecked cumulative damage multiplication exceeding standard 32-bit signed integer limits (`INT_MAX`), causing the value to wrap into negative space.
+        
+    - **Fix:** Implemented clamp safeguards on target damage application and health modification pools to cap minimum health at `0` and maximum health values safely.

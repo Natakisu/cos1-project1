@@ -4,6 +4,8 @@
 #include "ConsoleHelper.h"
 #include <cstdlib> 
 #include <iostream>
+#include <algorithm>
+#include <climits>
 
 // --- CONSTRUCTORS & INITIALIZATION ---
 Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
@@ -97,20 +99,30 @@ void Enemy::ExecuteIntent(Player& player)
 }
 
 // --- DAMAGE & STATUS HANDLERS ---
-void Enemy::TakeDamage(int damage, int postureDmg)
+void Enemy::TakeDamage(int damage, int postureDamage)
 {
-    currentHP -= damage;
-    if (currentHP < 0) currentHP = 0;
+    // Prevent negative damage from wrapping or healing the enemy unexpectedly
+    if (damage < 0) damage = 0;
 
-    currentPosture -= postureDmg;
-    CheckPostureBreak();
+    // Strict boundary checks against integer overflow and underflow
+    if (damage >= currentHP)
+    {
+        currentHP = 0;
+    }
+    else
+    {
+        currentHP -= damage;
+    }
+
+    // Apply posture damage clamp as well
+    currentPosture = std::max(0, currentPosture - postureDamage);
 }
 
 void Enemy::ApplyStatusBuildup(int bleed, int burn, int frostbite)
 {
-    bleedMeter += bleed;
-    burnMeter += burn;
-    frostbiteMeter += frostbite;
+    bleedMeter = std::max(0, bleedMeter + bleed);
+    burnMeter = std::max(0, burnMeter + burn);
+    frostbiteMeter = std::max(0, frostbiteMeter + frostbite);
 }
 
 void Enemy::CheckPostureBreak()
@@ -128,8 +140,7 @@ void Enemy::ResolveStatusEffects()
     if (bleedMeter >= maxBleedThreshold)
     {
         int bleedDmg = 75;
-        currentHP -= bleedDmg;
-        if (currentHP < 0) currentHP = 0;
+        currentHP = std::max(0, currentHP - bleedDmg);
 
         ConsoleHelper::print(" [!] BLOOD LOSS! " + name + " suffers " + std::to_string(bleedDmg) + " Hemorrhage damage!", ConsoleHelper::Red);
         bleedMeter = 0;
@@ -139,8 +150,7 @@ void Enemy::ResolveStatusEffects()
     if (burnMeter >= maxBurnThreshold)
     {
         int burnDmg = 40;
-        currentHP -= burnDmg;
-        if (currentHP < 0) currentHP = 0;
+        currentHP = std::max(0, currentHP - burnDmg);
 
         ConsoleHelper::print(" [!] BLAZING! " + name + " burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
         burnMeter = 0;
@@ -155,4 +165,3 @@ void Enemy::ResetTurnState()
         currentPosture = maxPosture;
     }
 }
-//Organized and Refactored
