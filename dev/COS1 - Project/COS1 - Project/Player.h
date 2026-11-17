@@ -11,6 +11,7 @@ class WeaponSkillManager;
 class Player
 {
     friend class WeaponSkillManager;
+    friend class PlayerSaveManager;
 
 private:
     std::string name;
