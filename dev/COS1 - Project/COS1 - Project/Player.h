@@ -30,6 +30,7 @@ private:
 
     // Combat Stances
     bool isBlocking;
+    bool isFullBlocking;
     bool isDodging;
 
     // XP System
@@ -60,9 +61,13 @@ public:
     int PerformLightAttack(Enemy& target);
     int PerformHeavyAttack(Enemy& target);
     void Block();
+    void FullBlock() { isFullBlocking = true; }
     void Dodge();
     void RegainResourcesPerTurn();
-    void ConsumeMP(int amount) { currentMP -= amount; if (currentMP < 0) currentMP = 0; }
+    void Heal(int amount) { currentHP = std::min(maxHP, currentHP + amount); }
+    void RestoreMP(int amount) { currentMP = std::min(maxMP, currentMP + amount); }
+    void ConsumeSP(int amount) { currentSP = std::max(0, currentSP - amount); }
+    void ConsumeMP(int amount) { currentMP = std::max(0, currentMP - amount); }
 
     // Damage & Status Handlers
     void TakeDamage(int damage);

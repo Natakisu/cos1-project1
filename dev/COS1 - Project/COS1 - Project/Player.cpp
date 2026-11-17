@@ -45,6 +45,7 @@ Player::~Player()
     secondaryWeapon = nullptr;
 }
 
+
 // Handle Player Attributes and Stats
 void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
     constitution += conPoints;
@@ -127,6 +128,7 @@ void Player::UpdateDerivedStats()
     RecalculatePools();
 }
 
+
 // Handles Player Weapons
 void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
 {
@@ -162,6 +164,7 @@ bool Player::SwapWeapon()
     return true;
 }
 
+
 // Handles Player Inventory
 void Player::AddItem(Item* item)
 {
@@ -172,6 +175,7 @@ const std::vector<Item*>& Player::GetInventory() const
 {
     return inventory;
 }
+
 
 // Consumables
 void Player::UseItem(int index)
@@ -200,6 +204,7 @@ void Player::UseItem(int index)
         std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Mana.\n";
     }
 }
+
 
 // LoZ: OoT Themed Items
 void Player::CastMagicBlessing(Item* item, Enemy* target)
@@ -240,6 +245,7 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
         std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
     }
 }
+
 
 // Handles Player Combat Actions
 int Player::PerformLightAttack(Enemy& target)
@@ -350,12 +356,13 @@ void Player::RegainResourcesPerTurn()
     currentSP = std::min(maxSP, currentSP + 20);
     currentMP = std::min(maxMP, currentMP + 10);
     isBlocking = false;
+    isFullBlocking = false;
     isDodging = false;
 }
 
 void Player::TakeDamage(int damage)
 {
-    if (isDodging) return;
+    if (isDodging || isFullBlocking) return;
 
     if (isBlocking)
     {
@@ -365,6 +372,7 @@ void Player::TakeDamage(int damage)
     currentHP -= damage;
     if (currentHP < 0) currentHP = 0;
 }
+
 
 // Handles Player Combat Rewards
 void Player::GainXP(int amount)
@@ -392,6 +400,7 @@ void Player::GainXP(int amount)
         safetyCounter++;
     }
 }
+
 
 // Handles Player Save/Load
 void Player::SaveToFile(const std::string& filename) const
