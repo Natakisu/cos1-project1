@@ -10,7 +10,8 @@ Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     strScaling(strScale), agiScaling(agiScale), intScaling(intScale), focScaling(focScale),
     attackStaminaCost(atkSP), attackManaCost(atkMP),
     blockStaminaCost(blockSP), dodgeStaminaCost(dodgeSP),
-    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal) // <--- Added frostbite initialization
+    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal),
+    shortCooldownRemaining(0), longCooldownRemaining(0)
 {
 }
 
@@ -34,12 +35,12 @@ void Weapon::DisplayWeaponInfo() const {
 
 int Weapon::GetShortCooldownRemaining() const
 {
-    return shortCooldownRemaining; // Or whatever your internal short cooldown variable is named
+    return shortCooldownRemaining;
 }
 
 int Weapon::GetLongCooldownRemaining() const
 {
-    return longCooldownRemaining; // Or whatever your internal long cooldown variable is named
+    return longCooldownRemaining;
 }
 
 bool Weapon::CanUseShortSkill() const

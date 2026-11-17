@@ -25,6 +25,7 @@ Player::Player(std::string name)
     secondaryWeapon(nullptr),
     isPrimaryActive(true),
     isBlocking(false),
+    isFullBlocking(false),
     isDodging(false),
     level(1),
     currentXP(0),
@@ -230,9 +231,9 @@ bool Player::SwapWeapon()
     return true;
 }
 
-void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
+bool Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
 {
-    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
+    return WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }
 
 // Handles Player Inventory
@@ -572,9 +573,4 @@ void Player::LoadFromFile(const std::string& filename)
     {
         ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
     }
-}
-
-void Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
-{
-    WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }

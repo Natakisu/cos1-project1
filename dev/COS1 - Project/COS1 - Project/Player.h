@@ -60,7 +60,7 @@ public:
 
     // Actions
     bool SwapWeapon();
-    void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
+    bool ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
     void UseItem(int index);
     int PerformLightAttack(Enemy& target);
     int PerformHeavyAttack(Enemy& target);
@@ -105,6 +105,7 @@ public:
     // Save/Load
     void SaveToFile(const std::string& filename) const;
     void LoadFromFile(const std::string& filename);
+    void AutoSave() const { SaveToFile(name + "_save.txt"); }
 
     // Item System
     void AddItem(Item* item);
@@ -124,5 +125,4 @@ public:
     int GetIntellect() const { return intellect; }
     int GetFocus() const { return focus; }
 
-    void ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
 };
