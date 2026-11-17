@@ -15,15 +15,10 @@ private:
     // --- PRIVATE HELPER METHODS ---
     bool HandleInventoryMenu();
     bool HandleWeaponSkillMenu();
-    void HandleVictoryRewards();
-    bool HandleVictoryMenu();
-    void HandleDeathMenu();
     void HandlePlayerAction(int choice);
-    void HandleCombatOutcome() const;
 
     void StartFreshGameSession();
     void LoadExistingGameSession();
-    void SetupBossDifficulty();
 
 public:
     // --- CONSTRUCTORS & DESTRUCTOR ---
@@ -33,8 +28,9 @@ public:
     // --- GAMEPLAY LIFECYCLE ---
     void Initialize();
     void DisplayWelcomeMenu();
-    GameDifficulty SelectDifficulty();
-    void DisplayMenu() const;
+    void SetupBossDifficulty();
     void RunCombatLoop();
+
+    // Allow GameProgression to access session state if needed
+    friend class GameProgression;
 };
-//Organized and Refactored
