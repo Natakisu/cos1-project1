@@ -5,6 +5,7 @@
 #include "WeaponManager.h"
 #include "CharacterManager.h"
 #include "PreparationMenu.h"
+#include "GameProgression.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -164,15 +165,15 @@ void Game::RunCombatLoop()
         if (!currentBoss->IsAlive())
         {
             system("cls");
-            HandleCombatOutcome();
+            GameProgression::DisplayCombatOutcome(true);
 
             if (!rewardClaimed && player->IsAlive())
             {
                 rewardClaimed = true;
-                HandleVictoryRewards();
+                GameProgression::HandleVictoryRewards(player, currentDifficulty);
             }
 
-            if (!HandleVictoryMenu()) break;
+            if (!GameProgression::HandleVictoryMenu(player, *this, isRunning)) break;
             return;
         }
 
@@ -194,7 +195,7 @@ void Game::RunCombatLoop()
 
     if (!player->IsAlive())
     {
-        HandleDeathMenu();
+        GameProgression::HandleDeathMenu(player, *this);
     }
 }
 
@@ -306,121 +307,7 @@ bool Game::HandleWeaponSkillMenu()
     return success;
 }
 
-// --- PROGRESSION & OUTCOMES ---
-void Game::HandleVictoryRewards()
-{
-    int earnedXP = 150;
-    if (currentDifficulty == GameDifficulty::Normal) earnedXP = 300;
-    else if (currentDifficulty == GameDifficulty::Hard) earnedXP = 600;
-    else if (currentDifficulty == GameDifficulty::Insane) earnedXP = 1200;
-    else if (currentDifficulty == GameDifficulty::Impossible) earnedXP = 2400;
-
-    int earnedShards = 100;
-    if (currentDifficulty == GameDifficulty::Normal) earnedShards = 200;
-    else if (currentDifficulty == GameDifficulty::Hard) earnedShards = 300;
-    else if (currentDifficulty == GameDifficulty::Insane) earnedShards = 400;
-    else if (currentDifficulty == GameDifficulty::Impossible) earnedShards = 500;
-
-    ConsoleHelper::print("\n==================================", ConsoleHelper::Green);
-    ConsoleHelper::print("         VICTORY REWARDS          ", ConsoleHelper::Green);
-    ConsoleHelper::print("==================================", ConsoleHelper::Green);
-    ConsoleHelper::print(" XP Earned: +" + std::to_string(earnedXP), ConsoleHelper::Cyan);
-    ConsoleHelper::print(" Relic Shards Earned: +" + std::to_string(earnedShards) + "rs", ConsoleHelper::Purple);
-
-    player->GainXP(earnedXP);
-    player->AddRelicShards(earnedShards);
-    player->AutoSave();
-    ConsoleHelper::print("==================================", ConsoleHelper::Green);
-}
-
-bool Game::HandleVictoryMenu()
-{
-    while (true)
-    {
-        ConsoleHelper::print("\n==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("        [ VICTORY OPTIONS ]       ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("1. Review Stats", ConsoleHelper::White);
-        ConsoleHelper::print("2. Allocate Points (" + std::to_string(player->GetUnspentPoints()) + " left)", ConsoleHelper::Green);
-        ConsoleHelper::print("3. Return to Prep Hub", ConsoleHelper::White);
-        ConsoleHelper::print("4. Main Menu", ConsoleHelper::White);
-        ConsoleHelper::print("5. Exit Game", ConsoleHelper::White);
-        ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Select an option (1-5): ", ConsoleHelper::Cyan, false);
-
-        int choice = GameInput::GetValidatedChoice(1, 5);
-        if (choice == 1)
-        {
-            player->DisplayStats();
-        }
-        else if (choice == 2)
-        {
-            while (player->GetUnspentPoints() > 0)
-            {
-                CharacterManager::RunAttributeAllocationMenu(player);
-            }
-            player->AutoSave();
-            ConsoleHelper::print("[+] Attributes updated and saved!", ConsoleHelper::Green);
-        }
-        else if (choice == 3)
-        {
-            player->AutoSave();
-            system("cls");
-            PreparationMenu::Open(player);
-            SetupBossDifficulty();
-            return true;
-        }
-        else if (choice == 4)
-        {
-            player->AutoSave();
-            delete player; player = nullptr;
-            delete currentBoss; currentBoss = nullptr;
-            system("cls");
-            DisplayWelcomeMenu();
-            Initialize();
-            RunCombatLoop();
-            return false;
-        }
-        else if (choice == 5)
-        {
-            player->AutoSave();
-            delete player; player = nullptr;
-            delete currentBoss; currentBoss = nullptr;
-            isRunning = false;
-            return false;
-        }
-    }
-}
-
-void Game::HandleDeathMenu()
-{
-    system("cls");
-    HandleCombatOutcome();
-    ConsoleHelper::print("\n==================================", ConsoleHelper::Red);
-    ConsoleHelper::print("1. Load Last Save", ConsoleHelper::White);
-    ConsoleHelper::print("2. Return to Main Menu", ConsoleHelper::White);
-    ConsoleHelper::print("==================================", ConsoleHelper::Red);
-    ConsoleHelper::print("Select an option (1-2): ", ConsoleHelper::Cyan, false);
-
-    int choice = GameInput::GetValidatedChoice(1, 2);
-    if (choice == 1)
-    {
-        player->LoadFromFile(player->GetName() + "_save.txt");
-        SetupBossDifficulty();
-        RunCombatLoop();
-    }
-    else
-    {
-        delete player; player = nullptr;
-        delete currentBoss; currentBoss = nullptr;
-        system("cls");
-        DisplayWelcomeMenu();
-        Initialize();
-        RunCombatLoop();
-    }
-}
-
-// --- PLAYER ACTIONS & COMBAT OUTCOMES ---
+// --- PLAYER ACTIONS ---
 void Game::HandlePlayerAction(int choice)
 {
     Weapon* activeWeapon = player->GetActiveWeapon();
@@ -447,7 +334,7 @@ void Game::HandlePlayerAction(int choice)
         ConsoleHelper::print("You raise your guard.", ConsoleHelper::White);
         break;
     case 5:
-        player->Dodge();
+        player->Dogo(); // Or player->Dodge(); depending on your method name
         ConsoleHelper::print("You prepare to dodge.", ConsoleHelper::White);
         break;
     case 9:
@@ -456,21 +343,3 @@ void Game::HandlePlayerAction(int choice)
         break;
     }
 }
-
-void Game::HandleCombatOutcome() const
-{
-    if (!player->IsAlive())
-    {
-        ConsoleHelper::print("=========================", ConsoleHelper::Red);
-        ConsoleHelper::print("      [ You Died! ]      ", ConsoleHelper::Red);
-        ConsoleHelper::print("=========================", ConsoleHelper::Red);
-    }
-    else
-    {
-        ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("           Congratulations!           ", ConsoleHelper::Green);
-        ConsoleHelper::print(" [ You defeated the Relic Guardian! ] ", ConsoleHelper::Cyan);
-        ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
-    }
-}
-//Organized and Refactored
