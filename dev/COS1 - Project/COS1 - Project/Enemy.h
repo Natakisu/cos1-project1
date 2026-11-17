@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "GameUI.h"
 
 enum class BossIntent {
     LightSweep,

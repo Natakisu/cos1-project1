@@ -161,6 +161,7 @@
     <ClInclude Include="ConsoleHelper.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameDifficulty.h" />
     <ClInclude Include="GameInput.h" />
     <ClInclude Include="GameUI.h" />
     <ClInclude Include="InputValidator.h" />

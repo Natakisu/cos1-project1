@@ -1,48 +1,36 @@
 #pragma once
 #include "Player.h"
 #include "Enemy.h"
-#include <vector>
-
-enum class GameDifficulty 
-{
-    Easy,
-    Normal,
-    Hard,
-    Insane,
-    Impossible
-};
+#include "GameUI.h"
 
 class Game
 {
 private:
     Player* player;
     Enemy* currentBoss;
+    GameDifficulty currentDifficulty;
     bool isRunning;
 
-    GameDifficulty currentDifficulty;
+    // Private Helper Methods (Declared only once)
+    bool HandleInventoryMenu();
+    bool HandleWeaponSkillMenu();
+    void HandleVictoryRewards();
+    bool HandleVictoryMenu();
+    void HandleDeathMenu();
+    void HandlePlayerAction(int choice);
+    void HandleCombatOutcome() const;
 
-    void LoadExistingGameSession();
     void StartFreshGameSession();
+    void LoadExistingGameSession();
     void SetupBossDifficulty();
 
 public:
     Game();
     ~Game();
 
-    void DisplayWelcomeMenu();
     void Initialize();
-    void RunCombatLoop();
-
-    // Public action and outcome handlers used by the loop
-    void HandlePlayerAction(int choice);
-    void HandleCombatOutcome() const;
-
-    // UI rendering helpers
-    void DisplayMenu() const;
-
-    bool IsRunning() const
-    {
-        return isRunning;
-    }
+    void DisplayWelcomeMenu();
     GameDifficulty SelectDifficulty();
+    void DisplayMenu() const;
+    void RunCombatLoop();
 };

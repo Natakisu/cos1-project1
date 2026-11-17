@@ -189,7 +189,7 @@ void Game::RunCombatLoop()
     }
 }
 
-// --- HELPER EXTRACTIONS FOR CLEANLINESS ---
+// --- SUB-HANDLERS & MENU EXTRACTIONS ---
 
 bool Game::HandleInventoryMenu()
 {
