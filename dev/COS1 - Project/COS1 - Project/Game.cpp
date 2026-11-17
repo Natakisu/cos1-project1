@@ -134,7 +134,7 @@ void Game::RunCombatLoop()
         while (!turnConsumed)
         {
             GameUI::DisplayCombatMenu();
-            int choice = GameInput::GetValidatedChoice(1, 8, 9);
+            int choice = GameInput::GetValidatedChoice(1, 9);
 
             if (choice == 3) // Swap Weapon (Free)
             {
