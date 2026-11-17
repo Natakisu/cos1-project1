@@ -354,24 +354,6 @@ void Player::TakeDamage(int damage)
     if (currentHP > maxHP) currentHP = maxHP;
 }
 
-void Player::RestoreHP(int amount)
-{
-    if (amount < 0) amount = 0;
-    currentHP = std::min(maxHP, currentHP + amount);
-}
-
-void Player::RestoreMP(int amount)
-{
-    if (amount < 0) amount = 0;
-    currentMP = std::min(maxMP, currentMP + amount);
-}
-
-void Player::RestoreSP(int amount)
-{
-    if (amount < 0) amount = 0;
-    currentSP = std::min(maxSP, currentSP + amount);
-}
-
 // --- PROGRESSION & REWARDS ---
 void Player::GainXP(int amount)
 {
