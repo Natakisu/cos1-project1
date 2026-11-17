@@ -49,6 +49,7 @@ bool WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& t
 
     std::string wName = activeWeapon->GetName();
 
+    // Route based on weapon archetype
     if (wName == "Warhammer") return ExecuteWarhammer(player, activeWeapon, isLongSkill, target);
     if (wName == "Sword & Shield" || wName == "Sword and Shield") return ExecuteSwordAndShield(player, activeWeapon, isLongSkill, target);
     if (wName == "Daggers") return ExecuteDaggers(player, activeWeapon, isLongSkill, target);
@@ -67,7 +68,7 @@ bool WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& t
 // --- WEAPON-SPECIFIC SKILL IMPLEMENTATIONS ---
 bool WeaponSkillManager::ExecuteWarhammer(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Crushing Blow (25 SP, 2 CD)
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 25, false)) return false;
         int dmg = 45 + (player->strength * 2);
@@ -75,7 +76,7 @@ bool WeaponSkillManager::ExecuteWarhammer(Player* player, Weapon* weapon, bool i
         weapon->TriggerShortSkill(2);
         std::cout << " > You unleash Crushing Blow for " << dmg << " damage and moderate posture damage!\n";
     }
-    else // Earthshatter (45 SP, 4 CD)
+    else
     {
         if (!HasEnoughResource(player, 45, false)) return false;
         int dmg = 100 + (player->strength * 4);
@@ -88,7 +89,7 @@ bool WeaponSkillManager::ExecuteWarhammer(Player* player, Weapon* weapon, bool i
 
 bool WeaponSkillManager::ExecuteSwordAndShield(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Shield Bash (20 SP, 2 CD) -> Damage + Guard
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 20, false)) return false;
         int dmg = 25 + player->strength;
@@ -97,7 +98,7 @@ bool WeaponSkillManager::ExecuteSwordAndShield(Player* player, Weapon* weapon, b
         weapon->TriggerShortSkill(2);
         std::cout << " > You perform Shield Bash for " << dmg << " damage and raise your guard!\n";
     }
-    else // Fortress Wall (35 SP, 3 CD) -> 100% Block
+    else // Fortress Wall (Applies 100% Full Block)
     {
         if (!HasEnoughResource(player, 35, false)) return false;
         player->FullBlock();
@@ -109,7 +110,7 @@ bool WeaponSkillManager::ExecuteSwordAndShield(Player* player, Weapon* weapon, b
 
 bool WeaponSkillManager::ExecuteDaggers(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Flurry Strike (20 SP, 2 CD)
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 20, false)) return false;
         int totalDmg = (15 + (player->agility / 2)) * 3;
@@ -118,7 +119,7 @@ bool WeaponSkillManager::ExecuteDaggers(Player* player, Weapon* weapon, bool isL
         weapon->TriggerShortSkill(2);
         std::cout << " > You execute Flurry Strike (3 hits) for " << totalDmg << " damage and moderate Bleed!\n";
     }
-    else // Shadow Step (35 SP, 4 CD) -> Auto-Dodge + High Bleed
+    else
     {
         if (!HasEnoughResource(player, 35, false)) return false;
         player->Dodge();
@@ -131,7 +132,7 @@ bool WeaponSkillManager::ExecuteDaggers(Player* player, Weapon* weapon, bool isL
 
 bool WeaponSkillManager::ExecuteBow(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Quick Shot (15 SP, 1 CD) -> Damage + Evasive Dodge
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 15, false)) return false;
         int dmg = 30 + player->agility;
@@ -140,7 +141,7 @@ bool WeaponSkillManager::ExecuteBow(Player* player, Weapon* weapon, bool isLongS
         weapon->TriggerShortSkill(1);
         std::cout << " > You fire Quick Shot for " << dmg << " damage and leap back into an evasive dodge!\n";
     }
-    else // Rain of Arrows (40 SP, 4 CD)
+    else
     {
         if (!HasEnoughResource(player, 40, false)) return false;
         int dmg = 50 + (player->agility * 2);
@@ -153,7 +154,7 @@ bool WeaponSkillManager::ExecuteBow(Player* player, Weapon* weapon, bool isLongS
 
 bool WeaponSkillManager::ExecuteFireStaff(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Fireball (25 MP, 2 CD)
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 25, true)) return false;
         int dmg = 50 + (player->intellect * 2);
@@ -162,7 +163,7 @@ bool WeaponSkillManager::ExecuteFireStaff(Player* player, Weapon* weapon, bool i
         weapon->TriggerShortSkill(2);
         std::cout << " > You cast Fireball for " << dmg << " damage and moderate Burn buildup!\n";
     }
-    else // Combustion (50 MP, 4 CD)
+    else
     {
         if (!HasEnoughResource(player, 50, true)) return false;
         int burnBonus = target.GetBurnMeter() * 2;
@@ -176,7 +177,7 @@ bool WeaponSkillManager::ExecuteFireStaff(Player* player, Weapon* weapon, bool i
 
 bool WeaponSkillManager::ExecuteIceStaff(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Ice Spike (20 MP, 1 CD)
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 20, true)) return false;
         int dmg = 35 + (player->intellect * 2);
@@ -185,7 +186,7 @@ bool WeaponSkillManager::ExecuteIceStaff(Player* player, Weapon* weapon, bool is
         weapon->TriggerShortSkill(1);
         std::cout << " > You hurl Ice Spike for " << dmg << " damage and moderate Frostbite buildup!\n";
     }
-    else // Entomb (30 MP, 4 CD) -> 100% Block + MP Recovery
+    else // Entomb (Applies Full Block & Restores MP)
     {
         if (!HasEnoughResource(player, 30, true)) return false;
         int mpRecovered = 50 + (player->intellect * 2);
@@ -199,7 +200,7 @@ bool WeaponSkillManager::ExecuteIceStaff(Player* player, Weapon* weapon, bool is
 
 bool WeaponSkillManager::ExecuteLifeStaff(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Divine Plea (25 MP, 2 CD) -> Moderate Heal
+    if (!isLongSkill) // Divine Plea (Restores HP)
     {
         if (!HasEnoughResource(player, 25, true)) return false;
         int healAmount = 45 + (player->focus * 3);
@@ -207,7 +208,7 @@ bool WeaponSkillManager::ExecuteLifeStaff(Player* player, Weapon* weapon, bool i
         weapon->TriggerShortSkill(2);
         ConsoleHelper::print(" > You offer Divine Plea, restoring " + std::to_string(healAmount) + " HP!", ConsoleHelper::Green);
     }
-    else // Sacred Ground (45 MP, 4 CD) -> Large Heal + Defensive Guard
+    else // Sacred Ground (Restores HP + Raises Guard)
     {
         if (!HasEnoughResource(player, 45, true)) return false;
         int healAmount = 80 + (player->focus * 4);
@@ -221,7 +222,7 @@ bool WeaponSkillManager::ExecuteLifeStaff(Player* player, Weapon* weapon, bool i
 
 bool WeaponSkillManager::ExecuteGreatsword(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Relentless Onslaught (25 SP, 2 CD)
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 25, false)) return false;
         int hits = 2 + (player->agility / 15);
@@ -230,7 +231,7 @@ bool WeaponSkillManager::ExecuteGreatsword(Player* player, Weapon* weapon, bool 
         weapon->TriggerShortSkill(2);
         std::cout << " > You launch Relentless Onslaught (" << hits << " hits) for " << totalDmg << " total damage!\n";
     }
-    else // Execute (45 SP, 4 CD)
+    else
     {
         if (!HasEnoughResource(player, 45, false)) return false;
         int dmg = 80 + (player->strength * 4);
@@ -243,7 +244,7 @@ bool WeaponSkillManager::ExecuteGreatsword(Player* player, Weapon* weapon, bool 
 
 bool WeaponSkillManager::ExecuteRapier(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Evade Stance (20 SP, 2 CD) -> Bleed-scaling strike + Dodge
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 20, false)) return false;
         int dmg = 20 + player->agility + (target.GetBleedMeter() / 2);
@@ -252,7 +253,7 @@ bool WeaponSkillManager::ExecuteRapier(Player* player, Weapon* weapon, bool isLo
         weapon->TriggerShortSkill(2);
         std::cout << " > You enter Evade Stance, striking for " << dmg << " damage and preparing to dodge!\n";
     }
-    else // Detonate Stance (25 SP, 2 CD) -> Burn-scaling strike + MP Regen
+    else
     {
         if (!HasEnoughResource(player, 25, false)) return false;
         int dmg = 30 + player->intellect + (target.GetBurnMeter() / 2);
@@ -267,7 +268,7 @@ bool WeaponSkillManager::ExecuteRapier(Player* player, Weapon* weapon, bool isLo
 
 bool WeaponSkillManager::ExecuteFlailAndShield(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
-    if (!isLongSkill) // Blessed Aegis (20 SP, 2 CD) -> Block + Focus Heal
+    if (!isLongSkill)
     {
         if (!HasEnoughResource(player, 20, false)) return false;
         int healAmount = 25 + (player->focus * 2);
@@ -276,7 +277,7 @@ bool WeaponSkillManager::ExecuteFlailAndShield(Player* player, Weapon* weapon, b
         weapon->TriggerShortSkill(2);
         ConsoleHelper::print(" > You raise Blessed Aegis, blocking incoming damage and restoring " + std::to_string(healAmount) + " HP!", ConsoleHelper::Green);
     }
-    else // Divine Smite (35 SP + 20 MP, 4 CD) -> Heavy Damage + Health Pulse
+    else
     {
         if (!HasEnoughResource(player, 35, false)) return false;
         int dmg = 70 + player->strength + player->focus;
@@ -288,4 +289,3 @@ bool WeaponSkillManager::ExecuteFlailAndShield(Player* player, Weapon* weapon, b
     }
     return true;
 }
-//Organized and Refactored
