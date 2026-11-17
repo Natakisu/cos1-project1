@@ -7,53 +7,41 @@
 
 Player* CharacterManager::CreateCharacter()
 {
-    std::string playerName;
-    bool validName = false;
+    system("cls");
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("     [ CHARACTER CREATION ]       ", ConsoleHelper::Cyan);
+    ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
+    ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
 
-    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("        [ CHARACTER CREATION ]          ", ConsoleHelper::Cyan);
-    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
+    std::string name;
+    std::getline(std::cin, name);
 
-    // Keep prompting until a valid, non-empty name is entered
-    while (!validName)
-    {
-        ConsoleHelper::print("Enter your character's name: ", ConsoleHelper::Cyan, false);
-        std::getline(std::cin, playerName);
-
-        if (playerName.empty() || playerName.find_first_not_of(' ') == std::string::npos)
-        {
-            ConsoleHelper::print("[!] Name cannot be empty. Please enter a valid name.", ConsoleHelper::Yellow);
-        }
-        else
-        {
-            validName = true;
-        }
+    if (name.empty()) {
+        name = "Hero";
     }
 
-    // 1. Create player
-    Player* newPlayer = new Player(playerName);
-
-    // 2. Grant them their 30 starting attribute points to spend!
+    // Create player with base stats and grant 30 unspent points for the Prep Hub
+    Player* newPlayer = new Player(name);
     newPlayer->AddUnspentPoints(30);
 
-    // 3. Open the dedicated allocation menu
-    RunAttributeAllocationMenu(newPlayer);
+    // Save initial state
+    std::string saveFileName = name + "_save.txt";
+    newPlayer->SaveToFile(saveFileName);
 
     system("cls");
+    ConsoleHelper::print("\n========================================", ConsoleHelper::Green);
+    ConsoleHelper::print("     [ CHARACTER CREATED SUCCESS! ]     ", ConsoleHelper::Green);
+    ConsoleHelper::print("========================================", ConsoleHelper::Green);
+    ConsoleHelper::print("\nEntering Preparation Hub...", ConsoleHelper::White);
 
-    ConsoleHelper::print("\n========================================", ConsoleHelper::Cyan);
-    ConsoleHelper::print("     [ ATTRIBUTES CONFIGURED! ]         ", ConsoleHelper::Cyan);
-    ConsoleHelper::print("========================================", ConsoleHelper::Cyan);
-    newPlayer->DisplayStats();
-
-    // Smooth transition message
-    ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
+    ConsoleHelper::print("Press Enter to continue...", ConsoleHelper::White, false);
     std::string dummy;
     std::getline(std::cin, dummy);
 
     return newPlayer;
 }
 
+// Function body for attribute allocation menu
 void CharacterManager::RunAttributeAllocationMenu(Player* player)
 {
     if (!player) return;
