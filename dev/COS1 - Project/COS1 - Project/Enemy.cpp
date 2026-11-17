@@ -4,7 +4,10 @@
 #include "ConsoleHelper.h"
 #include <cstdlib> 
 #include <iostream>
+#include <algorithm>
+#include <climits>
 
+// --- CONSTRUCTORS & INITIALIZATION ---
 Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
     : name(name), maxHP(hp), currentHP(hp), isStaggered(false),
     bleedMeter(0), burnMeter(0), frostbiteMeter(0),
@@ -14,7 +17,7 @@ Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
         maxPosture = posture;
         maxBleedThreshold = 100;
         maxBurnThreshold = 100;
-        maxFrostbiteThreshold = 100; 
+        maxFrostbiteThreshold = 100;
     }
     else if (difficulty == GameDifficulty::Normal) {
         maxPosture = static_cast<int>(posture * 1.5);
@@ -44,24 +47,17 @@ Enemy::Enemy(std::string name, int hp, int posture, GameDifficulty difficulty)
     currentPosture = maxPosture;
 }
 
+// --- INTENT & COMBAT AI ---
 void Enemy::GenerateIntent()
 {
     int roll = rand() % 3;
 
     switch (roll)
     {
-    case 0:
-        currentIntent = BossIntent::LightSweep;
-        break;
-    case 1:
-        currentIntent = BossIntent::HeavyCleave;
-        break;
-    case 2:
-        currentIntent = BossIntent::DefensiveGuard;
-        break;
-    default:
-        currentIntent = BossIntent::LightSweep;
-        break;
+    case 0: currentIntent = BossIntent::LightSweep; break;
+    case 1: currentIntent = BossIntent::HeavyCleave; break;
+    case 2: currentIntent = BossIntent::DefensiveGuard; break;
+    default: currentIntent = BossIntent::LightSweep; break;
     }
 }
 
@@ -102,20 +98,31 @@ void Enemy::ExecuteIntent(Player& player)
     }
 }
 
-void Enemy::TakeDamage(int damage, int postureDmg)
+// --- DAMAGE & STATUS HANDLERS ---
+void Enemy::TakeDamage(int damage, int postureDamage)
 {
-    currentHP -= damage;
-    if (currentHP < 0) currentHP = 0;
+    // Prevent negative damage from wrapping or healing the enemy unexpectedly
+    if (damage < 0) damage = 0;
 
-    currentPosture -= postureDmg;
-    CheckPostureBreak();
+    // Strict boundary checks against integer overflow and underflow
+    if (damage >= currentHP)
+    {
+        currentHP = 0;
+    }
+    else
+    {
+        currentHP -= damage;
+    }
+
+    // Apply posture damage clamp as well
+    currentPosture = std::max(0, currentPosture - postureDamage);
 }
 
 void Enemy::ApplyStatusBuildup(int bleed, int burn, int frostbite)
 {
-    bleedMeter += bleed;
-    burnMeter += burn;
-    frostbiteMeter += frostbite;
+    bleedMeter = std::max(0, bleedMeter + bleed);
+    burnMeter = std::max(0, burnMeter + burn);
+    frostbiteMeter = std::max(0, frostbiteMeter + frostbite);
 }
 
 void Enemy::CheckPostureBreak()
@@ -133,22 +140,20 @@ void Enemy::ResolveStatusEffects()
     if (bleedMeter >= maxBleedThreshold)
     {
         int bleedDmg = 75;
-        currentHP -= bleedDmg;
-        if (currentHP < 0) currentHP = 0;
+        currentHP = std::max(0, currentHP - bleedDmg);
 
         ConsoleHelper::print(" [!] BLOOD LOSS! " + name + " suffers " + std::to_string(bleedDmg) + " Hemorrhage damage!", ConsoleHelper::Red);
-        bleedMeter = 0; // Reset meter after triggering
+        bleedMeter = 0;
     }
 
     // Burn Check 
     if (burnMeter >= maxBurnThreshold)
     {
         int burnDmg = 40;
-        currentHP -= burnDmg;
-        if (currentHP < 0) currentHP = 0;
+        currentHP = std::max(0, currentHP - burnDmg);
 
         ConsoleHelper::print(" [!] BLAZING! " + name + " burns for " + std::to_string(burnDmg) + " Fire damage!", ConsoleHelper::Yellow);
-        burnMeter = 0; // Reset meter after triggering
+        burnMeter = 0;
     }
 }
 

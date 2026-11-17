@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- ITEM SHOP INTERFACE & TRANSACTION LOGIC ---
 void ItemShop::Open(Player* player)
 {
     if (!player) return;
@@ -13,6 +14,7 @@ void ItemShop::Open(Player* player)
 
     while (shopping)
     {
+        // --- RENDER SHOP HUD ---
         system("cls");
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("       [ RELIC ITEM SHOP ]        ", ConsoleHelper::Cyan);
@@ -21,7 +23,7 @@ void ItemShop::Open(Player* player)
         ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
         ConsoleHelper::print("1. Health Potion (Restores Health)", ConsoleHelper::White);
         ConsoleHelper::print("   Cost: 35rs", ConsoleHelper::Purple);
-        ConsoleHelper::print("2. SP Potion     (Restores Stamina)",ConsoleHelper::White);
+        ConsoleHelper::print("2. SP Potion     (Restores Stamina)", ConsoleHelper::White);
         ConsoleHelper::print("   Cost: 30rs", ConsoleHelper::Purple);
         ConsoleHelper::print("3. MP Potion     (Restores mana)", ConsoleHelper::White);
         ConsoleHelper::print("   Cost: 30rs", ConsoleHelper::Purple);
@@ -34,7 +36,7 @@ void ItemShop::Open(Player* player)
         ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
         ConsoleHelper::print("0. Return to Preparation Hub", ConsoleHelper::White);
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
-        ConsoleHelper::print("Select an option (0-3): ", ConsoleHelper::Cyan, false);
+        ConsoleHelper::print("Select an option (0-6): ", ConsoleHelper::Cyan, false);
 
         int choice = GameInput::GetValidatedChoice(0, 6);
 
@@ -91,7 +93,8 @@ void ItemShop::Open(Player* player)
                 healValue = 30;
                 cost = 500;
             }
-            
+
+            // --- TRANSACTION VALIDATION ---
             if (player->GetRelicShards() >= cost)
             {
                 player->SpendRelicShards(cost);
@@ -110,3 +113,4 @@ void ItemShop::Open(Player* player)
         }
     }
 }
+//Organized and Refactored

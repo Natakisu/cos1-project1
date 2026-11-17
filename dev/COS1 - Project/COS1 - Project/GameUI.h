@@ -2,17 +2,21 @@
 #include <string>
 #include "Player.h"
 #include "Enemy.h"
-
-// Forward declaration instead of #include "Game.h" to avoid circular dependencies
-enum class GameDifficulty;
+#include "GameDifficulty.h"
 
 class GameUI
 {
 public:
+    // --- WELCOME & INSTRUCTION SCREENS ---
     static void DisplayWelcomeMenu();
     static void DisplayInstructions();
-    static void DisplayCombatMenu();
+
+    // --- CHARACTER CREATION & ATTRIBUTES ---
     static void DisplayAttributeDescriptions();
-    static void RenderCombatUI(const Player* player, const Enemy* currentBoss);
     static GameDifficulty SelectDifficulty();
+
+    // --- COMBAT HUD & MENUS ---
+    static void DisplayCombatMenu();
+    static void RenderCombatUI(const Player* player, const Enemy* currentBoss);
 };
+//Organized and Refactored

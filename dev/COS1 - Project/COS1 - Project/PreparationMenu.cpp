@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include "WeaponManager.h"
 
+// --- PREPARATION & RELIC HUB MAIN LOOP ---
 void PreparationMenu::Open(Player* player)
 {
     if (!player) return;
@@ -16,6 +17,7 @@ void PreparationMenu::Open(Player* player)
 
     while (preparing)
     {
+        // --- RENDER PREPARATION HUB HUD ---
         system("cls");
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("     [ PREPARATION & RELIC HUB ]  ", ConsoleHelper::Cyan);
@@ -41,7 +43,8 @@ void PreparationMenu::Open(Player* player)
 
         int choice = GameInput::GetValidatedChoice(1, 6);
 
-        if (choice == 1) // 1. Allocate / View Attributes
+        // --- OPTION 1: ATTRIBUTE MANAGEMENT ---
+        if (choice == 1)
         {
             bool managingStats = true;
             while (managingStats)
@@ -51,7 +54,6 @@ void PreparationMenu::Open(Player* player)
                 ConsoleHelper::print("     [ ATTRIBUTE MANAGEMENT ]     ", ConsoleHelper::Cyan);
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
 
-                // If they have unspent points (like fresh characters with 30 points), run allocation first!
                 if (player->GetUnspentPoints() > 0)
                 {
                     ConsoleHelper::print("[+] You have " + std::to_string(player->GetUnspentPoints()) + " unspent attribute points available!", ConsoleHelper::Green);
@@ -61,14 +63,12 @@ void PreparationMenu::Open(Player* player)
 
                     CharacterManager::RunAttributeAllocationMenu(player);
 
-                    // Save progress after allocating
                     std::string saveFileName = player->GetName() + "_save.txt";
                     player->SaveToFile(saveFileName);
 
                     system("cls");
                 }
 
-                // View Current Stats
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
                 ConsoleHelper::print("        [ CURRENT ATTRIBUTES ]    ", ConsoleHelper::Cyan);
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
@@ -105,7 +105,8 @@ void PreparationMenu::Open(Player* player)
             }
         }
 
-        else if (choice == 2) // 2. Assign / View Equipped Weapons
+        // --- OPTION 2: WEAPON LOADOUT HUB ---
+        else if (choice == 2)
         {
             bool managingWeapons = true;
             while (managingWeapons)
@@ -115,7 +116,6 @@ void PreparationMenu::Open(Player* player)
                 ConsoleHelper::print("       [ WEAPON LOADOUT HUB ]     ", ConsoleHelper::Cyan);
                 ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
 
-                // View current equipped weapons and skill tooltips
                 player->InspectWeapons();
 
                 ConsoleHelper::print("\n----------------------------------", ConsoleHelper::Cyan);
@@ -165,29 +165,33 @@ void PreparationMenu::Open(Player* player)
             }
         }
 
-        else if (choice == 3) // Open Inventory
+        // --- OPTION 3: INVENTORY ---
+        else if (choice == 3)
         {
             InventoryScreen::Open(player);
         }
 
-        else if (choice == 4) // Item Shop
+        // --- OPTION 4: ITEM SHOP ---
+        else if (choice == 4)
         {
             ItemShop::Open(player);
         }
 
-        else if (choice == 5) // Debug Menu
+        // --- OPTION 5: DEBUG MENU ---
+        else if (choice == 5)
         {
             OpenDebugMenu(player);
         }
 
-        else if (choice == 6) // Proceed to Boss Difficulty
+        // --- OPTION 6: PROCEED TO BOSS ---
+        else if (choice == 6)
         {
             preparing = false;
         }
     }
 }
 
-// DEBUG / Cheat Menu
+// --- DEVELOPER CHEAT / DEBUG MENU ---
 void PreparationMenu::OpenDebugMenu(Player* player)
 {
     bool inDebugMenu = true;
@@ -227,3 +231,4 @@ void PreparationMenu::OpenDebugMenu(Player* player)
         }
     }
 }
+//Organized and Refactored

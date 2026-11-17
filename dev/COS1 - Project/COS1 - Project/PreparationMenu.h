@@ -5,11 +5,10 @@
 class PreparationMenu
 {
 public:
-    // Runs the pre-battle hub loop. Returns true when ready to proceed to difficulty selection.
+    // --- PREPARATION HUB LIFECYCLE ---
     static void Open(Player* player);
 
-    // Runs the dedicated attribute allocation loop for existing players with unspent points
-    static void RunAttributeAllocationMenu(Player* player);
-
-    static void OpenDebugMenu(Player* player); // DEBUG / Cheat Menu
+    // --- DEBUG & UTILITY MENUS ---
+    static void OpenDebugMenu(Player* player);
 };
+//Organized and Refactored

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- WELCOME & INSTRUCTION SCREENS ---
 void GameUI::DisplayWelcomeMenu()
 {
     system("cls");
@@ -44,6 +45,7 @@ void GameUI::DisplayInstructions()
     ConsoleHelper::print("---------------------------------------------------", ConsoleHelper::Cyan);
 }
 
+// --- CHARACTER CREATION & ATTRIBUTES ---
 void GameUI::DisplayAttributeDescriptions()
 {
     system("cls");
@@ -74,6 +76,7 @@ GameDifficulty GameUI::SelectDifficulty()
     return static_cast<GameDifficulty>(choice - 1);
 }
 
+// --- COMBAT UI & HUD RENDERING ---
 void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
 {
     if (!player || !currentBoss) return;
@@ -114,7 +117,7 @@ void GameUI::RenderCombatUI(const Player* player, const Enemy* currentBoss)
     std::cout << " HP:      "; drawBar(currentBoss->GetCurrentHP(), currentBoss->GetMaxHP()); std::cout << "\n";
     std::cout << " Posture: "; drawBar(currentBoss->GetCurrentPosture(), currentBoss->GetMaxPosture()); std::cout << "\n";
 
-    // Updated to use dynamic difficulty thresholds instead of hardcoded 100
+    // Dynamic difficulty thresholds
     std::cout << " Bleed:   "; drawBar(currentBoss->GetBleedMeter(), currentBoss->GetMaxBleedThreshold()); std::cout << "\n";
     std::cout << " Burn:    "; drawBar(currentBoss->GetBurnMeter(), currentBoss->GetMaxBurnThreshold()); std::cout << "\n";
     std::cout << " Frostbite: "; drawBar(currentBoss->GetFrostbiteMeter(), currentBoss->GetMaxFrostbiteThreshold()); std::cout << "\n";
@@ -139,3 +142,4 @@ void GameUI::DisplayCombatMenu()
     ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("Choose your action: ", ConsoleHelper::Cyan, false);
 }
+//Organized and Refactored

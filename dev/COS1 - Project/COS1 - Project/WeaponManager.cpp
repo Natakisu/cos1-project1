@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- CONSTRUCTORS & DESTRUCTOR ---
 WeaponManager::WeaponManager()
 {
     InitializeWeaponPool();
@@ -11,7 +12,6 @@ WeaponManager::WeaponManager()
 
 WeaponManager::~WeaponManager()
 {
-    // Clean up any weapons that weren't picked (or clean all if unused)
     for (Weapon* w : availableWeapons)
     {
         delete w;
@@ -20,6 +20,7 @@ WeaponManager::~WeaponManager()
     availableWeapons.clear();
 }
 
+// --- WEAPON POOL INITIALIZATION ---
 void WeaponManager::InitializeWeaponPool()
 {
     availableWeapons.push_back(new Weapon("Warhammer", WeaponType::PureSTR, 25, 18, 1.0f, 0.0f, 0.0f, 0.0f, 25, 0, 20, 25, 0, 0));
@@ -38,6 +39,7 @@ void WeaponManager::InitializeWeaponPool()
     availableWeapons.push_back(new Weapon("Flail and Shield", WeaponType::Hybrid, 17, 12, 0.4f, 0.0f, 0.0f, 0.6f, 15, 8, 14, 18, 0, 0));
 }
 
+// --- LOADOUT SELECTION INTERFACE ---
 void WeaponManager::SelectPlayerLoadout(Weapon*& outPrimary, Weapon*& outSecondary)
 {
     bool weaponsConfirmed = false;
@@ -182,3 +184,4 @@ void WeaponManager::SelectPlayerLoadout(Weapon*& outPrimary, Weapon*& outSeconda
 
     availableWeapons.clear();
 }
+//Organized and Refactored

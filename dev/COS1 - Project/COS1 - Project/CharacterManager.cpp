@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- CREATION & INITIALIZATION ---
 Player* CharacterManager::CreateCharacter()
 {
     system("cls");
@@ -20,13 +21,12 @@ Player* CharacterManager::CreateCharacter()
         name = "Hero";
     }
 
-    // Create player with base stats and grant 30 unspent points for the Prep Hub
+    // Create player with base stats and grant initial unspent points for the Prep Hub
     Player* newPlayer = new Player(name);
     newPlayer->AddUnspentPoints(30);
 
-    // Save initial state
-    std::string saveFileName = name + "_save.txt";
-    newPlayer->SaveToFile(saveFileName);
+    // Save initial state using standardized AutoSave
+    newPlayer->AutoSave();
 
     system("cls");
     ConsoleHelper::print("\n========================================", ConsoleHelper::Green);
@@ -41,7 +41,7 @@ Player* CharacterManager::CreateCharacter()
     return newPlayer;
 }
 
-// Function body for attribute allocation menu
+// --- ATTRIBUTE ALLOCATION MENU ---
 void CharacterManager::RunAttributeAllocationMenu(Player* player)
 {
     if (!player) return;
@@ -85,3 +85,4 @@ void CharacterManager::RunAttributeAllocationMenu(Player* player)
         }
     }
 }
+//Organized and Refactored

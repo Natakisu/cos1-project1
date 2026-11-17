@@ -1,0 +1,42 @@
+Test1
+24
+765216
+1117558
+1550
+1465
+155
+10
+10
+10
+10
+0
+8605
+7
+0
+Health Potion
+50
+20
+0
+Health Potion
+50
+20
+1
+SP Potion
+30
+20
+2
+MP Potion
+30
+20
+3
+Din's Fire
+30
+20
+4
+Farore's Wind
+30
+20
+5
+Nayru's Love
+30
+20

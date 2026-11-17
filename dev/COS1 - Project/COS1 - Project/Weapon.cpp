@@ -3,17 +3,20 @@
 #include "Weapon.h"
 #include "ConsoleHelper.h"
 
+// --- CONSTRUCTORS ---
 Weapon::Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
     float strScale, float agiScale, float intScale, float focScale,
     int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal)
     : name(name), type(type), baseDamage(baseDmg), postureDamage(postureDmg),
-    strScaling(strScale), agiScaling(agiScale), intScaling(intScale), focScaling(focScale),
+    strScaling(strScale), agiScaling(agiScale), intScaling(intScale), focScaling(focScaling),
     attackStaminaCost(atkSP), attackManaCost(atkMP),
     blockStaminaCost(blockSP), dodgeStaminaCost(dodgeSP),
-    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal) // <--- Added frostbite initialization
+    bleedBuildUp(bleedVal), burnBuildUp(burnVal), frostbiteBuildUp(frostbiteVal),
+    shortCooldownRemaining(0), longCooldownRemaining(0)
 {
 }
 
+// --- DAMAGE CALCULATIONS & DISPLAY ---
 int Weapon::CalculateDamage(int str, int agi, int intel, int foc) const
 {
     float bonusDamage = (str * strScaling) +
@@ -32,14 +35,15 @@ void Weapon::DisplayWeaponInfo() const {
         << "% | INT: " << (intScaling * 100) << "% | FOC: " << (focScaling * 100) << "%\n";
 }
 
+// --- COOLDOWN & SKILL MANAGEMENT ---
 int Weapon::GetShortCooldownRemaining() const
 {
-    return shortCooldownRemaining; // Or whatever your internal short cooldown variable is named
+    return shortCooldownRemaining;
 }
 
 int Weapon::GetLongCooldownRemaining() const
 {
-    return longCooldownRemaining; // Or whatever your internal long cooldown variable is named
+    return longCooldownRemaining;
 }
 
 bool Weapon::CanUseShortSkill() const
@@ -67,3 +71,4 @@ void Weapon::UpdateCooldowns()
     if (shortCooldownRemaining > 0) shortCooldownRemaining--;
     if (longCooldownRemaining > 0) longCooldownRemaining--;
 }
+//Organized and Refactored

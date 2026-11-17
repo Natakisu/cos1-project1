@@ -1,46 +1,70 @@
 #include "GameInput.h"
-#include "InputValidator.h"
 #include "ConsoleHelper.h"
 #include <iostream>
+#include <stdexcept>
 
-int GameInput::GetValidatedChoice(int minRange, int maxRange, int debugOption)
+int GameInput::GetValidatedInt(const std::string& prompt, int minVal, int maxVal)
 {
-    int choice = 0;
-    std::string inputLine;
-    bool isValid = false;
-
-    while (!isValid)
+    while (true)
     {
-        if (std::cin.fail() || std::cin.bad())
+        if (!prompt.empty())
         {
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
+            std::cout << prompt;
         }
 
-        ConsoleHelper::print("Choice: ", ConsoleHelper::Cyan, false);
-
-        if (!std::getline(std::cin, inputLine) || inputLine.empty())
+        std::string input;
+        if (!std::getline(std::cin, input))
         {
+            std::cin.clear();
             continue;
         }
 
-        if (InputValidator::IsValidNumber(inputLine))
+        // Trim leading/trailing whitespace
+        size_t start = input.find_first_not_of(" \t\r\n");
+        if (start == std::string::npos)
         {
-            choice = std::stoi(inputLine);
-            if ((choice >= minRange && choice <= maxRange) || choice == debugOption)
-            {
-                isValid = true;
-            }
-            else
-            {
-                ConsoleHelper::print("[!] Invalid choice. Please enter a valid number.", ConsoleHelper::Red);
-            }
+            ConsoleHelper::print("[!] Invalid input. Please enter a number between " +
+                std::to_string(minVal) + " and " + std::to_string(maxVal) + ".", ConsoleHelper::Red);
+            continue;
         }
-        else
+        size_t end = input.find_last_not_of(" \t\r\n");
+        input = input.substr(start, end - start + 1);
+
+        try
         {
-            ConsoleHelper::print("[!] Invalid input. Please enter numbers only.", ConsoleHelper::Red);
+            size_t processedChars = 0;
+            int value = std::stoi(input, &processedChars);
+
+            // Reject partial parses like "2abc"
+            if (processedChars != input.length())
+            {
+                throw std::invalid_argument("Trailing characters");
+            }
+
+            if (value < minVal || value > maxVal)
+            {
+                ConsoleHelper::print("[!] Choice out of range (" + std::to_string(minVal) +
+                    "-" + std::to_string(maxVal) + "). Try again.", ConsoleHelper::Yellow);
+                continue;
+            }
+
+            return value;
+        }
+        catch (const std::invalid_argument&)
+        {
+            ConsoleHelper::print("[!] Invalid input. Please enter a valid number.", ConsoleHelper::Red);
+        }
+        catch (const std::out_of_range&)
+        {
+            ConsoleHelper::print("[!] Number is too large. Please enter a number between " +
+                std::to_string(minVal) + " and " + std::to_string(maxVal) + ".", ConsoleHelper::Red);
         }
     }
+}
 
-    return choice;
+void GameInput::WaitForEnter(const std::string& prompt)
+{
+    ConsoleHelper::print(prompt, ConsoleHelper::White, false);
+    std::string dummy;
+    std::getline(std::cin, dummy);
 }
