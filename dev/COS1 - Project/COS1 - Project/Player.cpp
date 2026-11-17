@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <fstream>
 #include "Player.h"
 #include "Enemy.h"
 #include "ConsoleHelper.h"
 #include "WeaponSkills.h"
+#include "PlayerSaveManager.h"
 
 // --- CONSTRUCTORS & DESTRUCTOR ---
 Player::Player(std::string name)
@@ -45,10 +45,17 @@ Player::~Player()
     delete secondaryWeapon;
     primaryWeapon = nullptr;
     secondaryWeapon = nullptr;
+
+    for (Item* item : inventory)
+    {
+        delete item;
+    }
+    inventory.clear();
 }
 
 // --- ATTRIBUTES & POOL MANAGEMENT ---
-void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
+void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints)
+{
     constitution += conPoints;
     strength += strPoints;
     agility += agiPoints;
@@ -57,7 +64,8 @@ void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int
     RecalculatePools();
 }
 
-void Player::SetAttributes(int con, int str, int agi, int intel, int foc) {
+void Player::SetAttributes(int con, int str, int agi, int intel, int foc)
+{
     constitution = con;
     strength = str;
     agility = agi;
@@ -84,7 +92,8 @@ void Player::AllocateAttribute(int choice, int amount)
     UpdateDerivedStats();
 }
 
-void Player::DisplayStats() const {
+void Player::DisplayStats() const
+{
     system("cls");
 
     ConsoleHelper::print("--- " + name + "'s Attributes ---", ConsoleHelper::Cyan);
@@ -134,7 +143,8 @@ void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
     secondaryWeapon = secondary;
 }
 
-void Player::InspectWeapons() const {
+void Player::InspectWeapons() const
+{
     system("cls");
 
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
@@ -159,7 +169,7 @@ void Player::InspectWeapons() const {
             shortName = "Crushing Blow"; shortDesc = "Deals heavy STR damage and moderate posture damage (2 Turn CD)";
             longName = "Earthshatter"; longDesc = "Slams the ground for massive damage and heavy disruption (4 Turn CD)";
         }
-        else if (wName == "Sword & Shield") {
+        else if (wName == "Sword & Shield" || wName == "Sword and Shield") {
             shortName = "Shield Bash"; shortDesc = "Strikes the foe and guards posture (2 Turn CD)";
             longName = "Fortress Wall"; longDesc = "Raises an absolute defense aura for the turn (3 Turn CD)";
         }
@@ -189,9 +199,9 @@ void Player::InspectWeapons() const {
         }
         else if (wName == "Rapier") {
             shortName = "Evade Stance"; shortDesc = "Strikes scaling off target Bleed while dodging (2 Turn CD)";
-            longName = "Detonate Stance"; shortDesc = "Explodes target Burn buildup while regenerating MP (2 Turn CD)";
+            longName = "Detonate Stance"; longDesc = "Explodes target Burn buildup while regenerating MP (2 Turn CD)";
         }
-        else if (wName == "Flail & Shield") {
+        else if (wName == "Flail & Shield" || wName == "Flail and Shield") {
             shortName = "Blessed Aegis"; shortDesc = "Blocks incoming attacks and restores HP based on Focus (2 Turn CD)";
             longName = "Divine Smite"; longDesc = "Smites the foe with heavy damage and a health pulse (4 Turn CD)";
         }
@@ -236,27 +246,24 @@ const std::vector<Item*>& Player::GetInventory() const
 
 void Player::UseItem(int index)
 {
-    if (index < 0 || index >= inventory.size()) return;
+    if (index < 0 || index >= static_cast<int>(inventory.size())) return;
 
     Item* item = inventory[index];
     if (!item) return;
 
     if (item->GetType() == ItemType::HealthPotion)
     {
-        currentHP += item->GetEffectValue();
-        if (currentHP > maxHP) currentHP = maxHP;
+        currentHP = std::min(maxHP, currentHP + item->GetEffectValue());
         std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " HP.\n";
     }
     else if (item->GetType() == ItemType::StaminaPotion)
     {
-        currentSP += item->GetEffectValue();
-        if (currentSP > maxSP) currentSP = maxSP;
+        currentSP = std::min(maxSP, currentSP + item->GetEffectValue());
         std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Stamina.\n";
     }
     else if (item->GetType() == ItemType::ManaPotion)
     {
-        currentMP += item->GetEffectValue();
-        if (currentMP > maxMP) currentMP = maxMP;
+        currentMP = std::min(maxMP, currentMP + item->GetEffectValue());
         std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Mana.\n";
     }
 }
@@ -266,7 +273,6 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
     if (!item || !target) return;
 
     int manaCost = 100;
-
     if (currentMP < manaCost)
     {
         std::cout << " > Not enough Mana to cast " << item->GetName() << "! (Requires 100 MP)\n";
@@ -277,22 +283,19 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
 
     if (item->GetType() == ItemType::DinsFire)
     {
-        int fireDmg = 45;
-        target->TakeDamage(fireDmg, 15);
+        target->TakeDamage(45, 15);
         target->ApplyStatusBuildup(0, 50, 0);
         std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
     }
     else if (item->GetType() == ItemType::FaroresWind)
     {
-        int windDmg = 35;
-        target->TakeDamage(windDmg, 15);
+        target->TakeDamage(35, 15);
         target->ApplyStatusBuildup(50, 0, 0);
         std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
     }
     else if (item->GetType() == ItemType::NayrusLove)
     {
-        int frostDmg = 35;
-        target->TakeDamage(frostDmg, 15);
+        target->TakeDamage(35, 15);
         target->ApplyStatusBuildup(0, 0, 50);
         std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
     }
@@ -309,14 +312,13 @@ int Player::PerformLightAttack(Enemy& target)
     if (weaponName == "Life Staff")
     {
         int healingAmount = 25 + (focus * 2);
-        currentHP += healingAmount;
-        if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
-
+        currentHP = std::min(maxHP, currentHP + healingAmount);
         ConsoleHelper::print(" > " + name + " channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0;
     }
 
-    if (currentSP < activeWeapon->GetAttackStaminaCost()) {
+    if (currentSP < activeWeapon->GetAttackStaminaCost())
+    {
         ConsoleHelper::print("[!] Not enough stamina for light attack!", ConsoleHelper::Red);
         return 0;
     }
@@ -326,13 +328,12 @@ int Player::PerformLightAttack(Enemy& target)
 
     target.TakeDamage(damage, activeWeapon->GetPostureDamage());
 
-    if (weaponName == "Flail and Shield")
+    if (weaponName == "Flail and Shield" || weaponName == "Flail & Shield")
     {
         if (focus >= 12)
         {
             int drainHeal = 10 + focus;
-            currentHP += drainHeal;
-            if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+            currentHP = std::min(maxHP, currentHP + drainHeal);
             ConsoleHelper::print(" [+] Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else
@@ -344,7 +345,8 @@ int Player::PerformLightAttack(Enemy& target)
     return damage;
 }
 
-int Player::PerformHeavyAttack(Enemy& target) {
+int Player::PerformHeavyAttack(Enemy& target)
+{
     Weapon* activeWeapon = GetActiveWeapon();
     if (!activeWeapon) return 0;
 
@@ -353,15 +355,14 @@ int Player::PerformHeavyAttack(Enemy& target) {
     if (weaponName == "Life Staff")
     {
         int healingAmount = 50 + (focus * 4);
-        currentHP += healingAmount;
-        if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
-
+        currentHP = std::min(maxHP, currentHP + healingAmount);
         ConsoleHelper::print(" > " + name + " heavily channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0;
     }
 
     int staminaCost = activeWeapon->GetAttackStaminaCost() * 2;
-    if (currentSP < staminaCost) {
+    if (currentSP < staminaCost)
+    {
         ConsoleHelper::print("[!] Not enough stamina for heavy attack!", ConsoleHelper::Red);
         return 0;
     }
@@ -369,16 +370,14 @@ int Player::PerformHeavyAttack(Enemy& target) {
     currentSP -= staminaCost;
 
     int damage = (activeWeapon->CalculateDamage(strength, agility, intellect, focus) * 3) / 2;
-
     target.TakeDamage(damage, activeWeapon->GetPostureDamage() * 2);
 
-    if (weaponName == "Flail and Shield")
+    if (weaponName == "Flail and Shield" || weaponName == "Flail & Shield")
     {
         if (focus >= 12)
         {
             int drainHeal = 20 + (focus * 2);
-            currentHP += drainHeal;
-            if (currentHP > GetMaxHP()) currentHP = GetMaxHP();
+            currentHP = std::min(maxHP, currentHP + drainHeal);
             ConsoleHelper::print(" [+] Heavy Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else
@@ -452,99 +451,10 @@ void Player::GainXP(int amount)
 // --- SAVE & LOAD OPERATIONS ---
 void Player::SaveToFile(const std::string& filename) const
 {
-    std::ofstream outFile(filename);
-    if (outFile.is_open())
-    {
-        outFile << name << "\n";
-        outFile << level << "\n";
-        outFile << currentXP << "\n";
-        outFile << xpToNextLevel << "\n";
-        outFile << maxHP << "\n";
-        outFile << currentHP << "\n";
-        outFile << constitution << "\n";
-        outFile << strength << "\n";
-        outFile << agility << "\n";
-        outFile << intellect << "\n";
-        outFile << focus << "\n";
-        outFile << unspentAttributePoints << "\n";
-        outFile << relicShards << "\n";
-
-        outFile << inventory.size() << "\n";
-        for (const Item* item : inventory)
-        {
-            if (item)
-            {
-                outFile << static_cast<int>(item->GetType()) << "\n";
-                outFile << item->GetName() << "\n";
-                outFile << item->GetEffectValue() << "\n";
-                outFile << item->GetCost() << "\n";
-            }
-        }
-
-        outFile.close();
-        ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
-    }
-    else
-    {
-        ConsoleHelper::print("[!] Error: Could not open file for saving.", ConsoleHelper::Red);
-    }
+    PlayerSaveManager::Save(this, filename);
 }
 
 void Player::LoadFromFile(const std::string& filename)
 {
-    std::ifstream inFile(filename);
-    if (inFile.is_open())
-    {
-        std::getline(inFile, name);
-        inFile >> level;
-        inFile >> currentXP;
-        inFile >> xpToNextLevel;
-        inFile >> maxHP;
-        inFile >> currentHP;
-        inFile >> constitution;
-        inFile >> strength;
-        inFile >> agility;
-        inFile >> intellect;
-        inFile >> focus;
-        inFile >> unspentAttributePoints;
-        inFile >> relicShards;
-
-        for (Item* item : inventory)
-        {
-            delete item;
-        }
-        inventory.clear();
-
-        size_t inventorySize = 0;
-        inFile >> inventorySize;
-        inFile.ignore();
-
-        for (size_t i = 0; i < inventorySize; ++i)
-        {
-            int typeInt = 0;
-            std::string itemName;
-            int effectVal = 0;
-            int itemCost = 0;
-
-            inFile >> typeInt;
-            inFile.ignore();
-            std::getline(inFile, itemName);
-            inFile >> effectVal >> itemCost;
-            inFile.ignore();
-
-            ItemType type = static_cast<ItemType>(typeInt);
-
-            inventory.push_back(new Item(itemName, type, effectVal, itemCost));
-        }
-
-        inFile.close();
-        UpdateDerivedStats();
-
-        ConsoleHelper::print("[!] Game loaded successfully!", ConsoleHelper::Green);
-    }
-    else
-    {
-        ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
-    }
+    PlayerSaveManager::Load(this, filename);
 }
-//Organized and Refactored

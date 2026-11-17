@@ -153,6 +153,7 @@
     <ClCompile Include="ItemShop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerSaveManager.cpp" />
     <ClCompile Include="PreparationMenu.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponManager.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemShop.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerSaveManager.h" />
     <ClInclude Include="PreparationMenu.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponManager.h" />
