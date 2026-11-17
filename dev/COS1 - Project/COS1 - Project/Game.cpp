@@ -8,10 +8,18 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- CONSTRUCTORS & DESTRUCTOR ---
 Game::Game() : player(nullptr), currentBoss(nullptr), isRunning(true)
 {
 }
 
+Game::~Game()
+{
+    delete player;
+    delete currentBoss;
+}
+
+// --- INITIALIZATION & SESSION MANAGEMENT ---
 void Game::Initialize()
 {
     isRunning = true;
@@ -103,6 +111,7 @@ void Game::SetupBossDifficulty()
     currentBoss = new Enemy("Relic Guardian", bossHP, 50, currentDifficulty);
 }
 
+// --- CORE COMBAT LOOP ---
 void Game::RunCombatLoop()
 {
     bool rewardClaimed = false;
@@ -189,8 +198,7 @@ void Game::RunCombatLoop()
     }
 }
 
-// --- SUB-HANDLERS & MENU EXTRACTIONS ---
-
+// --- MENU & SUB-HANDLERS ---
 bool Game::HandleInventoryMenu()
 {
     const auto& inv = player->GetInventory();
@@ -298,6 +306,7 @@ bool Game::HandleWeaponSkillMenu()
     return success;
 }
 
+// --- PROGRESSION & OUTCOMES ---
 void Game::HandleVictoryRewards()
 {
     int earnedXP = 150;
@@ -411,6 +420,7 @@ void Game::HandleDeathMenu()
     }
 }
 
+// --- PLAYER ACTIONS & COMBAT OUTCOMES ---
 void Game::HandlePlayerAction(int choice)
 {
     Weapon* activeWeapon = player->GetActiveWeapon();
@@ -463,9 +473,4 @@ void Game::HandleCombatOutcome() const
         ConsoleHelper::print("======================================", ConsoleHelper::Cyan);
     }
 }
-
-Game::~Game()
-{
-    delete player;
-    delete currentBoss;
-}
+//Organized and Refactored

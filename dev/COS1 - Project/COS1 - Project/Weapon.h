@@ -16,59 +16,42 @@ private:
     std::string name;
     WeaponType type;
 
-    // Base Combat Metrics
+    // --- BASE COMBAT METRICS ---
     int baseDamage;
     int postureDamage;
 
-    // Scaling Ratios
+    // --- SCALING RATIOS ---
     float strScaling;
     float agiScaling;
     float intScaling;
     float focScaling;
 
-    // Resource Costs
+    // --- RESOURCE COSTS ---
     int attackStaminaCost;
     int attackManaCost;
     int blockStaminaCost;
     int dodgeStaminaCost;
 
-    // Status Buildups (Bleed, Burn, Frostbite)
+    // --- STATUS BUILDUPS ---
     int bleedBuildUp;
     int burnBuildUp;
     int frostbiteBuildUp;
 
-    // Cooldown System
+    // --- COOLDOWN SYSTEM ---
     int shortCooldownRemaining;
     int longCooldownRemaining;
-    int shortCooldownCurrent = 0;
-    int longCooldownCurrent = 0;
 
 public:
+    // --- CONSTRUCTORS ---
     Weapon(std::string name, WeaponType type, int baseDmg, int postureDmg,
         float strScale, float agiScale, float intScale, float focScale,
-        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal = 0); // Added default param for backward compatibility
+        int atkSP, int atkMP, int blockSP, int dodgeSP, int bleedVal, int burnVal, int frostbiteVal = 0);
 
-    // Getters
-    std::string GetName() const { return name; }
-    int GetBaseDamage() const { return baseDamage; }
-    int GetPostureDamage() const { return postureDamage; }
-    int GetAttackStaminaCost() const { return attackStaminaCost; }
-    int GetAttackManaCost() const { return attackManaCost; }
-    int GetBlockStaminaCost() const { return blockStaminaCost; }
-    int GetDodgeStaminaCost() const { return dodgeStaminaCost; }
-    WeaponType GetType() const { return type; }
-
-    // Scaled Damage Calculation
+    // --- DAMAGE CALCULATION & DISPLAY ---
     int CalculateDamage(int str, int agi, int intel, int foc) const;
-
     void DisplayWeaponInfo() const;
 
-    // Status Buildup Getters
-    int GetBleedBuildUp() const { return bleedBuildUp; }
-    int GetBurnBuildUp() const { return burnBuildUp; }
-    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; }
-
-    // Cooldown Tracker
+    // --- COOLDOWN & SKILL MANAGEMENT ---
     int GetShortCooldownRemaining() const;
     int GetLongCooldownRemaining() const;
     bool CanUseShortSkill() const;
@@ -76,4 +59,20 @@ public:
     void TriggerShortSkill(int cooldownTurns);
     void TriggerLongSkill(int cooldownTurns);
     void UpdateCooldowns();
+
+    // --- GETTERS ---
+    std::string GetName() const { return name; }
+    WeaponType GetType() const { return type; }
+    int GetBaseDamage() const { return baseDamage; }
+    int GetPostureDamage() const { return postureDamage; }
+
+    int GetAttackStaminaCost() const { return attackStaminaCost; }
+    int GetAttackManaCost() const { return attackManaCost; }
+    int GetBlockStaminaCost() const { return blockStaminaCost; }
+    int GetDodgeStaminaCost() const { return dodgeStaminaCost; }
+
+    int GetBleedBuildUp() const { return bleedBuildUp; }
+    int GetBurnBuildUp() const { return burnBuildUp; }
+    int GetFrostbiteBuildUp() const { return frostbiteBuildUp; }
 };
+//Organized and Refactored

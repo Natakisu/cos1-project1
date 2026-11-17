@@ -1,61 +1,63 @@
 #pragma once
 #include <string>
-#include "GameUI.h"
+#include "GameDifficulty.h"
 
-enum class BossIntent {
+class Player;
+
+// --- ENEMY AI INTENTS ---
+enum class BossIntent
+{
     LightSweep,
     HeavyCleave,
     DefensiveGuard
 };
 
-enum class GameDifficulty;
-
-class Player;
-
-class Enemy {
+class Enemy
+{
 private:
+    // Core Stats & Posture
     std::string name;
-    int maxHP;
-    int currentHP;
-    int maxPosture;
-    int currentPosture;
+    int maxHP, currentHP;
+    int maxPosture, currentPosture;
     bool isStaggered;
 
-    int bleedMeter;
-    int burnMeter;
-    int frostbiteMeter;
-
-    int maxBleedThreshold;
-    int maxBurnThreshold;
-    int maxFrostbiteThreshold;
+    // Status Buildup & Thresholds
+    int bleedMeter, burnMeter, frostbiteMeter;
+    int maxBleedThreshold, maxBurnThreshold, maxFrostbiteThreshold;
 
     BossIntent currentIntent;
 
 public:
+    // --- CONSTRUCTORS ---
     Enemy(std::string name, int hp, int posture, GameDifficulty difficulty);
 
+    // --- COMBAT AI & INTENTS ---
     void GenerateIntent();
     std::string GetIntentDescription() const;
     void ExecuteIntent(Player& player);
 
+    // --- DAMAGE & STATUS HANDLERS ---
     void TakeDamage(int damage, int postureDmg);
     void ApplyStatusBuildup(int bleed, int burn, int frostbite);
     void CheckPostureBreak();
-    void ResetTurnState();
     void ResolveStatusEffects();
+    void ResetTurnState();
 
-    // Getters
+    // --- GETTERS ---
+    std::string GetName() const { return name; }
+    bool IsAlive() const { return currentHP > 0; }
+
+    int GetCurrentHP() const { return currentHP; }
+    int GetMaxHP() const { return maxHP; }
+    int GetCurrentPosture() const { return currentPosture; }
+    int GetMaxPosture() const { return maxPosture; }
+
     int GetBleedMeter() const { return bleedMeter; }
     int GetBurnMeter() const { return burnMeter; }
     int GetFrostbiteMeter() const { return frostbiteMeter; }
-    std::string GetName() const { return name; }
-    int GetCurrentHP() const { return currentHP; }
-    int GetCurrentPosture() const { return currentPosture; }
-    bool IsAlive() const { return currentHP > 0; }
-    int GetMaxHP() const { return maxHP; }
-    int GetMaxPosture() const { return maxPosture; }
 
     int GetMaxBleedThreshold() const { return maxBleedThreshold; }
     int GetMaxBurnThreshold() const { return maxBurnThreshold; }
     int GetMaxFrostbiteThreshold() const { return maxFrostbiteThreshold; }
 };
+//Organized and Refactored

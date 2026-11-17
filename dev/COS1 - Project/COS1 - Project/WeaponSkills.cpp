@@ -2,6 +2,7 @@
 #include "ConsoleHelper.h"
 #include <iostream>
 
+// --- RESOURCE VALIDATION & CONSUMPTION ---
 bool WeaponSkillManager::HasEnoughResource(Player* player, int cost, bool isMana)
 {
     if (isMana)
@@ -25,6 +26,7 @@ bool WeaponSkillManager::HasEnoughResource(Player* player, int cost, bool isMana
     return true;
 }
 
+// --- CENTRAL SKILL ROUTER ---
 bool WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& target)
 {
     Weapon* activeWeapon = player->GetActiveWeapon();
@@ -62,6 +64,7 @@ bool WeaponSkillManager::ExecuteSkill(Player* player, bool isLongSkill, Enemy& t
     return false;
 }
 
+// --- WEAPON-SPECIFIC SKILL IMPLEMENTATIONS ---
 bool WeaponSkillManager::ExecuteWarhammer(Player* player, Weapon* weapon, bool isLongSkill, Enemy& target)
 {
     if (!isLongSkill) // Crushing Blow (25 SP, 2 CD)
@@ -285,3 +288,4 @@ bool WeaponSkillManager::ExecuteFlailAndShield(Player* player, Weapon* weapon, b
     }
     return true;
 }
+//Organized and Refactored

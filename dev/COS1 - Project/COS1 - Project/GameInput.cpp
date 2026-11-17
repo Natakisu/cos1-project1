@@ -44,3 +44,4 @@ int GameInput::GetValidatedChoice(int minRange, int maxRange, int debugOption)
 
     return choice;
 }
+//Organized and Refactored

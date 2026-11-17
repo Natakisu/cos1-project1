@@ -7,7 +7,7 @@
 #include "ConsoleHelper.h"
 #include "WeaponSkills.h"
 
-// Player Constructor and Destructor
+// --- CONSTRUCTORS & DESTRUCTOR ---
 Player::Player(std::string name)
     : name(name),
     constitution(10),
@@ -47,8 +47,7 @@ Player::~Player()
     secondaryWeapon = nullptr;
 }
 
-
-// Handle Player Attributes and Stats
+// --- ATTRIBUTES & POOL MANAGEMENT ---
 void Player::AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints) {
     constitution += conPoints;
     strength += strPoints;
@@ -111,12 +110,10 @@ void Player::RecalculatePools()
     maxSP = agility * 10;
     maxMP = intellect * 10;
 
-    // Scale current resources up by the exact amount your maximums increased
     currentHP += (maxHP - oldMaxHP);
     currentSP += (maxSP - oldMaxSP);
     currentMP += (maxMP - oldMaxMP);
 
-    // Safety bounds
     if (currentHP > maxHP) currentHP = maxHP;
     if (currentSP > maxSP) currentSP = maxSP;
     if (currentMP > maxMP) currentMP = maxMP;
@@ -130,8 +127,7 @@ void Player::UpdateDerivedStats()
     RecalculatePools();
 }
 
-
-// Handles Player Weapons
+// --- WEAPONS & LOADOUT ---
 void Player::EquipWeapons(Weapon* primary, Weapon* secondary)
 {
     primaryWeapon = primary;
@@ -145,7 +141,6 @@ void Player::InspectWeapons() const {
     ConsoleHelper::print("               [ LOADOUT & WEAPON SKILLS ]        ", ConsoleHelper::Cyan);
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
 
-    // Lambda helper to print weapon info + skills
     auto printWeaponDetails = [](Weapon* weapon, bool isActive) {
         if (!weapon) return;
 
@@ -160,7 +155,6 @@ void Player::InspectWeapons() const {
         std::string longName = "Long Skill";
         std::string longDesc = "Devastating signature technique.";
 
-        // Assign specific names/descriptions per weapon blueprint
         if (wName == "Warhammer") {
             shortName = "Crushing Blow"; shortDesc = "Deals heavy STR damage and moderate posture damage (2 Turn CD)";
             longName = "Earthshatter"; longDesc = "Slams the ground for massive damage and heavy disruption (4 Turn CD)";
@@ -206,15 +200,8 @@ void Player::InspectWeapons() const {
         std::cout << "   -> Long:  " << longName << " (" << longDesc << ")\n\n";
         };
 
-    if (primaryWeapon)
-    {
-        printWeaponDetails(primaryWeapon, isPrimaryActive);
-    }
-
-    if (secondaryWeapon)
-    {
-        printWeaponDetails(secondaryWeapon, !isPrimaryActive);
-    }
+    if (primaryWeapon) printWeaponDetails(primaryWeapon, isPrimaryActive);
+    if (secondaryWeapon) printWeaponDetails(secondaryWeapon, !isPrimaryActive);
 
     ConsoleHelper::print("==================================================", ConsoleHelper::Cyan);
     ConsoleHelper::print("\nPress Enter to continue...", ConsoleHelper::White, false);
@@ -236,7 +223,7 @@ bool Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
     return WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }
 
-// Handles Player Inventory
+// --- INVENTORY & ITEMS ---
 void Player::AddItem(Item* item)
 {
     inventory.push_back(item);
@@ -247,8 +234,6 @@ const std::vector<Item*>& Player::GetInventory() const
     return inventory;
 }
 
-
-// Consumables
 void Player::UseItem(int index)
 {
     if (index < 0 || index >= inventory.size()) return;
@@ -276,8 +261,6 @@ void Player::UseItem(int index)
     }
 }
 
-
-// LoZ: OoT Themed Items
 void Player::CastMagicBlessing(Item* item, Enemy* target)
 {
     if (!item || !target) return;
@@ -290,41 +273,36 @@ void Player::CastMagicBlessing(Item* item, Enemy* target)
         return;
     }
 
-    // Deduct Mana cost
     currentMP -= manaCost;
 
-    // Apply effects based on which blessing is cast
     if (item->GetType() == ItemType::DinsFire)
     {
         int fireDmg = 45;
         target->TakeDamage(fireDmg, 15);
-        target->ApplyStatusBuildup(0, 50, 0); // Heavy burn buildup
+        target->ApplyStatusBuildup(0, 50, 0);
         std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
     }
     else if (item->GetType() == ItemType::FaroresWind)
     {
         int windDmg = 35;
         target->TakeDamage(windDmg, 15);
-        target->ApplyStatusBuildup(50, 0, 0); // Heavy bleed buildup
+        target->ApplyStatusBuildup(50, 0, 0);
         std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
     }
     else if (item->GetType() == ItemType::NayrusLove)
     {
         int frostDmg = 35;
         target->TakeDamage(frostDmg, 15);
-        target->ApplyStatusBuildup(0, 0, 50); // Heavy frostbite buildup
+        target->ApplyStatusBuildup(0, 0, 50);
         std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
     }
 }
 
-
-// Handles Player Combat Actions
+// --- COMBAT ACTIONS & RESOURCE MANAGEMENT ---
 int Player::PerformLightAttack(Enemy& target)
 {
     Weapon* activeWeapon = GetActiveWeapon();
-    if (!activeWeapon) {
-        return 0;
-    }
+    if (!activeWeapon) return 0;
 
     std::string weaponName = activeWeapon->GetName();
 
@@ -444,8 +422,7 @@ void Player::TakeDamage(int damage)
     if (currentHP < 0) currentHP = 0;
 }
 
-
-// Handles Player Combat Rewards
+// --- PROGRESSION & REWARDS ---
 void Player::GainXP(int amount)
 {
     currentXP += amount;
@@ -472,8 +449,7 @@ void Player::GainXP(int amount)
     }
 }
 
-
-// Handles Player Save/Load
+// --- SAVE & LOAD OPERATIONS ---
 void Player::SaveToFile(const std::string& filename) const
 {
     std::ofstream outFile(filename);
@@ -482,7 +458,7 @@ void Player::SaveToFile(const std::string& filename) const
         outFile << name << "\n";
         outFile << level << "\n";
         outFile << currentXP << "\n";
-        outFile << xpToNextLevel << "\n"; // <--- Added so level-up curve persists
+        outFile << xpToNextLevel << "\n";
         outFile << maxHP << "\n";
         outFile << currentHP << "\n";
         outFile << constitution << "\n";
@@ -504,7 +480,7 @@ void Player::SaveToFile(const std::string& filename) const
                 outFile << item->GetCost() << "\n";
             }
         }
-        
+
         outFile.close();
         ConsoleHelper::print("[!] Game saved successfully!", ConsoleHelper::Green);
     }
@@ -522,7 +498,7 @@ void Player::LoadFromFile(const std::string& filename)
         std::getline(inFile, name);
         inFile >> level;
         inFile >> currentXP;
-        inFile >> xpToNextLevel; // <--- Added to match save file order
+        inFile >> xpToNextLevel;
         inFile >> maxHP;
         inFile >> currentHP;
         inFile >> constitution;
@@ -539,7 +515,6 @@ void Player::LoadFromFile(const std::string& filename)
         }
         inventory.clear();
 
-        // Load inventory
         size_t inventorySize = 0;
         inFile >> inventorySize;
         inFile.ignore();
@@ -559,12 +534,10 @@ void Player::LoadFromFile(const std::string& filename)
 
             ItemType type = static_cast<ItemType>(typeInt);
 
-            // Recreate and add the item to the player's inventory
             inventory.push_back(new Item(itemName, type, effectVal, itemCost));
         }
 
         inFile.close();
-
         UpdateDerivedStats();
 
         ConsoleHelper::print("[!] Game loaded successfully!", ConsoleHelper::Green);
@@ -574,3 +547,4 @@ void Player::LoadFromFile(const std::string& filename)
         ConsoleHelper::print("[!] Error: No save file found. Starting fresh.", ConsoleHelper::Yellow);
     }
 }
+//Organized and Refactored

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cctype>
 
+// --- STRING VALIDATION UTILITIES ---
 bool InputValidator::IsValidNumber(const std::string& str)
 {
     if (str.empty()) return false;
@@ -16,6 +17,7 @@ bool InputValidator::IsValidNumber(const std::string& str)
     return true;
 }
 
+// --- SAFE INPUT EXTRACTION ---
 int InputValidator::GetValidatedInt(int minRange, int maxRange)
 {
     std::string inputLine;
@@ -30,6 +32,7 @@ int InputValidator::GetValidatedInt(int minRange, int maxRange)
         {
             choice = std::stoi(inputLine);
 
+            // Allow range bounds as well as the special debug flag (9)
             if ((choice >= minRange && choice <= maxRange) || choice == 9)
             {
                 isValid = true;
@@ -48,3 +51,4 @@ int InputValidator::GetValidatedInt(int minRange, int maxRange)
 
     return choice;
 }
+//Organized and Refactored

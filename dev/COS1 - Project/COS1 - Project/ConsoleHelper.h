@@ -1,20 +1,22 @@
 #ifndef CONSOLE_HELPER_H
+#define CONSOLE_HELPER_H
+
 #include <string>
 
 namespace ConsoleHelper
 {
-    // Struct to represent an ARGB or RGB color
+    // --- COLOR STRUCTURE ---
     struct Color
     {
         int a, r, g, b;
 
         // Constructor defaulting alpha
-        Color(int red, int green, int blue, int alpha)
+        Color(int red, int green, int blue, int alpha = 255)
             : r(red), g(green), b(blue), a(alpha) {
         }
     };
 
-    // Predefined colors
+    // --- PREDEFINED COLOR PALETTE ---
     const Color Red(231, 76, 60, 255);
     const Color Orange(243, 156, 18, 255);
     const Color Yellow(241, 196, 15, 255);
@@ -26,8 +28,9 @@ namespace ConsoleHelper
     const Color White(255, 255, 255, 255);
     const Color DarkGray(64, 64, 64, 255);
 
-    // Custom print function
+    // --- CONSOLE UTILITIES ---
     void print(const std::string& text, const Color& color = White, bool newline = true);
 }
 
 #endif
+//Organized and Refactored

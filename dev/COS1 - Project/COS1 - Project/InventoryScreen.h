@@ -4,6 +4,7 @@
 class InventoryScreen
 {
 public:
-    // Opens the standalone out-of-combat inventory management menu
+    // --- INVENTORY MANAGEMENT SCREEN ---
     static void Open(Player* player);
 };
+//Organized and Refactored

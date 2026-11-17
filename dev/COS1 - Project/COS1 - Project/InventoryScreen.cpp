@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 
+// --- INVENTORY MANAGEMENT SCREEN ---
 void InventoryScreen::Open(Player* player)
 {
     if (!player) return;
@@ -12,6 +13,7 @@ void InventoryScreen::Open(Player* player)
 
     while (managingInventory)
     {
+        // --- RENDER INVENTORY HUD ---
         system("cls");
         ConsoleHelper::print("==================================", ConsoleHelper::Cyan);
         ConsoleHelper::print("      [ PLAYER INVENTORY ]        ", ConsoleHelper::Cyan);
@@ -32,6 +34,7 @@ void InventoryScreen::Open(Player* player)
             }
         }
 
+        // --- MENU OPTIONS ---
         ConsoleHelper::print("----------------------------------", ConsoleHelper::Cyan);
         ConsoleHelper::print("1. Use an Item", ConsoleHelper::White);
         ConsoleHelper::print("0. Back to Main Menu", ConsoleHelper::White);
@@ -40,6 +43,7 @@ void InventoryScreen::Open(Player* player)
 
         int choice = GameInput::GetValidatedChoice(0, 1);
 
+        // --- HANDLE USER SELECTION ---
         if (choice == 0)
         {
             managingInventory = false;
@@ -61,3 +65,4 @@ void InventoryScreen::Open(Player* player)
         }
     }
 }
+//Organized and Refactored
