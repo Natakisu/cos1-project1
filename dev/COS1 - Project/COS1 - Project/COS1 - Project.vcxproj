@@ -148,6 +148,7 @@
     <ClCompile Include="GameProgression.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="InputValidator.cpp" />
+    <ClCompile Include="InventoryManager.cpp" />
     <ClCompile Include="InventoryScreen.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemShop.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="GameProgression.h" />
     <ClInclude Include="GameUI.h" />
     <ClInclude Include="InputValidator.h" />
+    <ClInclude Include="InventoryManager.h" />
     <ClInclude Include="InventoryScreen.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemShop.h" />

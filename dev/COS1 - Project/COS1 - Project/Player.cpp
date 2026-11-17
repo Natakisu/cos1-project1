@@ -45,12 +45,6 @@ Player::~Player()
     delete secondaryWeapon;
     primaryWeapon = nullptr;
     secondaryWeapon = nullptr;
-
-    for (Item* item : inventory)
-    {
-        delete item;
-    }
-    inventory.clear();
 }
 
 // --- ATTRIBUTES & POOL MANAGEMENT ---
@@ -233,74 +227,6 @@ bool Player::ExecuteWeaponSkill(bool isLongSkill, Enemy& target)
     return WeaponSkillManager::ExecuteSkill(this, isLongSkill, target);
 }
 
-// --- INVENTORY & ITEMS ---
-void Player::AddItem(Item* item)
-{
-    inventory.push_back(item);
-}
-
-const std::vector<Item*>& Player::GetInventory() const
-{
-    return inventory;
-}
-
-void Player::UseItem(int index)
-{
-    if (index < 0 || index >= static_cast<int>(inventory.size())) return;
-
-    Item* item = inventory[index];
-    if (!item) return;
-
-    if (item->GetType() == ItemType::HealthPotion)
-    {
-        currentHP = std::min(maxHP, currentHP + item->GetEffectValue());
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " HP.\n";
-    }
-    else if (item->GetType() == ItemType::StaminaPotion)
-    {
-        currentSP = std::min(maxSP, currentSP + item->GetEffectValue());
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Stamina.\n";
-    }
-    else if (item->GetType() == ItemType::ManaPotion)
-    {
-        currentMP = std::min(maxMP, currentMP + item->GetEffectValue());
-        std::cout << " > Used " << item->GetName() << "! Restored " << item->GetEffectValue() << " Mana.\n";
-    }
-}
-
-void Player::CastMagicBlessing(Item* item, Enemy* target)
-{
-    if (!item || !target) return;
-
-    int manaCost = 100;
-    if (currentMP < manaCost)
-    {
-        std::cout << " > Not enough Mana to cast " << item->GetName() << "! (Requires 100 MP)\n";
-        return;
-    }
-
-    currentMP -= manaCost;
-
-    if (item->GetType() == ItemType::DinsFire)
-    {
-        target->TakeDamage(45, 15);
-        target->ApplyStatusBuildup(0, 50, 0);
-        std::cout << " > You cast Din's Fire! Flames engulf the foe, causing intense Burn buildup.\n";
-    }
-    else if (item->GetType() == ItemType::FaroresWind)
-    {
-        target->TakeDamage(35, 15);
-        target->ApplyStatusBuildup(50, 0, 0);
-        std::cout << " > You cast Farore's Wind! Gale-force winds slash the foe, causing severe Bleed buildup.\n";
-    }
-    else if (item->GetType() == ItemType::NayrusLove)
-    {
-        target->TakeDamage(35, 15);
-        target->ApplyStatusBuildup(0, 0, 50);
-        std::cout << " > You cast Nayru's Love! Crystal energy freezes the foe, causing heavy Frostbite buildup.\n";
-    }
-}
-
 // --- COMBAT ACTIONS & RESOURCE MANAGEMENT ---
 int Player::PerformLightAttack(Enemy& target)
 {
@@ -312,7 +238,7 @@ int Player::PerformLightAttack(Enemy& target)
     if (weaponName == "Life Staff")
     {
         int healingAmount = 25 + (focus * 2);
-        currentHP = std::min(maxHP, currentHP + healingAmount);
+        RestoreHP(healingAmount);
         ConsoleHelper::print(" > " + name + " channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0;
     }
@@ -333,7 +259,7 @@ int Player::PerformLightAttack(Enemy& target)
         if (focus >= 12)
         {
             int drainHeal = 10 + focus;
-            currentHP = std::min(maxHP, currentHP + drainHeal);
+            RestoreHP(drainHeal);
             ConsoleHelper::print(" [+] Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else
@@ -355,7 +281,7 @@ int Player::PerformHeavyAttack(Enemy& target)
     if (weaponName == "Life Staff")
     {
         int healingAmount = 50 + (focus * 4);
-        currentHP = std::min(maxHP, currentHP + healingAmount);
+        RestoreHP(healingAmount);
         ConsoleHelper::print(" > " + name + " heavily channels the Life Staff, restoring " + std::to_string(healingAmount) + " HP!", ConsoleHelper::Green);
         return 0;
     }
@@ -377,7 +303,7 @@ int Player::PerformHeavyAttack(Enemy& target)
         if (focus >= 12)
         {
             int drainHeal = 20 + (focus * 2);
-            currentHP = std::min(maxHP, currentHP + drainHeal);
+            RestoreHP(drainHeal);
             ConsoleHelper::print(" [+] Heavy Flail & Shield life-drain active! Restored " + std::to_string(drainHeal) + " HP.", ConsoleHelper::Green);
         }
         else

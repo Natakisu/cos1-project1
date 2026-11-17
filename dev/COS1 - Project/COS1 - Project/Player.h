@@ -1,122 +1,141 @@
 #pragma once
 #include <string>
-#include <vector>
 #include <algorithm>
 #include "Weapon.h"
 #include "Item.h"
+#include "InventoryManager.h"
 
 class Enemy;
-class WeaponSkillManager;
 
 class Player
 {
-    friend class WeaponSkillManager;
-    friend class PlayerSaveManager;
-
 private:
+
+    friend class PlayerSaveManager;
+    friend class WeaponSkillManager;
+
     std::string name;
 
-    // Core Attributes
-    int constitution; // CON
-    int strength;     // STR
-    int agility;      // AGI
-    int intellect;    // INT
-    int focus;        // FOC
+    // Attributes
+    int constitution;
+    int strength;
+    int agility;
+    int intellect;
+    int focus;
 
-    // Calculated Pools & Current Values
-    int maxHP, currentHP;
-    int maxSP, currentSP;
-    int maxMP, currentMP;
+    // Resource Pools
+    int maxHP;
+    int currentHP;
+    int maxSP;
+    int currentSP;
+    int maxMP;
+    int currentMP;
 
-    // Dual-Weapon Slots
+    // Equipment & Combat State
     Weapon* primaryWeapon;
     Weapon* secondaryWeapon;
     bool isPrimaryActive;
-
-    // Combat Stances
     bool isBlocking;
     bool isFullBlocking;
     bool isDodging;
 
-    // XP & Progression System
+    // Progression & Economy
     int level;
     int currentXP;
     int xpToNextLevel;
     int unspentAttributePoints;
-
-    // Inventory & Currency
-    std::vector<Item*> inventory;
     int relicShards;
+
+    // Delegated Inventory Manager
+    InventoryManager inventoryManager;
+
+    void RecalculatePools();
+
+    friend class PlayerSaveManager;
 
 public:
     // --- CONSTRUCTORS & DESTRUCTOR ---
-    Player(std::string name);
+    Player(std::string name = "Hero");
     ~Player();
 
-    // --- SETUP & ATTRIBUTE PROGRESSION ---
+    // --- ATTRIBUTES & POOL MANAGEMENT ---
     void AllocateAttributes(int conPoints, int strPoints, int agiPoints, int intPoints, int focPoints);
     void SetAttributes(int con, int str, int agi, int intel, int foc);
     void AllocateAttribute(int choice, int amount);
-    void RecalculatePools();
-    void UpdateDerivedStats();
-    void EquipWeapons(Weapon* primary, Weapon* secondary);
     void DisplayStats() const;
-    void InspectWeapons() const;
+    void UpdateDerivedStats();
 
-    // --- COMBAT ACTIONS & RESOURCE MANAGEMENT ---
+    // --- WEAPONS & LOADOUT ---
+    void EquipWeapons(Weapon* primary, Weapon* secondary);
+    void InspectWeapons() const;
     bool SwapWeapon();
     bool ExecuteWeaponSkill(bool isLongSkill, Enemy& target);
+
+    Weapon* GetActiveWeapon() const { return isPrimaryActive ? primaryWeapon : secondaryWeapon; }
+    Weapon* GetPrimaryWeapon() const { return primaryWeapon; }
+    Weapon* GetSecondaryWeapon() const { return secondaryWeapon; }
+
+    // --- INVENTORY DELEGATION ---
+    void AddItem(Item* item) { inventoryManager.AddItem(item); }
+    const std::vector<Item*>& GetInventory() const { return inventoryManager.GetInventory(); }
+    void UseItem(int index) { inventoryManager.UseItem(index, this); }
+    void CastMagicBlessing(Item* item, Enemy* target) { inventoryManager.CastMagicBlessing(item, this, target); }
+    InventoryManager& GetInventoryManager() { return inventoryManager; }
+
+    // --- COMBAT ACTIONS & RESOURCE MANAGEMENT ---
     int PerformLightAttack(Enemy& target);
     int PerformHeavyAttack(Enemy& target);
     void Block();
-    void FullBlock() { isFullBlocking = true; }
     void Dodge();
     void RegainResourcesPerTurn();
     void TakeDamage(int damage);
 
-    void Heal(int amount) { currentHP = std::min(maxHP, currentHP + amount); }
+    void RestoreHP(int amount) { currentHP = std::min(maxHP, currentHP + amount); }
+    void RestoreSP(int amount) { currentSP = std::min(maxSP, currentSP + amount); }
     void RestoreMP(int amount) { currentMP = std::min(maxMP, currentMP + amount); }
-    void ConsumeSP(int amount) { currentSP = std::max(0, currentSP - amount); }
     void ConsumeMP(int amount) { currentMP = std::max(0, currentMP - amount); }
-
-    // --- INVENTORY & MAGIC BLESSINGS ---
-    void AddItem(Item* item);
-    void UseItem(int index);
-    void CastMagicBlessing(Item* item, Enemy* target);
-    const std::vector<Item*>& GetInventory() const;
-
-    // --- XP & CURRENCY ---
-    void GainXP(int amount);
+    void ConsumeSP(int amount) { currentSP = std::max(0, currentSP - amount); }
+    void FullBlock() { isFullBlocking = true; }
+    void Heal(int amount) { currentHP = std::min(maxHP, currentHP + amount); }
     void AddUnspentPoints(int amount) { unspentAttributePoints += amount; }
-    void AddRelicShards(int amount) { relicShards += amount; }
-    void SpendRelicShards(int amount) { if (relicShards >= amount) relicShards -= amount; }
 
-    // --- SAVE & LOAD ---
+    void SetFullBlocking(bool state) { isFullBlocking = state; }
+    void SetDodging(bool state) { isDodging = state; }
+
+    // --- PROGRESSION & REWARDS ---
+    void GainXP(int amount);
+    void AddRelicShards(int amount) { relicShards += amount; }
+    bool SpendRelicShards(int amount) {
+        if (relicShards < amount) return false;
+        relicShards -= amount;
+        return true;
+    }
+
+    // --- SAVE & LOAD OPERATIONS ---
     void SaveToFile(const std::string& filename) const;
     void LoadFromFile(const std::string& filename);
     void AutoSave() const { SaveToFile(name + "_save.txt"); }
 
     // --- GETTERS ---
     std::string GetName() const { return name; }
-    bool IsAlive() const { return currentHP > 0; }
-    Weapon* GetActiveWeapon() const { return isPrimaryActive ? primaryWeapon : secondaryWeapon; }
-
-    int GetCurrentHP() const { return currentHP; }
-    int GetMaxHP() const { return maxHP; }
-    int GetCurrentSP() const { return currentSP; }
-    int GetMaxSP() const { return maxSP; }
-    int GetCurrentMP() const { return currentMP; }
-    int GetMaxMP() const { return maxMP; }
-
-    int GetStrength() const { return strength; }
-    int GetAgility() const { return agility; }
-    int GetIntellect() const { return intellect; }
-    int GetFocus() const { return focus; }
-
     int GetLevel() const { return level; }
     int GetCurrentXP() const { return currentXP; }
     int GetXPToNextLevel() const { return xpToNextLevel; }
     int GetUnspentPoints() const { return unspentAttributePoints; }
     int GetRelicShards() const { return relicShards; }
+
+    int GetMaxHP() const { return maxHP; }
+    int GetCurrentHP() const { return currentHP; }
+    int GetMaxSP() const { return maxSP; }
+    int GetCurrentSP() const { return currentSP; }
+    int GetMaxMP() const { return maxMP; }
+    int GetCurrentMP() const { return currentMP; }
+
+    int GetConstitution() const { return constitution; }
+    int GetStrength() const { return strength; }
+    int GetAgility() const { return agility; }
+    int GetIntellect() const { return intellect; }
+    int GetFocus() const { return focus; }
+
+    bool IsAlive() const { return currentHP > 0; }
 };
-//Organized and Refactored

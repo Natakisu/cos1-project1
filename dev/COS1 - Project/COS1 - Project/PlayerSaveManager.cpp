@@ -64,11 +64,7 @@ void PlayerSaveManager::Load(Player* player, const std::string& filename)
         inFile >> player->unspentAttributePoints;
         inFile >> player->relicShards;
 
-        for (Item* item : player->inventory)
-        {
-            delete item;
-        }
-        player->inventory.clear();
+        player->GetInventoryManager().ClearInventory();
 
         size_t inventorySize = 0;
         inFile >> inventorySize;
@@ -88,7 +84,7 @@ void PlayerSaveManager::Load(Player* player, const std::string& filename)
             inFile.ignore();
 
             ItemType type = static_cast<ItemType>(typeInt);
-            player->inventory.push_back(new Item(itemName, type, effectVal, itemCost));
+            player->AddItem(new Item(itemName, type, effectVal, itemCost));
         }
 
         inFile.close();
